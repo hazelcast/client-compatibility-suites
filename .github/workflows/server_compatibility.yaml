@@ -36,7 +36,7 @@ jobs:
           repository: hazelcast/hazelcast-enterprise
           path: hazelcast-enterprise
           ref: ${{ github.event.inputs.branch_name }}
-          token: ${{ secrets.PAT }}
+          token: ${{ secrets.GH_PAT }}
       - name: Build JARs
         run: mvn clean install -DskipTests=True
         working-directory: hazelcast
