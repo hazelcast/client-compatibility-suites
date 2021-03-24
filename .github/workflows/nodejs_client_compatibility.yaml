@@ -1,0 +1,77 @@
+name: Test Node.js client against the released IMDG servers
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch_name:
+        description: Name of the branch to test client from
+        required: true
+        default: master
+
+jobs:
+  setup_server_matrix:
+    name: Setup the server test matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Checkout to scripts
+        uses: actions/checkout@v2
+      - name: Set server matrix
+        id: set-matrix
+        run: echo "::set-output name=matrix::$( python get_server_matrix.py )"
+  test_client:
+    needs: [setup_server_matrix]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ${{ fromJson(needs.setup_server_matrix.outputs.matrix) }}
+        kind: [os, enterprise]
+    name: Test Node.js client against ${{ matrix.kind }} ${{ matrix.version }} server
+    steps:
+      - name: Checkout to scripts
+        uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+      - name: Download JARs
+        run: python download_server_jars.py --version ${{ matrix.version }} --server-kind ${{ matrix.kind }} --dst jars
+      - name: Checkout to ${{ github.event.inputs.branch_name }}
+        uses: actions/checkout@v2
+        with:
+          repository: hazelcast/hazelcast-nodejs-client
+          path: client
+          ref: ${{ github.event.inputs.branch_name }}
+      - name: Install dependencies and compile client
+        run: |
+          npm install
+          npm run compile
+        working-directory: client
+      - name: Start RC
+        env:
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+        run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.kind }} --use-simple-server
+      - name: Run non-enterprise tests
+        if: ${{ matrix.kind == 'os' }}
+        run: node node_modules/mocha/bin/mocha --recursive test
+        working-directory: client
+      - name: Run all tests
+        if: ${{ matrix.kind == 'enterprise' }}
+        run: node node_modules/mocha/bin/mocha --recursive test/
+        working-directory: client
+        env:
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}

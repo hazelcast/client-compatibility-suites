@@ -1,3 +1,0 @@
-"""
-Hazelcast Portable Serialization Module
-"""
