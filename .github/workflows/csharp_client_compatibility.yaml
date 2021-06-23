@@ -26,13 +26,14 @@ jobs:
         run: echo "::set-output name=matrix::$( python get_server_matrix.py )"
   test_client:
     needs: [setup_server_matrix]
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         version: ${{ fromJson(needs.setup_server_matrix.outputs.matrix) }}
         kind: [os, enterprise]
-    name: Test CSharp client against ${{ matrix.kind }} ${{ matrix.version }} server
+        os: [ ubuntu-latest, windows-latest ]
+    name: Test CSharp client against ${{ matrix.kind }} ${{ matrix.version }} server on ${{ matrix.os }}
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v2
@@ -40,18 +41,22 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - name: Setup .NET Core 3.1
+      - name: Setup .NET Core 5.0.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+      - name: Setup .NET Core 3.1.x
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 3.1.x
-      - name: Setup .NET Core 2.1
+      - name: Setup .NET Core 2.1.x
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 2.1.x
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
-          java-version: 8
+          java-version: 11
       - name: Checkout to ${{ github.event.inputs.branch_name }}
         uses: actions/checkout@v2
         with:
@@ -62,13 +67,19 @@ jobs:
         run: |
             git submodule update --init
         working-directory: client
+      - name: Build
+        shell: pwsh
+        run: ./hz.ps1 -localRestore build
+        working-directory: client
       - name: Run non-enterprise tests
+        shell: pwsh
         if: ${{ matrix.kind == 'os' }}
-        run: ./hz.sh -tf "namespace == Hazelcast.Tests.Remote" -server ${{ matrix.version }} clean,build,tests,nuget
+        run: ./hz.ps1 -tf "namespace == Hazelcast.Tests.Remote" -server ${{ matrix.version }} test
         working-directory: client
       - name: Run all tests
         if: ${{ matrix.kind == 'enterprise' }}
-        run: ./hz.sh -enterprise -tf "namespace == Hazelcast.Tests.Remote" -server ${{ matrix.version }}  clean,build,tests,nuget
+        run: ./hz.ps1 -enterprise -tf "namespace == Hazelcast.Tests.Remote" -server ${{ matrix.version }} test
         working-directory: client
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+        
