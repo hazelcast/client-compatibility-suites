@@ -47,7 +47,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: hazelcast
-          path: hazelcast/hazelcast/target/hazelcast-*[!s].jar
+          path: hazelcast/hazelcast-all/target/hazelcast-all-*[!s].jar
           retention-days: 1
       - name: Upload Hazelcast tests JAR
         uses: actions/upload-artifact@v2
@@ -59,7 +59,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: hazelcast-enterprise
-          path: hazelcast-enterprise/hazelcast-enterprise/target/hazelcast-enterprise-*[!s].jar
+          path: hazelcast-enterprise/hazelcast-enterprise-all/target/hazelcast-enterprise-all-*[!s].jar
           retention-days: 1
       - name: Upload Hazelcast Enterprise tests JAR
         uses: actions/upload-artifact@v2
