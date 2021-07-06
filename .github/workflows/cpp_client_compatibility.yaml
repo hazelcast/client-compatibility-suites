@@ -1,0 +1,96 @@
+name: Test Cpp client against the released IMDG servers
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch_name:
+        description: Name of the branch to test client from
+        required: true
+        default: master
+jobs:
+  setup_server_matrix:
+    name: Setup the server test matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Checkout to scripts
+        uses: actions/checkout@v2
+        
+      - name: Set server matrix
+        id: set-matrix
+        run: echo "::set-output name=matrix::$( python get_server_matrix.py )"
+        
+  test_client:
+    needs: [setup_server_matrix]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ${{ fromJson(needs.setup_server_matrix.outputs.matrix) }}
+        kind: [enterprise] # TODO: when tests are seperated as OS,ENTERPRISE, OS kind will be added
+        
+    name: Test Cpp client against ${{ matrix.kind }} ${{ matrix.version }} server on ubuntu-latest
+    steps:
+        
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+            distribution: 'adopt'
+            java-version: '8'
+            check-latest: true
+            
+      - name: Checkout the ${{ github.event.inputs.branch_name }}     
+        uses: actions/checkout@v2
+        with:
+          repository: hazelcast/hazelcast-cpp-client
+          path: client
+          ref: ${{ github.event.inputs.branch_name }}
+        
+            
+      - name: Install Necessary Packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y net-tools libssl-dev gdb
+        working-directory: client
+          
+      - name: Install Boost
+        run: |
+          sudo ./scripts/install-boost.sh 1.76.0
+        working-directory: client
+          
+      - name: Install Thrift
+        run: |
+          sudo ./scripts/install-thrift.sh 0.13.0
+        working-directory: client
+          
+      - name: Build & Install
+        env:
+          BUILD_DIR: build
+          INSTALL: ON
+        run: |
+          ./scripts/build-unix.sh                                          \
+              -DCMAKE_BUILD_TYPE=Release                                   \
+              -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/destination   \
+              -DBUILD_SHARED_LIBS=ON                                       \
+              -DWITH_OPENSSL=ON                                            \
+              -DBUILD_TESTS=ON                                             \
+              -DBUILD_EXAMPLES=OFF
+        working-directory: client
+              
+      - name: Test
+        env:
+          BUILD_DIR: build
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+          GTEST_FILTER: -*Aws*
+          HZ_VERSION: ${{ matrix.version }}
+        run: |
+          ulimit -c unlimited
+          sudo sh -c "echo 'core' > /proc/sys/kernel/core_pattern"
+          sudo sh -c "echo '1' > /proc/sys/kernel/core_uses_pid"
+          ./scripts/test-unix.sh
+        working-directory: client
