@@ -74,7 +74,7 @@ jobs:
           INSTALL: ON
         run: |
           ./scripts/build-unix.sh                                          \
-              -DCMAKE_BUILD_TYPE=Release                                   \
+              -DCMAKE_BUILD_TYPE=Debug                                     \
               -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/destination   \
               -DBUILD_SHARED_LIBS=ON                                       \
               -DWITH_OPENSSL=ON                                            \
