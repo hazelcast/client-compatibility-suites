@@ -86,7 +86,7 @@ jobs:
         env:
           BUILD_DIR: build
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
-          GTEST_FILTER: -*Aws*
+          GTEST_FILTER: -*Aws*:*DescribeInstancesTest*
           HZ_VERSION: ${{ matrix.version }}
         run: |
           ulimit -c unlimited
