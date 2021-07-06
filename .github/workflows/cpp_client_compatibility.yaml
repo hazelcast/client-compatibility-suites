@@ -71,7 +71,6 @@ jobs:
       - name: Build & Install
         env:
           BUILD_DIR: build
-          INSTALL: ON
         run: |
           ./scripts/build-unix.sh                                          \
               -DCMAKE_BUILD_TYPE=Debug                                     \
