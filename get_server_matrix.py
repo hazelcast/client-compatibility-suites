@@ -23,4 +23,9 @@ if __name__ == "__main__":
     filters: List[ReleaseFilter] = [MajorVersionFilter([4])]
     server_release_parser = ServerReleaseParser(filters)
     releases = server_release_parser.get_all_releases()
-    print(json.dumps(get_latest_patch_releases(releases)))
+    latest_patch_releases = get_latest_patch_releases(releases)
+    latest_patch_release_strings = [
+        r.version.version_str for r in latest_patch_releases
+    ]
+
+    print(json.dumps(latest_patch_release_strings))

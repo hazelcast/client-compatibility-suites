@@ -280,7 +280,7 @@ MATRIX_OPTION_KIND_TO_GETTER: Dict[MatrixOptionKind, Callable[[Release], str]] =
 }
 
 
-def get_latest_patch_releases(releases: List[Release]) -> List[str]:
+def get_latest_patch_releases(releases: List[Release]) -> List[Release]:
     major_to_minor_to_latest_patch: DefaultDict[
         int, DefaultDict[int, Release]
     ] = defaultdict(lambda: defaultdict(lambda: Release("0.0.0", "")))
@@ -296,7 +296,7 @@ def get_latest_patch_releases(releases: List[Release]) -> List[str]:
 
     for minor_to_latest_patch in major_to_minor_to_latest_patch.values():
         for latest_patch in minor_to_latest_patch.values():
-            latest_patch_releases.append(latest_patch.version.version_str)
+            latest_patch_releases.append(latest_patch)
 
     return latest_patch_releases
 

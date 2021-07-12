@@ -8,6 +8,7 @@ from util import (
     MajorVersionFilter,
     MatrixOptionKind,
     get_option_from_release,
+    get_latest_patch_releases,
 )
 
 
@@ -36,6 +37,15 @@ def parse_args() -> argparse.Namespace:
         help="Matrix option type",
     )
 
+    parser.add_argument(
+        "--use-latest-patch-versions",
+        dest="use_latest_patch_versions",
+        action="store_true",
+        default=False,
+        required=False,
+        help="Use only the latest patch versions",
+    )
+
     return parser.parse_args()
 
 
@@ -43,14 +53,18 @@ if __name__ == "__main__":
     args = parse_args()
     client_kind = ClientKind[args.client.upper()]
     matrix_option_kind = MatrixOptionKind[args.option.upper()]
+    use_latest_patch_versions = args.use_latest_patch_versions
 
     filters = [
         MajorVersionFilter([4]),
         StableReleaseFilter(),
     ]
-    client_release_parser = ClientReleaseParser(client_kind, filters)
 
+    client_release_parser = ClientReleaseParser(client_kind, filters)
     releases = client_release_parser.get_all_releases()
+
+    if use_latest_patch_versions:
+        releases = get_latest_patch_releases(releases)
 
     options = [
         get_option_from_release(release, matrix_option_kind) for release in releases

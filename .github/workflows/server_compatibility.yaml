@@ -8,6 +8,7 @@ on:
         required: true
         default: master
       hz_version:
+        description: Version of the JARs that will be built, without the SNAPSHOT suffix.
         required: true
         default: 4.2.1
       run_python:
@@ -288,7 +289,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Set client matrix
         id: set-matrix
-        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client cs --option tag )"
+        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client cs --option tag --use-latest-patch-versions )"
         
   test_csharp_clients:
     needs: [upload_jars, setup_csharp_client_matrix]
@@ -384,7 +385,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Set client matrix
         id: set-matrix
-        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client cpp --option tag )"
+        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client cpp --option tag --use-latest-patch-versions )"
       
   test_cpp_clients:
     needs: [upload_jars, setup_cpp_client_matrix]
