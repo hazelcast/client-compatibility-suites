@@ -7,12 +7,23 @@ on:
         description: Name of the branch to build JARs from
         required: true
         default: master
+      hz_version:
+        required: true
+        default: 4.2.1
       run_python:
         description: Whether or not to run Python client tests. Set to something else to not run the tests.
         required: true
         default: run
       run_nodejs:
         description: Whether or not to run Node.js client tests. Set to something else to not run the tests.
+        required: true
+        default: run
+      run_cpp:
+        description: Whether or not to run CPP client tests. Set to something else to not run the tests.
+        required: true
+        default: run
+      run_csharp:
+        description: Whether or not to run Csharp client tests. Set to something else to not run the tests.
         required: true
         default: run
 jobs:
@@ -262,3 +273,214 @@ jobs:
         working-directory: master
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+  setup_csharp_client_matrix:
+    name: Setup the Csharp client test matrix
+    if: ${{ github.event.inputs.run_csharp == 'run' }}
+    runs-on: windows-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Checkout to scripts
+        uses: actions/checkout@v2
+      - name: Set client matrix
+        id: set-matrix
+        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client cs --option tag )"
+        
+  test_csharp_clients:
+    needs: [upload_jars, setup_csharp_client_matrix]
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        client_tag: ${{ fromJson(needs.setup_csharp_client_matrix.outputs.matrix) }}
+        server_kind: [os, enterprise]
+    name: Test Csharp client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Setup .NET Core 5.0.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+      - name: Setup .NET Core 3.1.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.x
+      - name: Setup .NET Core 2.1.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 2.1.x
+      - name: Checkout to tag
+        uses: actions/checkout@v2
+        with:
+          repository: hazelcast/hazelcast-csharp-client
+          path: tag
+          ref: ${{ matrix.client_tag }}
+      - name: Download Hazelcast tests JAR
+        uses: actions/download-artifact@v2
+        with:
+          name: hazelcast-tests
+          path: tag/temp/lib
+      - name: Download Hazelcast JAR
+        if: ${{ matrix.server_kind == 'os' }}
+        uses: actions/download-artifact@v2
+        with:
+          name: hazelcast
+          path: tag/temp/lib
+      - name: Download Hazelcast Enterprise JAR
+        if: ${{ matrix.server_kind == 'enterprise' }}
+        uses: actions/download-artifact@v2
+        with:
+          name: hazelcast-enterprise
+          path: tag/temp/lib
+      - name: Download Hazelcast Enterprise tests JAR
+        if: ${{ matrix.server_kind == 'enterprise' }}
+        uses: actions/download-artifact@v2
+        with:
+          name: hazelcast-enterprise-tests
+          path: tag/temp/lib
+        
+      - name: Update submodules
+        run: |
+            git submodule update --init
+        working-directory: tag
+
+      - name: Run non-enterprise tests
+        if: ${{ matrix.server_kind == 'os' }}
+        shell: bash
+        run: ./hz.sh clean,build,test -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
+        working-directory: tag
+      - name: Run all tests
+        if: ${{ matrix.server_kind == 'enterprise' }}
+        shell: bash
+        run: ./hz.sh -enterprise clean,build,test -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
+        working-directory: tag
+        env:
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+          
+  setup_cpp_client_matrix:
+    name: Setup the Cpp client test matrix
+    if: ${{ github.event.inputs.run_cpp == 'run' }}
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Checkout to scripts
+        uses: actions/checkout@v2
+      - name: Set client matrix
+        id: set-matrix
+        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client cpp --option tag )"
+      
+  test_cpp_clients:
+    needs: [upload_jars, setup_cpp_client_matrix]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        client_tag: ${{ fromJson(needs.setup_cpp_client_matrix.outputs.matrix) }}
+        server_kind: [enterprise] #TODO When tests are divided as OS, ENTERPRISE, OS matrix will be added
+    name: Test CPP client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+      - name: Checkout master
+        uses: actions/checkout@v2
+        with:
+          repository: hazelcast/hazelcast-cpp-client
+          path: master
+      - name: Checkout to tag
+        uses: actions/checkout@v2
+        with:
+          repository: hazelcast/hazelcast-cpp-client
+          path: tag
+          ref: ${{ matrix.client_tag }}
+      - name: Delete old scripts and get new ones
+        run: |
+            rm -rf tag/scripts
+            cp -R master/scripts tag/
+        
+      - name: Install Necessary Packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y net-tools libssl-dev gdb
+        working-directory: tag
+      - name: Install Boost
+        run: |
+          sudo ./scripts/install-boost.sh 1.76.0
+        working-directory: tag
+          
+      - name: Install Thrift
+        run: |
+          sudo ./scripts/install-thrift.sh 0.13.0
+        working-directory: tag
+        
+      - name: Download Hazelcast tests JAR
+        uses: actions/download-artifact@v2
+        with:
+          name: hazelcast-tests
+          path: tag
+      - name: Download Hazelcast JAR
+        if: ${{ matrix.server_kind == 'os' }}
+        uses: actions/download-artifact@v2
+        with:
+          name: hazelcast
+          path: tag
+      - name: Download Hazelcast Enterprise JAR
+        if: ${{ matrix.server_kind == 'enterprise' }}
+        uses: actions/download-artifact@v2
+        with:
+          name: hazelcast-enterprise
+          path: tag
+      - name: Download Hazelcast Enterprise tests JAR
+        if: ${{ matrix.server_kind == 'enterprise' }}
+        uses: actions/download-artifact@v2
+        with:
+          name: hazelcast-enterprise-tests
+          path: tag
+          
+      - name: Build & Install
+        env:
+          BUILD_DIR: build
+        run: |
+          ./scripts/build-unix.sh                                          \
+              -DCMAKE_BUILD_TYPE=Debug                                     \
+              -DBUILD_SHARED_LIBS=ON                                       \
+              -DWITH_OPENSSL=ON                                            \
+              -DBUILD_TESTS=ON                                             \
+              -DBUILD_EXAMPLES=OFF
+        working-directory: tag
+        
+      - name: Test
+        env:
+          BUILD_DIR: build
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+          GTEST_FILTER: -*Aws*:*DescribeInstancesTest*
+          HZ_VERSION: '${{ github.event.inputs.hz_version }}-SNAPSHOT'
+        run: |
+          ulimit -c unlimited
+          sudo sh -c "echo 'core' > /proc/sys/kernel/core_pattern"
+          sudo sh -c "echo '1' > /proc/sys/kernel/core_uses_pid"
+          ./scripts/test-unix.sh
+        working-directory: tag
