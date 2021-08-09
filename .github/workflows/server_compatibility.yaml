@@ -59,7 +59,14 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: hazelcast
-          path: hazelcast/hazelcast-all/target/hazelcast-all-*[!s].jar
+          path: hazelcast/hazelcast/target/hazelcast-*[!s].jar
+          retention-days: 1
+      - name: Upload Hazelcast SQL JAR (if exists)
+        uses: actions/upload-artifact@v2
+        with:
+          name: hazelcast-sql
+          path: hazelcast/hazelcast-sql/target/hazelcast-sql-*[!s].jar
+          if-no-files-found: ignore
           retention-days: 1
       - name: Upload Hazelcast tests JAR
         uses: actions/upload-artifact@v2
@@ -71,7 +78,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: hazelcast-enterprise
-          path: hazelcast-enterprise/hazelcast-enterprise-all/target/hazelcast-enterprise-all-*[!s].jar
+          path: hazelcast-enterprise/hazelcast-enterprise/target/hazelcast-enterprise-*[!s].jar
           retention-days: 1
       - name: Upload Hazelcast Enterprise tests JAR
         uses: actions/upload-artifact@v2
@@ -96,13 +103,13 @@ jobs:
         id: set-matrix
         run: echo "::set-output name=matrix::$( python get_client_matrix.py --client py --option tag )"
   test_python_clients:
-    needs: [upload_jars, setup_python_client_matrix]
+    needs: [ upload_jars, setup_python_client_matrix ]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         client_tag: ${{ fromJson(needs.setup_python_client_matrix.outputs.matrix) }}
-        server_kind: [os, enterprise]
+        server_kind: [ os, enterprise ]
     name: Test Python client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
       - name: Checkout to scripts
@@ -140,6 +147,12 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: hazelcast-tests
+          path: jars
+      - name: Download Hazelcast SQL JAR (if exists)
+        continue-on-error: true
+        uses: actions/download-artifact@v2
+        with:
+          name: hazelcast-sql
           path: jars
       - name: Download Hazelcast JAR
         if: ${{ matrix.server_kind == 'os' }}
@@ -188,13 +201,13 @@ jobs:
         id: set-matrix
         run: echo "::set-output name=matrix::$( python get_client_matrix.py --client node --option tag )"
   test_nodejs_clients:
-    needs: [upload_jars, setup_nodejs_client_matrix]
+    needs: [ upload_jars, setup_nodejs_client_matrix ]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         client_tag: ${{ fromJson(needs.setup_nodejs_client_matrix.outputs.matrix) }}
-        server_kind: [os, enterprise]
+        server_kind: [ os, enterprise ]
     name: Test Node.js client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
       - uses: actions/checkout@v2
@@ -241,6 +254,12 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: hazelcast-tests
+          path: jars
+      - name: Download Hazelcast SQL JAR (if exists)
+        continue-on-error: true
+        uses: actions/download-artifact@v2
+        with:
+          name: hazelcast-sql
           path: jars
       - name: Download Hazelcast JAR
         if: ${{ matrix.server_kind == 'os' }}
@@ -290,15 +309,14 @@ jobs:
       - name: Set client matrix
         id: set-matrix
         run: echo "::set-output name=matrix::$( python get_client_matrix.py --client cs --option tag --use-latest-patch-versions )"
-        
   test_csharp_clients:
-    needs: [upload_jars, setup_csharp_client_matrix]
+    needs: [ upload_jars, setup_csharp_client_matrix ]
     runs-on: windows-latest
     strategy:
       fail-fast: false
       matrix:
         client_tag: ${{ fromJson(needs.setup_csharp_client_matrix.outputs.matrix) }}
-        server_kind: [os, enterprise]
+        server_kind: [ os, enterprise ]
     name: Test Csharp client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
       - uses: actions/checkout@v2
@@ -333,6 +351,12 @@ jobs:
         with:
           name: hazelcast-tests
           path: tag/temp/lib
+      - name: Download Hazelcast SQL JAR (if exists)
+        continue-on-error: true
+        uses: actions/download-artifact@v2
+        with:
+          name: hazelcast-sql
+          path: tag/temp/lib
       - name: Download Hazelcast JAR
         if: ${{ matrix.server_kind == 'os' }}
         uses: actions/download-artifact@v2
@@ -351,12 +375,10 @@ jobs:
         with:
           name: hazelcast-enterprise-tests
           path: tag/temp/lib
-        
       - name: Update submodules
         run: |
-            git submodule update --init
+          git submodule update --init
         working-directory: tag
-
       - name: Run non-enterprise tests
         if: ${{ matrix.server_kind == 'os' }}
         shell: bash
@@ -369,7 +391,6 @@ jobs:
         working-directory: tag
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
-          
   setup_cpp_client_matrix:
     name: Setup the Cpp client test matrix
     if: ${{ github.event.inputs.run_cpp == 'run' }}
@@ -386,15 +407,14 @@ jobs:
       - name: Set client matrix
         id: set-matrix
         run: echo "::set-output name=matrix::$( python get_client_matrix.py --client cpp --option tag --use-latest-patch-versions )"
-      
   test_cpp_clients:
-    needs: [upload_jars, setup_cpp_client_matrix]
+    needs: [ upload_jars, setup_cpp_client_matrix ]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         client_tag: ${{ fromJson(needs.setup_cpp_client_matrix.outputs.matrix) }}
-        server_kind: [enterprise] #TODO When tests are divided as OS, ENTERPRISE, OS matrix will be added
+        server_kind: [ enterprise ] #TODO When tests are divided as OS, ENTERPRISE, OS matrix will be added
     name: Test CPP client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
       - uses: actions/checkout@v2
@@ -419,9 +439,8 @@ jobs:
           ref: ${{ matrix.client_tag }}
       - name: Delete old scripts and get new ones
         run: |
-            rm -rf tag/scripts
-            cp -R master/scripts tag/
-        
+          rm -rf tag/scripts
+          cp -R master/scripts tag/
       - name: Install Necessary Packages
         run: |
           sudo apt-get update
@@ -431,16 +450,20 @@ jobs:
         run: |
           sudo ./scripts/install-boost.sh 1.76.0
         working-directory: tag
-          
       - name: Install Thrift
         run: |
           sudo ./scripts/install-thrift.sh 0.13.0
         working-directory: tag
-        
       - name: Download Hazelcast tests JAR
         uses: actions/download-artifact@v2
         with:
           name: hazelcast-tests
+          path: tag
+      - name: Download Hazelcast SQL JAR (if exists)
+        continue-on-error: true
+        uses: actions/download-artifact@v2
+        with:
+          name: hazelcast-sql
           path: tag
       - name: Download Hazelcast JAR
         if: ${{ matrix.server_kind == 'os' }}
@@ -460,7 +483,6 @@ jobs:
         with:
           name: hazelcast-enterprise-tests
           path: tag
-          
       - name: Build & Install
         env:
           BUILD_DIR: build
@@ -472,7 +494,6 @@ jobs:
               -DBUILD_TESTS=ON                                             \
               -DBUILD_EXAMPLES=OFF
         working-directory: tag
-        
       - name: Test
         env:
           BUILD_DIR: build

@@ -305,6 +305,10 @@ def get_option_from_release(release: Release, option: MatrixOptionKind) -> str:
     return MATRIX_OPTION_KIND_TO_GETTER[option](release)
 
 
+class DownloadFailedError(Exception):
+    pass
+
+
 def download_via_maven(
     repo: str,
     artifact_id: str,
@@ -339,4 +343,4 @@ def download_via_maven(
     p = subprocess.run(args, shell=IS_ON_WINDOWS)
     if p.returncode != 0:
         print("Failed to download " + dst_file_name)
-        sys.exit(p.returncode)
+        raise DownloadFailedError()

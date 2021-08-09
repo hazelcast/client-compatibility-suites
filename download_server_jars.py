@@ -7,6 +7,7 @@ from util import (
     ENTERPRISE_RELEASE_REPO,
     download_via_maven,
     ServerKind,
+    DownloadFailedError,
 )
 
 
@@ -60,8 +61,15 @@ if __name__ == "__main__":
         enterprise_repo = ENTERPRISE_RELEASE_REPO
 
     download_via_maven(repo, "hazelcast", version, dst, True)
+
+    try:
+        download_via_maven(repo, "hazelcast-sql", version, dst)
+    except DownloadFailedError:
+        # SQL JAR might not exist on 4.0.x
+        pass
+
     if server_kind == ServerKind.ENTERPRISE:
-        download_via_maven(enterprise_repo, "hazelcast-enterprise-all", version, dst)
+        download_via_maven(enterprise_repo, "hazelcast-enterprise", version, dst)
         download_via_maven(enterprise_repo, "hazelcast-enterprise", version, dst, True)
     else:
-        download_via_maven(repo, "hazelcast-all", version, dst)
+        download_via_maven(repo, "hazelcast", version, dst)
