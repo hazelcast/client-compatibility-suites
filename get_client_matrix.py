@@ -55,8 +55,12 @@ if __name__ == "__main__":
     matrix_option_kind = MatrixOptionKind[args.option.upper()]
     use_latest_patch_versions = args.use_latest_patch_versions
 
+    if client_kind == ClientKind.GO:
+        filtered_major_version = 1
+    else:
+        filtered_major_version = 4
     filters = [
-        MajorVersionFilter([4]),
+        MajorVersionFilter([filtered_major_version]),
         StableReleaseFilter(),
     ]
 

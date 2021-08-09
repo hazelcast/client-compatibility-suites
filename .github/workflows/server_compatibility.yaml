@@ -27,6 +27,10 @@ on:
         description: Whether or not to run Csharp client tests. Set to something else to not run the tests.
         required: true
         default: run
+      run_go:
+        description: Whether or not to run Go client tests. Set to something else to not run the tests.
+        required: true
+        default: run
 jobs:
   upload_jars:
     name: Create and upload JARs
@@ -506,3 +510,74 @@ jobs:
           sudo sh -c "echo '1' > /proc/sys/kernel/core_uses_pid"
           ./scripts/test-unix.sh
         working-directory: tag
+        
+  setup_go_client_matrix:
+    name: Setup the Go client test matrix
+    if: ${{ github.event.inputs.run_go == 'run' }}
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Checkout to scripts
+        uses: actions/checkout@v2
+      - name: Set client matrix
+        id: set-matrix
+        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client go --option tag )"
+        
+  test_go_client:
+    needs: [upload_jars, setup_go_client_matrix]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        client_tag: ${{ fromJson(needs.setup_go_client_matrix.outputs.matrix) }}
+        
+    name: Test Go client ${{ matrix.client_tag }} with enterprise server on ubuntu-latest
+    steps:
+        
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+            
+      - name: Checkout the ${{ matrix.client_tag }}     
+        uses: actions/checkout@v2
+        with:
+          repository: hazelcast/hazelcast-go-client
+          path: client
+          ref: ${{ matrix.client_tag }}
+          
+      - name: Download Hazelcast tests JAR
+        uses: actions/download-artifact@v2
+        with:
+          name: hazelcast-tests
+          path: client
+      - name: Download Hazelcast JAR
+        uses: actions/download-artifact@v2
+        with:
+          name: hazelcast
+          path: client
+      - name: Download Hazelcast Enterprise JAR
+        uses: actions/download-artifact@v2
+        with:
+          name: hazelcast-enterprise
+          path: client
+      - name: Download Hazelcast Enterprise tests JAR
+        uses: actions/download-artifact@v2
+        with:
+          name: hazelcast-enterprise-tests
+          path: client
+          
+      - name: Test
+        env:
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+          HZ_VERSION: '${{ github.event.inputs.hz_version }}-SNAPSHOT'
+          SSL_ENABLED: 1
+        run: |
+          ./rc.sh start
+          make test-all
+        working-directory: client
