@@ -1,0 +1,287 @@
+name: Kubernetes internal clients compatibility tests
+on:
+  workflow_dispatch:
+    inputs:
+      python_run:
+        description: PYTHON = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
+        required: true
+        default: master
+      nodejs_run:
+        description: NODEJS = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
+        required: true
+        default: master
+      cpp_run:
+        description: CPP = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
+        required: true
+        default: master
+      go_run:
+        description: GO = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
+        required: true
+        default: master
+      csharp_run:
+        description: CSHARP = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
+        required: true
+        default: master
+
+jobs:
+
+  create-csharp-image:
+   runs-on: ubuntu-latest
+   if: ${{ github.event.inputs.csharp_run != 'no' }}
+   steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - name: Checkout the client repo
+        uses: actions/checkout@v2
+        with:
+          repository: hazelcast/hazelcast-csharp-client
+          path: KubernetesInternalClients/csharp/clientSourceCode
+          ref: ${{ github.event.inputs.csharp_run }}
+          
+      - name: Setup .NET Core 3.1.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.x
+          
+      - name: Copy KubernetesTest project to csharp project
+        run: |
+          cp -R KubernetesInternalClients/csharp/KubernetesTest KubernetesInternalClients/csharp/clientSourceCode/src/
+          
+      - name: Build KubernetesTest project
+        run: |
+          cd KubernetesInternalClients/csharp/clientSourceCode/src/KubernetesTest
+          dotnet build -c Release
+            
+      - name: Build client application
+        run: |-
+          docker build -t hazelcast-csharp-client:test KubernetesInternalClients/csharp
+          
+      - name: Upload image
+        uses: ishworkh/docker-image-artifact-upload@v1
+        with:
+         image: "hazelcast-csharp-client:test"
+         
+  create-python-image:
+   runs-on: ubuntu-latest
+   if: ${{ github.event.inputs.python_run != 'no' }}
+   steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - name: Checkout the client repo
+        uses: actions/checkout@v2
+        with:
+          repository: hazelcast/hazelcast-python-client
+          path: KubernetesInternalClients/python/clientSourceCode
+          ref: ${{ github.event.inputs.python-run }}
+            
+      - name: Build client application
+        run: |-
+          docker build -t hazelcast-python-client:test KubernetesInternalClients/python
+          
+      - name: Upload image
+        uses: ishworkh/docker-image-artifact-upload@v1
+        with:
+         image: "hazelcast-python-client:test"
+         
+  create-nodejs-image:
+   runs-on: ubuntu-latest
+   if: ${{ github.event.inputs.nodejs_run != 'no' }}
+   steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - name: Checkout the client repo
+        uses: actions/checkout@v2
+        with:
+          repository: hazelcast/hazelcast-nodejs-client
+          path: KubernetesInternalClients/nodejs/clientSourceCode
+          ref: ${{ github.event.inputs.nodejs_run }}
+          
+      - name: Build client project
+        run: |
+            cd KubernetesInternalClients/nodejs/clientSourceCode
+            npm install
+            npm run compile
+            
+      - name: Build client application
+        run: |-
+          docker build -t hazelcast-nodejs-client:test KubernetesInternalClients/nodejs
+          
+      - name: Upload image
+        uses: ishworkh/docker-image-artifact-upload@v1
+        with:
+         image: "hazelcast-nodejs-client:test"
+         
+  create-cpp-image:
+   runs-on: ubuntu-latest
+   if: ${{ github.event.inputs.cpp_run != 'no' }}
+   steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - name: Checkout the client repo
+        uses: actions/checkout@v2
+        with:
+          repository: hazelcast/hazelcast-cpp-client
+          path: KubernetesInternalClients/cpp/clientSourceCode
+          ref: ${{ github.event.inputs.cpp_run }}
+            
+      - name: Build client application
+        run: |-
+          docker build -t hazelcast-cpp-client:test KubernetesInternalClients/cpp
+          
+      - name: Upload image
+        uses: ishworkh/docker-image-artifact-upload@v1
+        with:
+         image: "hazelcast-cpp-client:test"
+         
+  create-go-image:
+   runs-on: ubuntu-latest
+   if: ${{ github.event.inputs.go_run != 'no' }}
+   steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - name: Checkout the client repo
+        uses: actions/checkout@v2
+        with:
+          repository: hazelcast/hazelcast-go-client
+          path: KubernetesInternalClients/go/clientSourceCode
+          ref: ${{ github.event.inputs.go_run }}
+            
+      - name: Build client application
+        run: |-
+          docker build -t hazelcast-go-client:test KubernetesInternalClients/go
+          
+      - name: Upload image
+        uses: ishworkh/docker-image-artifact-upload@v1
+        with:
+         image: "hazelcast-go-client:test"
+         
+  wait-for-images:
+    name: Waits for image creation and create json for which clients run
+    needs: [create-python-image, create-nodejs-image, create-go-image, create-csharp-image, create-cpp-image]
+    if: always()
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      
+    steps:      
+    - name: Checkout
+      uses: actions/checkout@v2
+ 
+#TODO: there is a better way to do it with a python script. It will be added as an improvement
+ 
+    - name: Json for run
+      run: |        
+        cat >> runs.json << EOF
+        [ "python","nodejs","go","csharp","cpp"]
+        EOF
+      
+    - name: If python run
+      if: ${{ github.event.inputs.python_run == 'no' }}
+      run: |
+        sed -i 's/"python",//g' runs.json
+        
+    - name: If nodejs run
+      if: ${{ github.event.inputs.nodejs_run == 'no' }}
+      run: |
+        sed -i 's/"nodejs",//g' runs.json
+        
+    - name: If go run
+      if: ${{ github.event.inputs.go_run == 'no' }}
+      run: |
+        sed -i 's/"go",//g' runs.json
+        
+    - name: If csharp run
+      if: ${{ github.event.inputs.csharp_run == 'no' }}
+      run: |
+        sed -i 's/"csharp",//g' runs.json
+        
+    - name: If cpp run
+      if: ${{ github.event.inputs.python_run == 'no' }}
+      run: |
+        sed -i 's/"cpp"//g' runs.json
+        sed -i 's/"csharp",/"csharp"/g' runs.json
+        
+    - name: Set output
+      id: set-matrix
+      run: | 
+        echo "::set-output name=matrix::$( cat ./runs.json )"
+         
+  run-tests:
+    name: Run kubernetes compatibility test
+    needs: [wait-for-images]
+    if: always()
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        deployment-type: [ 'helm' ]
+        client-language: ${{ fromJson(needs.wait-for-images.outputs.matrix) }}
+    steps:
+      - name: Setup Kubernetes in Docker
+        uses: engineerd/setup-kind@v0.5.0
+        with:
+          version: "v0.11.1"
+
+      - name: Deploy Hazelcast cluster (Helm)
+        if: startsWith(matrix.deployment-type, 'helm')
+        run: |-
+          helm repo add hazelcast https://hazelcast-charts.s3.amazonaws.com/
+          helm repo update
+          helm install hz-hazelcast hazelcast/hazelcast
+          
+      - name: Wait for Hazelcast cluster
+        run: |-
+          kubectl wait --for=condition=ready pod/hz-hazelcast-0 --timeout=150s
+          kubectl wait --for=condition=ready pod/hz-hazelcast-1 --timeout=150s
+          kubectl wait --for=condition=ready pod/hz-hazelcast-2 --timeout=150s
+          
+      - name: Download image
+        uses: ishworkh/docker-image-artifact-download@v1
+        with:
+         image: "hazelcast-${{ matrix.client-language }}-client:test"
+          
+      - name: Deploy client application
+        run: |-
+          kind load docker-image hazelcast-${{ matrix.client-language }}-client:test
+          kubectl run hazelcast-${{ matrix.client-language }}-client --image=hazelcast-${{ matrix.client-language }}-client:test
+          kubectl wait --for=condition=ready pod/hazelcast-${{ matrix.client-language }}-client --timeout=150s         
+      
+      - name: Verify client application
+        run: |-
+          sleep 10
+          kubectl logs pod/hazelcast-${{ matrix.client-language }}-client | grep 'Successful connection!' -q
+          
+      - name: Scale up
+        run: |
+            helm upgrade hz-hazelcast --set cluster.memberCount=6 hazelcast/hazelcast
+            sleep 180
+            kubectl logs --tail=20 hazelcast-${{ matrix.client-language }}-client >> output-${{ matrix.client-language }}-scaleup.txt
+            cat output-${{ matrix.client-language }}-scaleup.txt
+            if [ $(grep -o 'Current map size:' output-${{ matrix.client-language }}-scaleup.txt | wc -l) != $"20" ]; then exit 1; fi
+
+         
+      - name: Scale down
+        run: |
+            helm upgrade hz-hazelcast --set cluster.memberCount=3 hazelcast/hazelcast
+            sleep 120
+            kubectl logs --tail=20 hazelcast-${{ matrix.client-language }}-client >> output-${{ matrix.client-language }}-scaledown.txt
+            cat output-${{ matrix.client-language }}-scaledown.txt
+            if [ $(grep -o 'Current map size:' output-${{ matrix.client-language }}-scaledown.txt | wc -l) != $"20" ]; then exit 1; fi
+            
+      - name: Delete pods
+        run: |
+            kubectl delete pod hz-hazelcast-0 hz-hazelcast-1 hz-hazelcast-2
+            sleep 120
+            kubectl logs --tail=20 hazelcast-${{ matrix.client-language }}-client >> output-${{ matrix.client-language }}-deletepods.txt
+            cat output-${{ matrix.client-language }}-deletepods.txt
+            if [ $(grep -o 'Current map size:' output-${{ matrix.client-language }}-deletepods.txt | wc -l) != $"20" ]; then exit 1; fi
+            
+      - name: Logs
+        run: |
+            kubectl logs pod/hazelcast-${{ matrix.client-language }}-client
+

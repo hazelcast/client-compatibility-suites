@@ -1,0 +1,365 @@
+name: Kubernetes external clients compatibility tests with GKE
+on:
+  workflow_dispatch:
+    inputs:
+      hazelcast_version:
+        description: Set hazelcast version
+        default: 4.2
+      python_run:
+        description: PYTHON = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
+        required: true
+        default: master
+      nodejs_run:
+        description: NODEJS = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
+        required: true
+        default: master
+      cpp_run:
+        description: CPP = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
+        required: true
+        default: master
+      go_run:
+        description: GO = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
+        required: true
+        default: master
+      csharp_run:
+        description: CSHARP = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
+        required: true
+        default: master
+
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_ZONE: europe-west1-b
+  HAZELCAST_VERSION: ${{github.event.inputs.hazelcast_version}}
+
+jobs:
+  create-gke-cluster:
+    name: Run Integration tests on GKE
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup gcloud CLI
+      uses: GoogleCloudPlatform/github-actions/setup-gcloud@v0.2.1
+      with:
+        service_account_key: ${{ secrets.GKE_SA_KEY }}
+        project_id: ${{ env.PROJECT_ID }}
+        export_default_credentials: true 
+
+    - name: Install Kubectl
+      run: |-
+        gcloud components install kubectl
+    - name: Create GKE cluster
+      run: |-
+        repoName='kubernetes-clients-compatibility'
+        clusterName="$repoName-$GITHUB_RUN_NUMBER"
+        echo "clusterName=$clusterName" >> $GITHUB_ENV
+        gcloud container clusters create "$clusterName" --zone="$GKE_ZONE" --project="$PROJECT_ID" --machine-type=n1-standard-2 --num-nodes=2 --no-enable-ip-alias
+        sleep 30
+    - name: Deploy Hazelcast cluster
+      run: |-
+        kubectl apply -f https://raw.githubusercontent.com/hazelcast/hazelcast-kubernetes/master/rbac.yaml
+        kubectl create service loadbalancer hz-hazelcast-0 --tcp=5701
+        kubectl run hz-hazelcast-0 --image=hazelcast/hazelcast:$HAZELCAST_VERSION --port=5701 -l "app=hz-hazelcast-0,role=hazelcast"
+        kubectl create service loadbalancer hz-hazelcast-1 --tcp=5701
+        kubectl run hz-hazelcast-1 --image=hazelcast/hazelcast:$HAZELCAST_VERSION --port=5701 -l "app=hz-hazelcast-1,role=hazelcast"
+        kubectl create service loadbalancer hz-hazelcast-2 --tcp=5701
+        kubectl run hz-hazelcast-2 --image=hazelcast/hazelcast:$HAZELCAST_VERSION --port=5701 -l "app=hz-hazelcast-2,role=hazelcast"
+        kubectl create service loadbalancer hz-hazelcast --tcp=5701 -o yaml --dry-run=client | kubectl set selector --local -f - "role=hazelcast" -o yaml | kubectl create -f -
+    - name: Wait for deployment to finish
+      run: |-
+        kubectl wait --for=condition=ready pod/hz-hazelcast-0 --timeout=120s
+        kubectl wait --for=condition=ready pod/hz-hazelcast-1 --timeout=120s
+        kubectl wait --for=condition=ready pod/hz-hazelcast-2 --timeout=120s
+    - name: Wait for external IP to get assigned
+      run: |-
+        EXTERNAL_IP=$(kubectl get svc hz-hazelcast --output="jsonpath={.status.loadBalancer.ingress[0].ip}")
+        while [ "$EXTERNAL_IP" == "" ]; do
+          sleep 10
+          EXTERNAL_IP=$(kubectl get svc hz-hazelcast --output="jsonpath={.status.loadBalancer.ingress[0].ip}")
+        done
+        echo "EXTERNAL_IP=${EXTERNAL_IP}" >> $GITHUB_ENV
+        
+    - name: Write some values to Properties-file for other jobs
+      run: |
+        cat >> externalip.properties << EOF
+        EXTERNAL_IP=${{ env.EXTERNAL_IP }}
+        clusterName=${{ env.clusterName }}
+        GKE_ZONE=${{ env.GKE_ZONE }}
+        EOF
+        
+    - name: Upload properties files for other jobs
+      uses: actions/upload-artifact@v2
+      with:
+        name: externalip
+        path: externalip.properties
+        retention-days: 1
+        
+  run_go:
+    name: Run Go compatibility test
+    needs: [create-gke-cluster]
+    if: ${{ github.event.inputs.go_run != 'no' }}
+    runs-on: ubuntu-latest
+    
+    steps:  
+    - name: Set up Golang
+      uses: actions/setup-go@v2
+      with:
+        go-version: '^1.15.15'
+
+    - name: Checkout to scripts
+      uses: actions/checkout@v2
+      
+    - name: Download externalip.properties
+      uses: actions/download-artifact@v2
+      with:
+        name: externalip
+        
+    - name: Read value from externalip.properties
+      id: read_ip
+      uses: christian-draeger/read-properties@1.0.1
+      with:
+        path: externalip.properties
+        property: 'EXTERNAL_IP'
+        
+    - name: Checkout the go client repo
+      uses: actions/checkout@v2
+      with:
+        repository: hazelcast/hazelcast-go-client
+        path: KubernetesExternalClients/go/clientSourceCode
+        ref: ${{ github.event.inputs.go_run }}
+      
+    - name: Run test
+      run: |
+        cd KubernetesExternalClients/go
+        sed -i "s/<EXTERNAL-IP>/${{ steps.read_ip.outputs.value }}/g" main.go
+        go run main.go &> output.txt && tail -n 20 output.txt &> last20lines.txt
+        cat last20lines.txt
+        if [ $(grep -o 'Current map size:' last20lines.txt | wc -l) != $"20" ]; then exit 1; fi
+        
+#TODO: More reliabe verification
+        
+  run_python:
+    name: Run Python compatibility test
+    needs: [create-gke-cluster]
+    if: ${{ github.event.inputs.python_run != 'no' }}
+    runs-on: ubuntu-latest
+      
+    steps:  
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+        
+    - name: Checkout to scripts
+      uses: actions/checkout@v2
+      
+    - name: Download externalip.properties
+      uses: actions/download-artifact@v2
+      with:
+        name: externalip
+        
+    - name: Read value from externalip.properties
+      id: read_ip
+      uses: christian-draeger/read-properties@1.0.1
+      with:
+        path: externalip.properties
+        property: 'EXTERNAL_IP'
+        
+    - name: Checkout the Python client repo
+      uses: actions/checkout@v2
+      with:
+        repository: hazelcast/hazelcast-python-client
+        path: KubernetesExternalClients/python/clientSourceCode
+        ref: ${{ github.event.inputs.python_run }}
+        
+    - name: Run test
+      run: |
+        cp KubernetesExternalClients/python/client.py KubernetesExternalClients/python/clientSourceCode/
+        cd KubernetesExternalClients/python/clientSourceCode
+        sed -i "s/<EXTERNAL-IP>/${{ steps.read_ip.outputs.value }}/g" client.py
+        python client.py &> output.txt && tail -n 20 output.txt &> last20lines.txt
+        cat last20lines.txt
+        if [ $(grep -o 'Current map size:' last20lines.txt | wc -l) != $"20" ]; then exit 1; fi
+        
+#TODO: More reliabe verification.
+
+  run_nodejs:
+    name: Run Nodejs compatibility test
+    needs: [create-gke-cluster]
+    if: ${{ github.event.inputs.nodejs_run != 'no' }}
+    runs-on: ubuntu-latest
+      
+    steps:  
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14
+        
+    - name: Checkout to scripts
+      uses: actions/checkout@v2
+      
+    - name: Download externalip.properties
+      uses: actions/download-artifact@v2
+      with:
+        name: externalip
+        
+    - name: Read value from externalip.properties
+      id: read_ip
+      uses: christian-draeger/read-properties@1.0.1
+      with:
+        path: externalip.properties
+        property: 'EXTERNAL_IP'
+        
+    - name: Checkout the Nodejs client repo
+      uses: actions/checkout@v2
+      with:
+        repository: hazelcast/hazelcast-nodejs-client
+        path: KubernetesExternalClients/nodejs/clientSourceCode
+        ref: ${{ github.event.inputs.nodejs_run }}
+        
+    - name: Run test
+      run: |
+        cp KubernetesExternalClients/nodejs/client.js KubernetesExternalClients/nodejs/clientSourceCode/
+        cd KubernetesExternalClients/nodejs/clientSourceCode
+        npm install
+        npm run compile
+        sed -i "s/<EXTERNAL-IP>/'${{ steps.read_ip.outputs.value }}'/g" client.js
+        node client.js &> output.txt && tail -n 20 output.txt &> last20lines.txt
+        cat last20lines.txt
+        if [ $(grep -o 'Current map size:' last20lines.txt | wc -l) != $"14" ]; then exit 1; fi
+        
+#Count set it as 14 for verification because last 6 lines has shotdown logs of nodejs and there should be 14 'Current map size:'
+#TODO: More reliabe verification. 
+
+  run_csharp:
+    name: Run Csharp compatibility test
+    needs: [create-gke-cluster]
+    if: ${{ github.event.inputs.csharp_run != 'no' }}
+    runs-on: ubuntu-latest
+        
+    steps: 
+    
+    - name: Setup .NET Core 3.1.x
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.x
+    - name: Checkout to scripts
+      uses: actions/checkout@v2
+      
+    - name: Download externalip.properties
+      uses: actions/download-artifact@v2
+      with:
+        name: externalip
+        
+    - name: Read value from externalip.properties
+      id: read_ip
+      uses: christian-draeger/read-properties@1.0.1
+      with:
+        path: externalip.properties
+        property: 'EXTERNAL_IP'
+        
+    - name: Checkout the Csharp client repo
+      uses: actions/checkout@v2
+      with:
+        repository: hazelcast/hazelcast-csharp-client
+        path: KubernetesExternalClients/csharp/clientSourceCode
+        ref: ${{ github.event.inputs.csharp_run }}
+      
+    - name: Run test
+      run: |
+        cp -R KubernetesExternalClients/csharp/KubernetesTest/ KubernetesExternalClients/csharp/clientSourceCode/src/KubernetesTest/
+        cd KubernetesExternalClients/csharp/clientSourceCode/src/KubernetesTest       
+        sed -i "s/<EXTERNAL-IP>/${{ steps.read_ip.outputs.value }}/g" Program.cs
+        dotnet build -c Release
+        cd bin/Release/netcoreapp3.1
+        dotnet KubernetesTest.dll &> output.txt && tail -n 20 output.txt &> last20lines.txt
+        cat last20lines.txt
+        if [ $(grep -o 'Current map size:' last20lines.txt | wc -l) != $"20" ]; then exit 1; fi
+        
+#TODO: More reliabe verification.
+        
+  run_cpp:
+    name: Run Cpp compatibility test
+    needs: [create-gke-cluster]
+    if: ${{ github.event.inputs.cpp_run != 'no' }}
+    runs-on: ubuntu-latest
+        
+    steps: 
+    - name: Checkout to scripts
+      uses: actions/checkout@v2
+      
+    - name: Download externalip.properties
+      uses: actions/download-artifact@v2
+      with:
+        name: externalip
+        
+    - name: Read value from externalip.properties
+      id: read_ip
+      uses: christian-draeger/read-properties@1.0.1
+      with:
+        path: externalip.properties
+        property: 'EXTERNAL_IP'
+        
+    - name: Checkout the Cpp client repo
+      uses: actions/checkout@v2
+      with:
+        repository: hazelcast/hazelcast-cpp-client
+        path: KubernetesExternalClients/cpp/clientSourceCode
+        ref: ${{ github.event.inputs.cpp_run }}
+
+    - name: Install Boost
+      run: |
+        sudo apt-get install libboost-dev libboost-thread-dev libboost-chrono-dev
+      
+    - name: Build&Install client
+      run: |
+        cd KubernetesExternalClients/cpp/clientSourceCode/ && mkdir build && cd build
+        cmake .. && cmake --build . --parallel && sudo cmake --build . --target install
+        
+    - name: Run test
+      run: |
+        cd KubernetesExternalClients/cpp
+        sed -i "s/<EXTERNAL-IP>/${{ steps.read_ip.outputs.value }}/g" client.cpp
+        mkdir build && cd build && cmake .. && cmake --build .
+        ./cppClientProject &> output.txt && tail -n 20 output.txt &> last20lines.txt
+        cat last20lines.txt
+        if [ $(grep -o 'Current map size:' last20lines.txt | wc -l) != $"20" ]; then exit 1; fi
+        
+#TODO: More reliabe verification
+
+  cleanup:
+    runs-on: ubuntu-latest
+    needs: [run_nodejs, run_python, run_go, run_cpp, run_csharp]
+    if: always()
+    steps:
+    
+    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@v0.2.1
+      with:
+        service_account_key: ${{ secrets.GKE_SA_KEY }}
+        project_id: ${{ env.PROJECT_ID }}
+        export_default_credentials: true
+    
+    - name: Download externalip.properties
+      uses: actions/download-artifact@v2
+      with:
+        name: externalip
+        
+    - name: Read value from externalip.properties
+      id: clusterName
+      uses: christian-draeger/read-properties@1.0.1
+      with:
+        path: externalip.properties
+        property: 'clusterName'
+        
+    - name: Read value from externalip.properties
+      id: GKE_ZONE
+      uses: christian-draeger/read-properties@1.0.1
+      with:
+        path: externalip.properties
+        property: 'GKE_ZONE'
+        
+    - name: Delete cluster
+      run: |-
+        gcloud container clusters delete ${{ steps.clusterName.outputs.value }} --zone=${{ steps.GKE_ZONE.outputs.value }} --quiet  
