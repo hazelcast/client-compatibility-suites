@@ -10,7 +10,7 @@ namespace Client
         public static async Task Main(string[] args)
         {
             Console.WriteLine("Started");
-            var options = HazelcastOptions.Build(args);
+            var options = new HazelcastOptionsBuilder().Build();
             options.Networking.Addresses.Add("<EXTERNAL-IP>");
             await using var client = await HazelcastClientFactory.StartNewClientAsync(options);
             await using var map = await client.GetMapAsync<string, string>("mapForCsharp");

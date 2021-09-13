@@ -142,5 +142,4 @@ cython_debug/
 
 .DS_Store
 .directory
-*.txt
 *.pyc
