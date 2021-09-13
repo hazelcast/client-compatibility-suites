@@ -29,9 +29,4 @@ helm chart. Workflow is also verifying cluster
 scale up, down, delete scenarios.
 
 2. When a new client is ready to release, we can verify it is able to connect
-a cluster which is running on GKE.
-
-## 3.x Client Compatibility Test Suite
-
-Please use the ``master-3.x`` branch for the old client
-compatibility test suite. 
+a cluster which is running on GKE. 
