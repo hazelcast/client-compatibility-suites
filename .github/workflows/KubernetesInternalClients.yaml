@@ -259,16 +259,27 @@ jobs:
       - name: Scale up
         run: |
             helm upgrade hz-hazelcast --set cluster.memberCount=6 hazelcast/hazelcast
-            sleep 180
+            kubectl wait --for=condition=ready pod/hz-hazelcast-0 --timeout=180s
+            kubectl wait --for=condition=ready pod/hz-hazelcast-1 --timeout=180s
+            kubectl wait --for=condition=ready pod/hz-hazelcast-2 --timeout=180s
+            kubectl wait --for=condition=ready pod/hz-hazelcast-3 --timeout=180s
+            kubectl wait --for=condition=ready pod/hz-hazelcast-4 --timeout=180s
+            kubectl wait --for=condition=ready pod/hz-hazelcast-5 --timeout=180s
+            sleep 60
+            
+      - name: Verify after scale up
+        run: |
             kubectl logs --tail=20 hazelcast-${{ matrix.client-language }}-client >> output-${{ matrix.client-language }}-scaleup.txt
             cat output-${{ matrix.client-language }}-scaleup.txt
             if [ $(grep -o 'Current map size:' output-${{ matrix.client-language }}-scaleup.txt | wc -l) != $"20" ]; then exit 1; fi
-
-         
+        
       - name: Scale down
         run: |
             helm upgrade hz-hazelcast --set cluster.memberCount=3 hazelcast/hazelcast
             sleep 120
+            
+      - name: Verify after scale down
+        run: |            
             kubectl logs --tail=20 hazelcast-${{ matrix.client-language }}-client >> output-${{ matrix.client-language }}-scaledown.txt
             cat output-${{ matrix.client-language }}-scaledown.txt
             if [ $(grep -o 'Current map size:' output-${{ matrix.client-language }}-scaledown.txt | wc -l) != $"20" ]; then exit 1; fi
@@ -276,12 +287,19 @@ jobs:
       - name: Delete pods
         run: |
             kubectl delete pod hz-hazelcast-0 hz-hazelcast-1 hz-hazelcast-2
-            sleep 120
+            kubectl wait --for=condition=ready pod/hz-hazelcast-0 --timeout=180s
+            kubectl wait --for=condition=ready pod/hz-hazelcast-1 --timeout=180s
+            kubectl wait --for=condition=ready pod/hz-hazelcast-2 --timeout=180s
+            sleep 60
+            
+      - name: Verify after delete pods
+        run: |            
             kubectl logs --tail=20 hazelcast-${{ matrix.client-language }}-client >> output-${{ matrix.client-language }}-deletepods.txt
             cat output-${{ matrix.client-language }}-deletepods.txt
             if [ $(grep -o 'Current map size:' output-${{ matrix.client-language }}-deletepods.txt | wc -l) != $"20" ]; then exit 1; fi
             
       - name: Logs
+        if: always()
         run: |
             kubectl logs pod/hazelcast-${{ matrix.client-language }}-client
 
