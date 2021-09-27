@@ -16,7 +16,7 @@ if __name__ == "__main__":
     if my_map.get("key") == "value":
         print("Successful connection!")
         print("Starting to fill the map with random entries.")
-        
+
         while True:
             random_key = random.randint(1, 100000)
             try:
@@ -31,4 +31,3 @@ if __name__ == "__main__":
     else:
         client.shutdown()
         raise Exception("Connection failed, check your configuration.")
-

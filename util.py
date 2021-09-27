@@ -3,7 +3,6 @@ import os
 import re
 
 import subprocess
-import sys
 import urllib.request
 
 from abc import ABC, abstractmethod
@@ -46,6 +45,7 @@ IMDG_CLIENTS = (
     "https://raw.githubusercontent.com/hazelcast/rel-scripts/master/imdg-clients.txt"
 )
 IMDG_SERVERS = "https://raw.githubusercontent.com/hazelcast/rel-scripts/master/imdg-open-source.txt"
+HAZELCAST_SERVERS = "https://raw.githubusercontent.com/hazelcast/rel-scripts/master/hazelcast-open-source.txt"
 
 CLIENT_HEADER = "======= %s Client\n---\n(.*?)\n---\n==="
 
@@ -58,10 +58,10 @@ IS_ON_WINDOWS = os.name == "nt"
 CLASS_PATH_SEPARATOR = ";" if IS_ON_WINDOWS else ":"
 
 CURRENT_STABLE_SERVER_PATTERN = re.compile(
-    "========== Current Stable\n---\n(.*?)\n---", re.DOTALL
+    "========== Current Stable\n---\n(.*?)---", re.DOTALL
 )
 PREVIOUS_STABLE_SERVER_PATTERN = re.compile(
-    "========== Previous Stable\n---\n(.*?)\n---\n========== Development: SHOW",
+    "========== Previous Stable\n---\n(.*?)---\n========== Development: SHOW",
     re.DOTALL,
 )
 
@@ -156,10 +156,14 @@ class AbstractReleaseParser(ABC):
         self._filters = filters
 
     def get_all_releases(self) -> List[Release]:
-        with urllib.request.urlopen(self.get_source_url()) as r:
-            raw_data = r.read().decode()
+        all_releases = []
 
-        all_releases = self.parse_raw_data(raw_data)
+        for source_url in self.get_source_urls():
+            with urllib.request.urlopen(source_url) as r:
+                raw_data = r.read().decode()
+
+            releases = self.parse_raw_data(raw_data)
+            all_releases.extend(releases)
 
         filtered_releases = []
         for release in all_releases:
@@ -175,7 +179,7 @@ class AbstractReleaseParser(ABC):
         return filtered_releases
 
     @abstractmethod
-    def get_source_url(self) -> str:
+    def get_source_urls(self) -> List[str]:
         pass
 
     @abstractmethod
@@ -200,13 +204,15 @@ class AbstractReleaseParser(ABC):
 
         if version and tag:
             return version, tag
+        elif version:
+            return version, f"v{version}"
 
         return None
 
 
 class ServerReleaseParser(AbstractReleaseParser):
-    def get_source_url(self) -> str:
-        return IMDG_SERVERS
+    def get_source_urls(self) -> List[str]:
+        return [IMDG_SERVERS, HAZELCAST_SERVERS]
 
     def parse_raw_data(self, raw_data: str) -> List[Release]:
         stable_match = re.search(CURRENT_STABLE_SERVER_PATTERN, raw_data)
@@ -226,7 +232,8 @@ class ServerReleaseParser(AbstractReleaseParser):
         all_releases = []
 
         for release in itertools.chain(
-            [stable_match.group(1)], previous_match.group(1).split("---\n")
+            [stable_match.group(1).strip()],
+            previous_match.group(1).strip().split("---\n"),
         ):
             version_and_tag = self.parse_version_and_tag(release)
             if version_and_tag:
@@ -241,8 +248,8 @@ class ClientReleaseParser(AbstractReleaseParser):
         self._kind = kind
         self._pattern = re.compile(CLIENT_HEADER % kind.value, re.DOTALL)
 
-    def get_source_url(self) -> str:
-        return IMDG_CLIENTS
+    def get_source_urls(self) -> List[str]:
+        return [IMDG_CLIENTS]
 
     def parse_raw_data(self, raw_data: str) -> List[Release]:
         match = re.search(self._pattern, raw_data)

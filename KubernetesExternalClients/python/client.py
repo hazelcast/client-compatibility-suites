@@ -7,7 +7,7 @@ if __name__ == "__main__":
 
     client = hazelcast.HazelcastClient(
         cluster_members=["<EXTERNAL-IP>"],
-        use_public_ip=True
+        use_public_ip=True,
     )
 
     my_map = client.get_map("map_for_python").blocking()
@@ -30,4 +30,3 @@ if __name__ == "__main__":
         raise Exception("Connection failed, check your configuration.")
 
     client.shutdown()
-
