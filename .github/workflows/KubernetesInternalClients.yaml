@@ -171,45 +171,15 @@ jobs:
     steps:      
     - name: Checkout
       uses: actions/checkout@v2
- 
-#TODO: there is a better way to do it with a python script. It will be added as an improvement
- 
-    - name: Json for run
-      run: |        
-        cat >> runs.json << EOF
-        [ "python","nodejs","go","csharp","cpp"]
-        EOF
-      
-    - name: If python run
-      if: ${{ github.event.inputs.python_run == 'no' }}
-      run: |
-        sed -i 's/"python",//g' runs.json
-        
-    - name: If nodejs run
-      if: ${{ github.event.inputs.nodejs_run == 'no' }}
-      run: |
-        sed -i 's/"nodejs",//g' runs.json
-        
-    - name: If go run
-      if: ${{ github.event.inputs.go_run == 'no' }}
-      run: |
-        sed -i 's/"go",//g' runs.json
-        
-    - name: If csharp run
-      if: ${{ github.event.inputs.csharp_run == 'no' }}
-      run: |
-        sed -i 's/"csharp",//g' runs.json
-        
-    - name: If cpp run
-      if: ${{ github.event.inputs.python_run == 'no' }}
-      run: |
-        sed -i 's/"cpp"//g' runs.json
-        sed -i 's/"csharp",/"csharp"/g' runs.json
-        
-    - name: Set output
+
+    - name: Set which client will be run
       id: set-matrix
-      run: | 
-        echo "::set-output name=matrix::$( cat ./runs.json )"
+      run: echo "::set-output name=matrix::$( python set_which_client_run.py
+       --nodejs ${{ github.event.inputs.nodejs_run }}
+       --go ${{ github.event.inputs.go_run }}
+       --cpp ${{ github.event.inputs.cpp_run }}
+       --csharp ${{ github.event.inputs.csharp_run }}
+       --python ${{ github.event.inputs.python_run }})"
          
   run-tests:
     name: Run kubernetes compatibility test
