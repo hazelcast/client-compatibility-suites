@@ -1,12 +1,15 @@
 #include <iostream>
-#include <hazelcast/client/hazelcast_client.h>
 #include <thread>
 #include <chrono>
 
+#include <hazelcast/client/hazelcast_client.h>
+
 int main() {
     hazelcast::client::client_config config;
+    
     config.get_network_config().use_public_address(true);
     config.get_network_config().add_address({"<EXTERNAL-IP>", 5701});
+
     auto hz = hazelcast::new_client(std::move(config)).get();
 
     std::cout << "Successful connection!" << std::endl;
@@ -17,10 +20,8 @@ int main() {
         int random_key = rand() % 100000;
         try {
             map->put("key-" + std::to_string(random_key), "value-" + std::to_string(random_key));
-            if (random_key % 100 == 0) {
-                std::cout << "Current map size: " + std::to_string(map->size().get()) << std::endl;
-                std::this_thread::sleep_for(std::chrono::seconds(1));
-            }
+            
+            std::cout << "Current map size: " << map->size().get() << std::endl;
         } catch (const std::exception& e) {
             std::cout << e.what() << std::endl;
         }
