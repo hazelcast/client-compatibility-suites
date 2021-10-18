@@ -50,6 +50,12 @@ jobs:
           java-version: 8
       - name: Download JARs
         run: python download_server_jars.py --version ${{ matrix.version }} --server-kind ${{ matrix.kind }} --dst jars
+      - name: Checkout to master
+        uses: actions/checkout@v2
+        with:
+          repository: hazelcast/hazelcast-nodejs-client
+          path: master
+          ref: master
       - name: Checkout to ${{ github.event.inputs.branch_name }}
         uses: actions/checkout@v2
         with:
@@ -61,6 +67,16 @@ jobs:
           npm install
           npm run compile
         working-directory: client
+      - name: Install test dependencies
+        run: |
+          npm install
+        working-directory: master
+      - name: Copy client code into master
+        run: |
+          rm -rf $GITHUB_WORKSPACE/master/lib
+          rm $GITHUB_WORKSPACE/master/package.json
+          cp -a $GITHUB_WORKSPACE/client/lib $GITHUB_WORKSPACE/master/lib
+          cp -a $GITHUB_WORKSPACE/client/package.json $GITHUB_WORKSPACE/master/package.json
       - name: Start RC
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
@@ -68,10 +84,10 @@ jobs:
       - name: Run non-enterprise tests
         if: ${{ matrix.kind == 'os' }}
         run: node node_modules/mocha/bin/mocha --recursive test
-        working-directory: client
+        working-directory: master
       - name: Run all tests
         if: ${{ matrix.kind == 'enterprise' }}
         run: node node_modules/mocha/bin/mocha --recursive test/
-        working-directory: client
+        working-directory: master
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
