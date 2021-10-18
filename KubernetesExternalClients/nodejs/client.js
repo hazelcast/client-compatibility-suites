@@ -25,7 +25,11 @@ const clientConfig = {
         let count = 120;
         while (numberOfLoop < count) {
             const randomKey = Math.floor(Math.random() * 100000);
-            await map.put('key' + randomKey, 'value' + randomKey);
+            try {
+                await map.put('key' + randomKey, 'value' + randomKey);
+            } catch (error) {
+                console.log('Put operation failed: ', error);
+            }
             const size = await map.size();
             console.log(`Current map size: ${size}`);
             await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -34,5 +38,6 @@ const clientConfig = {
         await client.shutdown();
     } catch (err) {
         console.error('Error occurred:', err);
+        process.exit(1);
     }
 })();

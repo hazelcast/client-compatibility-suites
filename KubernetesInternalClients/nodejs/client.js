@@ -23,7 +23,11 @@ const clientConfig = {
         console.log('Starting to fill the map with random entries.');
         while (true) {
             const randomKey = Math.floor(Math.random() * 100000);
-            await map.put('key' + randomKey, 'value' + randomKey);
+            try {
+                await map.put('key' + randomKey, 'value' + randomKey);
+            } catch (error) {
+                console.log('Put operation failed: ', error);
+            }
             if (randomKey % 100 === 0) {
                 const size = await map.size();
                 console.log(`Current map size: ${size}`);
@@ -32,5 +36,6 @@ const clientConfig = {
         }
     } catch (err) {
         console.error('Error occurred:', err);
+        process.exit(1);
     }
 })();
