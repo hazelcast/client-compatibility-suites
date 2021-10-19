@@ -215,7 +215,7 @@ jobs:
     - name: Checkout the Nodejs client repo
       uses: actions/checkout@v2
       with:
-        repository: hazelcast/hazelcast-nodejs-client
+        repository: srknzl/hazelcast-nodejs-client
         path: KubernetesExternalClients/nodejs/clientSourceCode
         ref: master
 
