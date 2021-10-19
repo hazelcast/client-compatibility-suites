@@ -53,13 +53,13 @@ jobs:
       - name: Checkout to master
         uses: actions/checkout@v2
         with:
-          repository: srknzl/hazelcast-nodejs-client
+          repository: hazelcast/hazelcast-nodejs-client
           path: master
           ref: master
       - name: Checkout to ${{ github.event.inputs.branch_name }}
         uses: actions/checkout@v2
         with:
-          repository: hazelcast/hazelcast-nodejs-client
+          repository: srknzl/hazelcast-nodejs-client
           path: client
           ref: ${{ github.event.inputs.branch_name }}
       - name: Install dependencies
