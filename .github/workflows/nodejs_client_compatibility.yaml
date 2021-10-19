@@ -62,10 +62,19 @@ jobs:
           repository: hazelcast/hazelcast-nodejs-client
           path: client
           ref: ${{ github.event.inputs.branch_name }}
-      - name: Install dependencies and compile client
+      - name: Install dependencies
+        run: npm install
+        working-directory: client
+      - name: Download and prepare the release pack
         run: |
-          npm install
-          npm run compile
+            node scripts/download-release-candidate.js -b ${{ github.event.inputs.branch_name }} -u github_actions -p $GH_PAT -o release-candidate.zip
+            unzip release-candidate.zip
+            sha256sum --check release-pack.sha256
+            tar xvzf hazelcast-client-*.tgz
+            rm -rf lib
+            mv package/lib .
+        env:
+          GH_PAT: ${{ secrets.GITHUB_TOKEN }}
         working-directory: client
       - name: Install test dependencies
         run: |
