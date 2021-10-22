@@ -56,11 +56,11 @@ if __name__ == "__main__":
     use_latest_patch_versions = args.use_latest_patch_versions
 
     if client_kind == ClientKind.GO:
-        filtered_major_version = 1
+        filtered_major_version = [1]
     else:
-        filtered_major_version = 4
+        filtered_major_version = [4, 5]
     filters = [
-        MajorVersionFilter([filtered_major_version]),
+        MajorVersionFilter(filtered_major_version),
         StableReleaseFilter(),
     ]
 
