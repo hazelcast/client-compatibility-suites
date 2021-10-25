@@ -286,7 +286,7 @@ jobs:
       - name: Start RC
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
-        run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.server_kind }} --use-simple-server
+        run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.server_kind }}
       - name: Run non-enterprise tests
         if: ${{ matrix.server_kind == 'os' }}
         run: node node_modules/mocha/bin/mocha --recursive test/integration/backward_compatible
