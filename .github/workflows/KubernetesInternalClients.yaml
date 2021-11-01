@@ -144,13 +144,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         
-      - name: Checkout the client repo
-        uses: actions/checkout@v2
-        with:
-          repository: hazelcast/hazelcast-go-client
-          path: KubernetesInternalClients/go/clientSourceCode
-          ref: ${{ github.event.inputs.go_run }}
-            
+      - name: Give the branch name to go.mod file
+        run: |
+            cd KubernetesInternalClients/go
+            sed -i "s/<InputBranchName>/${{ github.event.inputs.go_run }}/g" go.mod
+                       
       - name: Build client application
         run: |-
           docker build -t hazelcast-go-client:test KubernetesInternalClients/go
