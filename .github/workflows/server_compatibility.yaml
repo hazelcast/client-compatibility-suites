@@ -10,7 +10,7 @@ on:
       hz_version:
         description: Version of the JARs that will be built, without the SNAPSHOT suffix.
         required: true
-        default: 4.2.1
+        default: 5.0
       run_python:
         description: Whether or not to run Python client tests. Set to something else to not run the tests.
         required: true
