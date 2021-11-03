@@ -2,6 +2,10 @@ name: Kubernetes internal clients compatibility tests
 on:
   workflow_dispatch:
     inputs:
+      organization_name:
+        description: Default is hazelcast, but if you would like to run the workflow with your forked repo, set your github username
+        required: true
+        default: hazelcast
       python_run:
         description: PYTHON = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
         required: true
@@ -35,7 +39,7 @@ jobs:
       - name: Checkout the client repo
         uses: actions/checkout@v2
         with:
-          repository: hazelcast/hazelcast-csharp-client
+          repository: ${{ github.event.inputs.organization_name }}/hazelcast-csharp-client
           path: KubernetesInternalClients/csharp/clientSourceCode
           ref: ${{ github.event.inputs.csharp_run }}
           
@@ -72,7 +76,7 @@ jobs:
       - name: Checkout the client repo
         uses: actions/checkout@v2
         with:
-          repository: hazelcast/hazelcast-python-client
+          repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
           path: KubernetesInternalClients/python/clientSourceCode
           ref: ${{ github.event.inputs.python-run }}
             
@@ -95,7 +99,7 @@ jobs:
       - name: Checkout the client repo
         uses: actions/checkout@v2
         with:
-          repository: hazelcast/hazelcast-nodejs-client
+          repository: ${{ github.event.inputs.organization_name }}/hazelcast-nodejs-client
           path: KubernetesInternalClients/nodejs/clientSourceCode
           ref: ${{ github.event.inputs.nodejs_run }}
           
@@ -124,7 +128,7 @@ jobs:
       - name: Checkout the client repo
         uses: actions/checkout@v2
         with:
-          repository: hazelcast/hazelcast-cpp-client
+          repository: ${{ github.event.inputs.organization_name }}/hazelcast-cpp-client
           path: KubernetesInternalClients/cpp/clientSourceCode
           ref: ${{ github.event.inputs.cpp_run }}
             
