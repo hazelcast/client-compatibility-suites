@@ -3,6 +3,10 @@ name: Test Python client against the released IMDG servers
 on:
   workflow_dispatch:
     inputs:
+      organization_name:
+        description: Default is hazelcast, but if you would like to run the workflow with your forked repo, set your github username
+        required: true
+        default: hazelcast
       branch_name:
         description: Name of the branch to test client from
         required: true
@@ -49,13 +53,13 @@ jobs:
       - name: Checkout to master
         uses: actions/checkout@v2
         with:
-          repository: hazelcast/hazelcast-python-client
+          repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
           path: master
           ref: master
       - name: Checkout to ${{ github.event.inputs.branch_name }}
         uses: actions/checkout@v2
         with:
-          repository: hazelcast/hazelcast-python-client
+          repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
           path: client
           ref: ${{ github.event.inputs.branch_name }}
       - name: Copy the client code into master
