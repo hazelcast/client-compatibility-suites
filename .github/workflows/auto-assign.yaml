@@ -1,0 +1,26 @@
+name: Add reviewers for PRs
+on: [pull_request]
+
+jobs:
+  assign:
+    runs-on: ubuntu-latest
+    steps:
+    
+    - uses: dorny/paths-filter@v2
+      id: changes
+      with:
+        filters: |
+          org:
+            - 'org/**'
+          tech:
+            - 'tech/**'
+            
+    - uses: delivery-much/actions-assigner@v1
+      if: steps.changes.outputs.org == 'true'
+      with:
+        team-reviewers: hazelcast/apis
+        
+    - uses: delivery-much/actions-assigner@v1
+      if: steps.changes.outputs.tech == 'true'
+      with:
+        reviewers: yuce,sancar,zpqrtbnk,ihsandemir
