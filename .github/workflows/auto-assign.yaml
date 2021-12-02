@@ -18,11 +18,11 @@ jobs:
     - uses: delivery-much/actions-assigner@v1
       if: steps.changes.outputs.org == 'true'
       with:
-        token: ${{ secrets.GH_PAT }}
+        token: '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'
         team-reviewers: hazelcast/apis
         
     - uses: delivery-much/actions-assigner@v1
       if: steps.changes.outputs.tech == 'true'
       with:
-        token: ${{ secrets.GH_PAT }}
+        token: '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'
         reviewers: yuce,sancar,zpqrtbnk,ihsandemir
