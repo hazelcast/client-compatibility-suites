@@ -77,9 +77,9 @@ jobs:
         run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.kind }} --use-simple-server
       - name: Run non-enterprise tests
         if: ${{ matrix.kind == 'os' }}
-        run: nosetests -v tests/integration/backward_compatible -A 'not enterprise'
+        run: pytest -m 'not enterprise' tests/integration/backward_compatible
         working-directory: master
       - name: Run all tests
         if: ${{ matrix.kind == 'enterprise' }}
-        run: nosetests -v tests/integration/backward_compatible
+        run: pytest tests/integration/backward_compatible
         working-directory: master
