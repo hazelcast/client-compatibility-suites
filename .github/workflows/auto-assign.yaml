@@ -1,28 +1,13 @@
-name: Add reviewers for PRs
-on: [pull_request]
+name: Auto Request Review
+
+on: [pull_request_target]
 
 jobs:
-  assign:
+  auto-request-review:
+    name: Auto Request Review
     runs-on: ubuntu-latest
     steps:
-    
-    - uses: dorny/paths-filter@v2
-      id: changes
-      with:
-        filters: |
-          org:
-            - 'org/**'
-          tech:
-            - 'tech/**'
-            
-    - uses: delivery-much/actions-assigner@v1
-      if: steps.changes.outputs.org == 'true'
-      with:
-        token: ${{ secrets.GH_PAT }}
-        team-reviewers: hazelcast/apis
-        
-    - uses: delivery-much/actions-assigner@v1
-      if: steps.changes.outputs.tech == 'true'
-      with:
-        token: ${{ secrets.GH_PAT }}
-        reviewers: yuce,sancar,zpqrtbnk,ihsandemir
+      - name: Request review based on files changes and/or groups the author belongs to
+        uses: necojackarc/auto-request-review@v0.7.0
+        with:
+          token: ${{ secrets.GH_PAT }}
