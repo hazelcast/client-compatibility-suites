@@ -3,5 +3,3 @@ files:
   # You can assign groups defined above as well as GitHub usernames.
   'org/**':
     - team:hazelcast/apis
-  'tech/**':
-    - utku-caglayan
