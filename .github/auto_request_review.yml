@@ -2,4 +2,7 @@ files:
   # Keys are glob expressions.
   # You can assign groups defined above as well as GitHub usernames.
   'org/**':
-    - team:apis
+    - mdumandag
+    - srknzl
+  'tech/**':
+    - utku-caglayan
