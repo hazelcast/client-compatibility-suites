@@ -2,6 +2,6 @@ files:
   # Keys are glob expressions.
   # You can assign groups defined above as well as GitHub usernames.
   'org/**':
-    - mdumandag
+    - team:hazelcast/apis
   'tech/**':
     - utku-caglayan
