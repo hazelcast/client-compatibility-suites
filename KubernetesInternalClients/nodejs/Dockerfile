@@ -1,4 +1,4 @@
-FROM node:10.4
+FROM node:14
 ADD clientSourceCode/lib /lib
 ADD clientSourceCode/node_modules /node_modules
 ADD clientSourceCode/package.json .
