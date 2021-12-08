@@ -5,7 +5,7 @@ const { Client } = require('./lib');
 const clientConfig = {
     network: {
         clusterMembers: [
-            <EXTERNAL-IP>
+            '<EXTERNAL-IP>'
         ]
     }
 };
