@@ -58,8 +58,8 @@ jobs:
         if: ${{ github.event.inputs.base_url }} == 'https://uat.hazelcast.cloud'
         env:
           baseUrl: ${{ github.event.inputs.base_url }} 
-          apiKey: ${{ secrets.apiKey }}
-          apiSecret: ${{ secrets.apiSecret }}
+          apiKey: ${{ secrets.APIKEY }}
+          apiSecret: ${{ secrets.APISECRET }}
         run: |
           sudo bash ./rc.sh start &> rc.log &
           
