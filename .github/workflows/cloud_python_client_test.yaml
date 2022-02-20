@@ -15,11 +15,8 @@ on:
         description: Base url of the cloud env. I.e https://uat.hazelcast.cloud
         required: true
         default: https://uat.hazelcast.cloud
-      api_key:
-        description: apiKey for given cloud environment
-        required: true
-      api_secret:
-        description: apiSecret for given cloud environment
+      hzVersion:
+        description: Version of hazelcast (For cloud standard cluster, it has different versions, i.e 5.0.2-2)
         required: true
         
 jobs:
@@ -58,10 +55,11 @@ jobs:
         working-directory: HazelcastCloudTests/PythonHazelcastCloudTests
         
       - name: Start RC
+        if: ${{ github.event.inputs.base_url }} == 'https://uat.hazelcast.cloud'
         env:
           baseUrl: ${{ github.event.inputs.base_url }} 
-          apiKey: ${{secrets[github.event.inputs.api_key]}}
-          apiSecret: ${{secrets[github.event.inputs.api_secret]}}
+          apiKey: ${{ secrets.apiKey }}
+          apiSecret: ${{ secrets.apiSecret }}
         run: |
           sudo bash ./rc.sh start &> rc.log &
           
@@ -71,6 +69,7 @@ jobs:
       - name: Run cloud tests
         env: 
           baseUrl: ${{ github.event.inputs.base_url }}
+          hzVersion: ${{ github.event.inputs.hzVersion }}
         run: | 
           pytest -o log_cli=true
         working-directory: HazelcastCloudTests/PythonHazelcastCloudTests
