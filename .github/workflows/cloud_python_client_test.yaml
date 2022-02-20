@@ -66,7 +66,7 @@ jobs:
           apiKey: ${{secrets[github.event.inputs.api_key]}}
           apiSecret: ${{secrets[github.event.inputs.api_secret]}}
         run: |
-          ./rc.sh start
+          sudo bash ./rc.sh start &> rc.log &
           
       - name: Run cloud tests
         env: 
