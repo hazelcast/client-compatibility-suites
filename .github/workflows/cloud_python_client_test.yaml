@@ -61,7 +61,7 @@ jobs:
           apiKey: ${{ secrets.APIKEY }}
           apiSecret: ${{ secrets.APISECRET }}
         run: |
-          python start_remote_controller.py --use-simple-server
+          python start_remote_controller.py --use-simple-server &> rc.log &
           
       - name: Debugging with tmate
         uses: mxschmitt/action-tmate@v3.11
