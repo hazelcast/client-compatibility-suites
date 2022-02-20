@@ -12,7 +12,7 @@ on:
         required: true
         default: master
       base_url:
-        description: Base url of the cloud env. Example: https://uat.hazelcast.cloud
+        description: Base url of the cloud env. I.e https://uat.hazelcast.cloud
         required: true
         default: https://uat.hazelcast.cloud
       api_key:
