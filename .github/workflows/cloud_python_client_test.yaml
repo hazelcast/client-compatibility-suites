@@ -50,9 +50,6 @@ jobs:
       - name: Copy the client code to Hazelcast Cloud Test suites
         run: |
           cp -a $GITHUB_WORKSPACE/client/hazelcast $GITHUB_WORKSPACE/HazelcastCloudTests/PythonHazelcastCloudTests/hazelcast
-          
-      - name: Debugging with tmate
-        uses: mxschmitt/action-tmate@v3.11
 
       - name: Install dependencies
         run: |
@@ -60,11 +57,14 @@ jobs:
           pip install -r requirements-test.txt
         working-directory: HazelcastCloudTests/PythonHazelcastCloudTests
         
+      - name: Debugging with tmate
+        uses: mxschmitt/action-tmate@v3.11
+        
       - name: Start RC
         env:
-          baseUrl: ${{ github.event.inputs.base_url }}
-          apiKey: ${{ github.event.inputs.api_key }}
-          apiSecret: ${{ github.event.inputs.api_secret }}
+          baseUrl: ${{ github.event.inputs.base_url }} 
+          apiKey: ${{secrets[github.event.inputs.api_key]}}
+          apiSecret: ${{secrets[github.event.inputs.api_secret]}}
         run: |
           ./rc.sh start
           
