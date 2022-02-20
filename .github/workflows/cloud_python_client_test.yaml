@@ -62,7 +62,7 @@ jobs:
           apiSecret: 'WJvVV0MKYqc1KJejOm8dNGkbhCOipbaSk42l495YnXWx6bgIJgly42XvScQQ'
         run: |
           python download_server_jars.py --version 5.0 --server-kind os --dst .
-          java -jar hazelcast-remote-controller-0.8-SNAPSHOT.jar &> rc.log &
+          java -jar hazelcast-remote-controller-0.8-SNAPSHOT.jar --use-simple-server &> rc.log &
           
       - name: Debugging with tmate
         uses: mxschmitt/action-tmate@v3.11
