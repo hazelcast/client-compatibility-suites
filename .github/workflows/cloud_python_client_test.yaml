@@ -58,8 +58,8 @@ jobs:
         if: ${{ github.event.inputs.base_url }} == 'https://uat.hazelcast.cloud'
         env:
           baseUrl: ${{ github.event.inputs.base_url }} 
-          apiKey: 'cJvW2fu2InIjkJyvzdp2RPeaF'
-          apiSecret: 'WJvVV0MKYqc1KJejOm8dNGkbhCOipbaSk42l495YnXWx6bgIJgly42XvScQQ'
+          apiKey: ${{ secrets.APIKEY }}
+          apiSecret: ${{ secrets.APISECRET }}
         run: |
           python download_server_jars.py --version 5.0 --server-kind os --dst .
           java -jar hazelcast-remote-controller-0.8-SNAPSHOT.jar --use-simple-server &> rc.log &
