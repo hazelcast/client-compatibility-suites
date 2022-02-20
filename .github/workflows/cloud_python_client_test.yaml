@@ -55,7 +55,7 @@ jobs:
         working-directory: HazelcastCloudTests/PythonHazelcastCloudTests
         
       - name: Start RC for UAT
-        if: ${{ github.event.inputs.base_url }} == 'https://uat.hazelcast.cloud'
+        if: ${{ github.event.inputs.base_url == 'https://uat.hazelcast.cloud' }}
         env:
           baseUrl: ${{ github.event.inputs.base_url }} 
           apiKey: ${{ secrets.APIKEY_UAT }}
@@ -64,7 +64,7 @@ jobs:
           python start_remote_controller.py --use-simple-server &> rc.log &
           
       - name: Start RC for PROD
-        if: ${{ github.event.inputs.base_url }} == 'https://cloud.hazelcast.com'
+        if: ${{ github.event.inputs.base_url == 'https://cloud.hazelcast.com' }}
         env:
           baseUrl: ${{ github.event.inputs.base_url }} 
           apiKey: ${{ secrets.APIKEY_PROD }}
