@@ -40,3 +40,9 @@ class AzureEnterpriseClusterTests(unittest.TestCase):
                 logging.exception("Put operation failed!")
 
         self.assertEqual(map1.size(), 20, "Map size should be 20")
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.client.shutdown()
+        cls.rc.deleteCluster(cls.cluster.id)
+        cls.rc.exit()
