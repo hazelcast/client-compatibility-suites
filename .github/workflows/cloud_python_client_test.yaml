@@ -62,7 +62,7 @@ jobs:
           apiSecret: ${{ secrets.APISECRET_UAT }}
         run: |
           python start_remote_controller.py --use-simple-server &> rc_standard_cluster.log &
-          sleep 5
+          sleep 15
           
       - name: Start RC for PROD
         if: ${{ github.event.inputs.base_url == 'https://cloud.hazelcast.com' }}
@@ -72,7 +72,7 @@ jobs:
           apiSecret: ${{ secrets.APISECRET_PROD }}
         run: |
           python start_remote_controller.py --use-simple-server &> rc_standard_cluster.log &
-          sleep 5
+          sleep 15
           
       - name: Debugging with tmate
         uses: mxschmitt/action-tmate@v3.11
@@ -133,7 +133,7 @@ jobs:
           apiSecret: ${{ secrets.APISECRET_UAT }}
         run: |
           python start_remote_controller.py --use-simple-server &> rc_aws_ssl_enterprise_cluster.log &
-          sleep 5
+          sleep 15
           
       - name: Start RC for PROD
         if: ${{ github.event.inputs.base_url == 'https://cloud.hazelcast.com' }}
@@ -143,7 +143,10 @@ jobs:
           apiSecret: ${{ secrets.APISECRET_PROD }}
         run: |
           python start_remote_controller.py --use-simple-server &> rc_aws_ssl_enterprise_cluster.log &
-          sleep 5
+          sleep 15
+          
+      - name: Debugging with tmate
+        uses: mxschmitt/action-tmate@v3.11
 
       - name: Run cloud tests
         env: 
@@ -201,7 +204,7 @@ jobs:
           apiSecret: ${{ secrets.APISECRET_UAT }}
         run: |
           python start_remote_controller.py --use-simple-server &> rc_aws_enterprise_cluster.log &
-          sleep 5
+          sleep 15
           
       - name: Start RC for PROD
         if: ${{ github.event.inputs.base_url == 'https://cloud.hazelcast.com' }}
@@ -211,7 +214,10 @@ jobs:
           apiSecret: ${{ secrets.APISECRET_PROD }}
         run: |
           python start_remote_controller.py --use-simple-server &> rc_aws_enterprise_cluster.log &
-          sleep 5
+          sleep 15
+          
+      - name: Debugging with tmate
+        uses: mxschmitt/action-tmate@v3.11
 
       - name: Run cloud tests
         env: 
@@ -269,7 +275,7 @@ jobs:
           apiSecret: ${{ secrets.APISECRET_UAT }}
         run: |
           python start_remote_controller.py --use-simple-server &> rc_gcp_ssl_enterprise_cluster.log &
-          sleep 5
+          sleep 15
           
       - name: Start RC for PROD
         if: ${{ github.event.inputs.base_url == 'https://cloud.hazelcast.com' }}
@@ -279,7 +285,10 @@ jobs:
           apiSecret: ${{ secrets.APISECRET_PROD }}
         run: |
           python start_remote_controller.py --use-simple-server &> rc_gcp_ssl_enterprise_cluster.log &
-          sleep 5
+          sleep 15
+          
+      - name: Debugging with tmate
+        uses: mxschmitt/action-tmate@v3.11
 
       - name: Run cloud tests
         env: 
@@ -337,7 +346,7 @@ jobs:
           apiSecret: ${{ secrets.APISECRET_UAT }}
         run: |
           python start_remote_controller.py --use-simple-server &> rc_gcp_enterprise_cluster.log &
-          sleep 5
+          sleep 15
           
       - name: Start RC for PROD
         if: ${{ github.event.inputs.base_url == 'https://cloud.hazelcast.com' }}
@@ -347,7 +356,10 @@ jobs:
           apiSecret: ${{ secrets.APISECRET_PROD }}
         run: |
           python start_remote_controller.py --use-simple-server &> rc_gcp_enterprise_cluster.log &
-          sleep 5
+          sleep 15
+          
+      - name: Debugging with tmate
+        uses: mxschmitt/action-tmate@v3.11
 
       - name: Run cloud tests
         env: 
@@ -405,7 +417,7 @@ jobs:
           apiSecret: ${{ secrets.APISECRET_UAT }}
         run: |
           python start_remote_controller.py --use-simple-server &> rc_azure_ssl_enterprise_cluster.log &
-          sleep 5
+          sleep 15
           
       - name: Start RC for PROD
         if: ${{ github.event.inputs.base_url == 'https://cloud.hazelcast.com' }}
@@ -415,7 +427,10 @@ jobs:
           apiSecret: ${{ secrets.APISECRET_PROD }}
         run: |
           python start_remote_controller.py --use-simple-server &> rc_azure_ssl_enterprise_cluster.log &
-          sleep 5
+          sleep 15
+          
+      - name: Debugging with tmate
+        uses: mxschmitt/action-tmate@v3.11
 
       - name: Run cloud tests
         env: 
@@ -473,7 +488,7 @@ jobs:
           apiSecret: ${{ secrets.APISECRET_UAT }}
         run: |
           python start_remote_controller.py --use-simple-server &> rc_azure_enterprise_cluster.log &
-          sleep 5
+          sleep 15
           
       - name: Start RC for PROD
         if: ${{ github.event.inputs.base_url == 'https://cloud.hazelcast.com' }}
@@ -483,7 +498,10 @@ jobs:
           apiSecret: ${{ secrets.APISECRET_PROD }}
         run: |
           python start_remote_controller.py --use-simple-server &> rc_azure_enterprise_cluster.log &
-          sleep 5
+          sleep 15
+          
+      - name: Debugging with tmate
+        uses: mxschmitt/action-tmate@v3.11
 
       - name: Run cloud tests
         env: 
