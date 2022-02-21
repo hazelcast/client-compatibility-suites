@@ -72,6 +72,9 @@ jobs:
         run: |
           python start_remote_controller.py --use-simple-server &> rc_standard_cluster.log &
           
+      - name: Debugging with tmate
+        uses: mxschmitt/action-tmate@v3.11
+
       - name: Run cloud tests
         env: 
           baseUrl: ${{ github.event.inputs.base_url }}
