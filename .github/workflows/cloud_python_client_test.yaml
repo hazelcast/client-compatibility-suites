@@ -20,7 +20,7 @@ on:
         required: true
         
 jobs:
-  test_client:
+  test_standard_cluster:
     runs-on: ubuntu-latest
     name: Hazelcast cloud standard cluster tests with python
     steps:
@@ -62,6 +62,7 @@ jobs:
           apiSecret: ${{ secrets.APISECRET_UAT }}
         run: |
           python start_remote_controller.py --use-simple-server &> rc_standard_cluster.log &
+          sleep 5
           
       - name: Start RC for PROD
         if: ${{ github.event.inputs.base_url == 'https://cloud.hazelcast.com' }}
@@ -71,6 +72,7 @@ jobs:
           apiSecret: ${{ secrets.APISECRET_PROD }}
         run: |
           python start_remote_controller.py --use-simple-server &> rc_standard_cluster.log &
+          sleep 5
           
       - name: Debugging with tmate
         uses: mxschmitt/action-tmate@v3.11
@@ -86,8 +88,416 @@ jobs:
       - uses: actions/upload-artifact@v2
         if: always()
         with:
-          name: rc-logs-standard-cluster
+          name: rc_standard_cluster
           path: rc_standard_cluster.log
+          
+  test_aws_ssl_enterprise_cluster:
+    runs-on: ubuntu-latest
+    name: Hazelcast cloud aws ssl cluster tests with python
+    steps:
+      - name: Checkout to scripts
+        uses: actions/checkout@v2
+        
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+          
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+          
+      - name: Checkout to ${{ github.event.inputs.branch_name }}
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
+          path: client
+          ref: ${{ github.event.inputs.branch_name }}
+          
+      - name: Copy the client code to Hazelcast Cloud Test suites
+        run: |
+          cp -a $GITHUB_WORKSPACE/client/hazelcast $GITHUB_WORKSPACE/HazelcastCloudTests/PythonHazelcastCloudTests/hazelcast
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-test.txt
+        working-directory: HazelcastCloudTests/PythonHazelcastCloudTests
+        
+      - name: Start RC for UAT
+        if: ${{ github.event.inputs.base_url == 'https://uat.hazelcast.cloud' }}
+        env:
+          baseUrl: ${{ github.event.inputs.base_url }} 
+          apiKey: ${{ secrets.APIKEY_UAT }}
+          apiSecret: ${{ secrets.APISECRET_UAT }}
+        run: |
+          python start_remote_controller.py --use-simple-server &> rc_aws_ssl_enterprise_cluster.log &
+          sleep 5
+          
+      - name: Start RC for PROD
+        if: ${{ github.event.inputs.base_url == 'https://cloud.hazelcast.com' }}
+        env:
+          baseUrl: ${{ github.event.inputs.base_url }} 
+          apiKey: ${{ secrets.APIKEY_PROD }}
+          apiSecret: ${{ secrets.APISECRET_PROD }}
+        run: |
+          python start_remote_controller.py --use-simple-server &> rc_aws_ssl_enterprise_cluster.log &
+          sleep 5
+
+      - name: Run cloud tests
+        env: 
+          baseUrl: ${{ github.event.inputs.base_url }}
+          hzVersion: ${{ github.event.inputs.hzVersion }}
+        run: | 
+          pytest -o log_cli=true ./aws_ssl_enterprise_cluster_test.py
+        working-directory: HazelcastCloudTests/PythonHazelcastCloudTests
+        
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: rc_aws_ssl_enterprise_cluster
+          path: rc_aws_ssl_enterprise_cluster.log
+          
+  test_aws_enterprise_cluster:
+    runs-on: ubuntu-latest
+    name: Hazelcast cloud aws without ssl cluster tests with python
+    steps:
+      - name: Checkout to scripts
+        uses: actions/checkout@v2
+        
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+          
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+          
+      - name: Checkout to ${{ github.event.inputs.branch_name }}
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
+          path: client
+          ref: ${{ github.event.inputs.branch_name }}
+          
+      - name: Copy the client code to Hazelcast Cloud Test suites
+        run: |
+          cp -a $GITHUB_WORKSPACE/client/hazelcast $GITHUB_WORKSPACE/HazelcastCloudTests/PythonHazelcastCloudTests/hazelcast
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-test.txt
+        working-directory: HazelcastCloudTests/PythonHazelcastCloudTests
+        
+      - name: Start RC for UAT
+        if: ${{ github.event.inputs.base_url == 'https://uat.hazelcast.cloud' }}
+        env:
+          baseUrl: ${{ github.event.inputs.base_url }} 
+          apiKey: ${{ secrets.APIKEY_UAT }}
+          apiSecret: ${{ secrets.APISECRET_UAT }}
+        run: |
+          python start_remote_controller.py --use-simple-server &> rc_aws_enterprise_cluster.log &
+          sleep 5
+          
+      - name: Start RC for PROD
+        if: ${{ github.event.inputs.base_url == 'https://cloud.hazelcast.com' }}
+        env:
+          baseUrl: ${{ github.event.inputs.base_url }} 
+          apiKey: ${{ secrets.APIKEY_PROD }}
+          apiSecret: ${{ secrets.APISECRET_PROD }}
+        run: |
+          python start_remote_controller.py --use-simple-server &> rc_aws_enterprise_cluster.log &
+          sleep 5
+
+      - name: Run cloud tests
+        env: 
+          baseUrl: ${{ github.event.inputs.base_url }}
+          hzVersion: ${{ github.event.inputs.hzVersion }}
+        run: | 
+          pytest -o log_cli=true ./aws_enterprise_cluster_test.py
+        working-directory: HazelcastCloudTests/PythonHazelcastCloudTests
+        
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: rc_aws_enterprise_cluster
+          path: rc_aws_enterprise_cluster.log
+          
+  test_gcp_ssl_enterprise_cluster:
+    runs-on: ubuntu-latest
+    name: Hazelcast cloud gcp ssl cluster tests with python
+    steps:
+      - name: Checkout to scripts
+        uses: actions/checkout@v2
+        
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+          
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+          
+      - name: Checkout to ${{ github.event.inputs.branch_name }}
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
+          path: client
+          ref: ${{ github.event.inputs.branch_name }}
+          
+      - name: Copy the client code to Hazelcast Cloud Test suites
+        run: |
+          cp -a $GITHUB_WORKSPACE/client/hazelcast $GITHUB_WORKSPACE/HazelcastCloudTests/PythonHazelcastCloudTests/hazelcast
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-test.txt
+        working-directory: HazelcastCloudTests/PythonHazelcastCloudTests
+        
+      - name: Start RC for UAT
+        if: ${{ github.event.inputs.base_url == 'https://uat.hazelcast.cloud' }}
+        env:
+          baseUrl: ${{ github.event.inputs.base_url }} 
+          apiKey: ${{ secrets.APIKEY_UAT }}
+          apiSecret: ${{ secrets.APISECRET_UAT }}
+        run: |
+          python start_remote_controller.py --use-simple-server &> rc_gcp_ssl_enterprise_cluster.log &
+          sleep 5
+          
+      - name: Start RC for PROD
+        if: ${{ github.event.inputs.base_url == 'https://cloud.hazelcast.com' }}
+        env:
+          baseUrl: ${{ github.event.inputs.base_url }} 
+          apiKey: ${{ secrets.APIKEY_PROD }}
+          apiSecret: ${{ secrets.APISECRET_PROD }}
+        run: |
+          python start_remote_controller.py --use-simple-server &> rc_gcp_ssl_enterprise_cluster.log &
+          sleep 5
+
+      - name: Run cloud tests
+        env: 
+          baseUrl: ${{ github.event.inputs.base_url }}
+          hzVersion: ${{ github.event.inputs.hzVersion }}
+        run: | 
+          pytest -o log_cli=true ./gcp_ssl_enterprise_cluster_test.py
+        working-directory: HazelcastCloudTests/PythonHazelcastCloudTests
+        
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: rc_gcp_ssl_enterprise_cluster
+          path: rc_gcp_ssl_enterprise_cluster.log
+          
+  test_gcp_enterprise_cluster:
+    runs-on: ubuntu-latest
+    name: Hazelcast cloud gcp without ssl cluster tests with python
+    steps:
+      - name: Checkout to scripts
+        uses: actions/checkout@v2
+        
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+          
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+          
+      - name: Checkout to ${{ github.event.inputs.branch_name }}
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
+          path: client
+          ref: ${{ github.event.inputs.branch_name }}
+          
+      - name: Copy the client code to Hazelcast Cloud Test suites
+        run: |
+          cp -a $GITHUB_WORKSPACE/client/hazelcast $GITHUB_WORKSPACE/HazelcastCloudTests/PythonHazelcastCloudTests/hazelcast
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-test.txt
+        working-directory: HazelcastCloudTests/PythonHazelcastCloudTests
+        
+      - name: Start RC for UAT
+        if: ${{ github.event.inputs.base_url == 'https://uat.hazelcast.cloud' }}
+        env:
+          baseUrl: ${{ github.event.inputs.base_url }} 
+          apiKey: ${{ secrets.APIKEY_UAT }}
+          apiSecret: ${{ secrets.APISECRET_UAT }}
+        run: |
+          python start_remote_controller.py --use-simple-server &> rc_gcp_enterprise_cluster.log &
+          sleep 5
+          
+      - name: Start RC for PROD
+        if: ${{ github.event.inputs.base_url == 'https://cloud.hazelcast.com' }}
+        env:
+          baseUrl: ${{ github.event.inputs.base_url }} 
+          apiKey: ${{ secrets.APIKEY_PROD }}
+          apiSecret: ${{ secrets.APISECRET_PROD }}
+        run: |
+          python start_remote_controller.py --use-simple-server &> rc_gcp_enterprise_cluster.log &
+          sleep 5
+
+      - name: Run cloud tests
+        env: 
+          baseUrl: ${{ github.event.inputs.base_url }}
+          hzVersion: ${{ github.event.inputs.hzVersion }}
+        run: | 
+          pytest -o log_cli=true ./gcp_enterprise_cluster_test.py
+        working-directory: HazelcastCloudTests/PythonHazelcastCloudTests
+        
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: rc_gcp_enterprise_cluster
+          path: rc_gcp_enterprise_cluster.log
+          
+  test_azure_ssl_enterprise_cluster:
+    runs-on: ubuntu-latest
+    name: Hazelcast cloud azure ssl cluster tests with python
+    steps:
+      - name: Checkout to scripts
+        uses: actions/checkout@v2
+        
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+          
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+          
+      - name: Checkout to ${{ github.event.inputs.branch_name }}
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
+          path: client
+          ref: ${{ github.event.inputs.branch_name }}
+          
+      - name: Copy the client code to Hazelcast Cloud Test suites
+        run: |
+          cp -a $GITHUB_WORKSPACE/client/hazelcast $GITHUB_WORKSPACE/HazelcastCloudTests/PythonHazelcastCloudTests/hazelcast
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-test.txt
+        working-directory: HazelcastCloudTests/PythonHazelcastCloudTests
+        
+      - name: Start RC for UAT
+        if: ${{ github.event.inputs.base_url == 'https://uat.hazelcast.cloud' }}
+        env:
+          baseUrl: ${{ github.event.inputs.base_url }} 
+          apiKey: ${{ secrets.APIKEY_UAT }}
+          apiSecret: ${{ secrets.APISECRET_UAT }}
+        run: |
+          python start_remote_controller.py --use-simple-server &> rc_azure_ssl_enterprise_cluster.log &
+          sleep 5
+          
+      - name: Start RC for PROD
+        if: ${{ github.event.inputs.base_url == 'https://cloud.hazelcast.com' }}
+        env:
+          baseUrl: ${{ github.event.inputs.base_url }} 
+          apiKey: ${{ secrets.APIKEY_PROD }}
+          apiSecret: ${{ secrets.APISECRET_PROD }}
+        run: |
+          python start_remote_controller.py --use-simple-server &> rc_azure_ssl_enterprise_cluster.log &
+          sleep 5
+
+      - name: Run cloud tests
+        env: 
+          baseUrl: ${{ github.event.inputs.base_url }}
+          hzVersion: ${{ github.event.inputs.hzVersion }}
+        run: | 
+          pytest -o log_cli=true ./azure_ssl_enterprise_cluster_test.py
+        working-directory: HazelcastCloudTests/PythonHazelcastCloudTests
+        
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: rc_azure_ssl_enterprise_cluster
+          path: rc_azure_ssl_enterprise_cluster.log
+          
+  test_azure_enterprise_cluster:
+    runs-on: ubuntu-latest
+    name: Hazelcast cloud azure without ssl cluster tests with python
+    steps:
+      - name: Checkout to scripts
+        uses: actions/checkout@v2
+        
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+          
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+          
+      - name: Checkout to ${{ github.event.inputs.branch_name }}
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
+          path: client
+          ref: ${{ github.event.inputs.branch_name }}
+          
+      - name: Copy the client code to Hazelcast Cloud Test suites
+        run: |
+          cp -a $GITHUB_WORKSPACE/client/hazelcast $GITHUB_WORKSPACE/HazelcastCloudTests/PythonHazelcastCloudTests/hazelcast
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-test.txt
+        working-directory: HazelcastCloudTests/PythonHazelcastCloudTests
+        
+      - name: Start RC for UAT
+        if: ${{ github.event.inputs.base_url == 'https://uat.hazelcast.cloud' }}
+        env:
+          baseUrl: ${{ github.event.inputs.base_url }} 
+          apiKey: ${{ secrets.APIKEY_UAT }}
+          apiSecret: ${{ secrets.APISECRET_UAT }}
+        run: |
+          python start_remote_controller.py --use-simple-server &> rc_azure_enterprise_cluster.log &
+          sleep 5
+          
+      - name: Start RC for PROD
+        if: ${{ github.event.inputs.base_url == 'https://cloud.hazelcast.com' }}
+        env:
+          baseUrl: ${{ github.event.inputs.base_url }} 
+          apiKey: ${{ secrets.APIKEY_PROD }}
+          apiSecret: ${{ secrets.APISECRET_PROD }}
+        run: |
+          python start_remote_controller.py --use-simple-server &> rc_azure_enterprise_cluster.log &
+          sleep 5
+
+      - name: Run cloud tests
+        env: 
+          baseUrl: ${{ github.event.inputs.base_url }}
+          hzVersion: ${{ github.event.inputs.hzVersion }}
+        run: | 
+          pytest -o log_cli=true ./azure_enterprise_cluster_test.py
+        working-directory: HazelcastCloudTests/PythonHazelcastCloudTests
+        
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: rc_azure_enterprise_cluster
+          path: rc_azure_enterprise_cluster.log
           
           
       
