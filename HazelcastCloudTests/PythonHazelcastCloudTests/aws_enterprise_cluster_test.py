@@ -15,7 +15,8 @@ from hzrc.ttypes import CloudCluster
 
 class AwsEnterpriseClusterTests(unittest.TestCase):
     cluster: CloudCluster = None
-    client: HazelcastClient = None
+    smartClient: HazelcastClient = None
+    unisocketClient: HazelcastClient = None
     rc: HzRemoteController = None
     HazelcastCloudDiscovery._CLOUD_URL_BASE = os.getenv('baseUrl').replace("https://", "")
 
@@ -23,14 +24,33 @@ class AwsEnterpriseClusterTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.rc = HzRemoteController("127.0.0.1", 9701)
         cls.cluster = cls.rc.createEnterpriseCluster("aws", os.getenv('hzVersion'), False)
-        cls.client = hazelcast.HazelcastClient(
+        cls.smartClient = hazelcast.HazelcastClient(
             cluster_name=cls.cluster.nameForConnect,
             cloud_discovery_token=cls.cluster.token,
             cluster_connect_timeout=1800)
 
-    def test_connect_enterprise_cluster_with_certificates(self):
+        cls.unisocketClient = hazelcast.HazelcastClient(
+            cluster_name=cls.cluster.nameForConnect,
+            cloud_discovery_token=cls.cluster.token,
+            smart_routing=False,
+            cluster_connect_timeout=1800)
 
-        map1 = self.client.get_map("map_for_test_connect_enterprise_ssl_cluster_with_certificates").blocking()
+    def test_connect_enterprise_cluster(self):
+
+        map1 = self.smartClient.get_map("map_for_test_connect_enterprise_cluster").blocking()
+        map1.clear()
+        while map1.size() < 20:
+            random_key = random.randint(1, 100000)
+            try:
+                map1.put("key" + str(random_key), "value" + str(random_key))
+            except:
+                logging.exception("Put operation failed!")
+
+        self.assertEqual(map1.size(), 20, "Map size should be 20")
+
+    def test_connect_enterprise_cluster_unisocket(self):
+
+        map1 = self.unisocketClient.get_map("map_for_test_connect_enterprise_cluster_unisocket").blocking()
         map1.clear()
         while map1.size() < 20:
             random_key = random.randint(1, 100000)
@@ -43,6 +63,7 @@ class AwsEnterpriseClusterTests(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        cls.client.shutdown()
+        cls.smartClient.shutdown()
+        cls.unisocketClient.shutdown()
         cls.rc.deleteCluster(cls.cluster.id)
         cls.rc.exit()
