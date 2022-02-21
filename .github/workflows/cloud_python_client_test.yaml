@@ -1,4 +1,4 @@
-name: Test Python client against hazelcast cloud
+name: Hazelcast cloud test with python client
 
 on:
   workflow_dispatch:
@@ -22,7 +22,7 @@ on:
 jobs:
   test_client:
     runs-on: ubuntu-latest
-    name: Test Python client against hazelcast cloud
+    name: Hazelcast cloud standard cluster tests with python
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v2
@@ -61,7 +61,7 @@ jobs:
           apiKey: ${{ secrets.APIKEY_UAT }}
           apiSecret: ${{ secrets.APISECRET_UAT }}
         run: |
-          python start_remote_controller.py --use-simple-server &> rc.log &
+          python start_remote_controller.py --use-simple-server &> rc_standard_cluster.log &
           
       - name: Start RC for PROD
         if: ${{ github.event.inputs.base_url == 'https://cloud.hazelcast.com' }}
@@ -70,18 +70,20 @@ jobs:
           apiKey: ${{ secrets.APIKEY_PROD }}
           apiSecret: ${{ secrets.APISECRET_PROD }}
         run: |
-          python start_remote_controller.py --use-simple-server &> rc.log &
-          
-      - name: Debugging with tmate
-        uses: mxschmitt/action-tmate@v3.11
+          python start_remote_controller.py --use-simple-server &> rc_standard_cluster.log &
           
       - name: Run cloud tests
         env: 
           baseUrl: ${{ github.event.inputs.base_url }}
           hzVersion: ${{ github.event.inputs.hzVersion }}
         run: | 
-          pytest -o log_cli=true
+          pytest -o log_cli=true ./standard_cluster_test.py
         working-directory: HazelcastCloudTests/PythonHazelcastCloudTests
+        
+      - uses: actions/upload-artifact@v2
+        with:
+          name: rc-logs-standard-cluster
+          path: rc_standard_cluster.log
           
           
       
