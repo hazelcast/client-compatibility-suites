@@ -144,6 +144,9 @@ jobs:
         run: |
           python start_remote_controller.py --use-simple-server &> rc_aws_ssl_enterprise_cluster.log &
           sleep 15
+          
+      - name: Debugging with tmate
+        uses: mxschmitt/action-tmate@v3.11
 
       - name: Run cloud tests
         env: 
@@ -212,6 +215,9 @@ jobs:
         run: |
           python start_remote_controller.py --use-simple-server &> rc_aws_enterprise_cluster.log &
           sleep 15
+          
+      - name: Debugging with tmate
+        uses: mxschmitt/action-tmate@v3.11
 
       - name: Run cloud tests
         env: 
@@ -280,6 +286,9 @@ jobs:
         run: |
           python start_remote_controller.py --use-simple-server &> rc_gcp_ssl_enterprise_cluster.log &
           sleep 15
+          
+      - name: Debugging with tmate
+        uses: mxschmitt/action-tmate@v3.11
 
       - name: Run cloud tests
         env: 
@@ -348,6 +357,9 @@ jobs:
         run: |
           python start_remote_controller.py --use-simple-server &> rc_gcp_enterprise_cluster.log &
           sleep 15
+          
+      - name: Debugging with tmate
+        uses: mxschmitt/action-tmate@v3.11
 
       - name: Run cloud tests
         env: 
@@ -416,6 +428,9 @@ jobs:
         run: |
           python start_remote_controller.py --use-simple-server &> rc_azure_ssl_enterprise_cluster.log &
           sleep 15
+          
+      - name: Debugging with tmate
+        uses: mxschmitt/action-tmate@v3.11
 
       - name: Run cloud tests
         env: 
@@ -484,6 +499,9 @@ jobs:
         run: |
           python start_remote_controller.py --use-simple-server &> rc_azure_enterprise_cluster.log &
           sleep 15
+          
+      - name: Debugging with tmate
+        uses: mxschmitt/action-tmate@v3.11
 
       - name: Run cloud tests
         env: 
