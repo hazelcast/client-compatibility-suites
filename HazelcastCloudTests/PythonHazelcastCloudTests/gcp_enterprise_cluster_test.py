@@ -13,7 +13,7 @@ from hzrc.client import HzRemoteController
 from hzrc.ttypes import CloudCluster
 
 
-class TestAwsEnterpriseClusterTestsWithSsl(unittest.TestCase):
+class GcpEnterpriseClusterTests(unittest.TestCase):
     cluster: CloudCluster = None
     client: HazelcastClient = None
     rc: HzRemoteController = None
@@ -22,10 +22,11 @@ class TestAwsEnterpriseClusterTestsWithSsl(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.rc = HzRemoteController("127.0.0.1", 9701)
-        cls.cluster = cls.rc.createEnterpriseCluster("gcp", os.getenv('hzVersion'), True)
+        cls.cluster = cls.rc.createEnterpriseCluster("gcp", os.getenv('hzVersion'), False)
         cls.client = hazelcast.HazelcastClient(
             cluster_name=cls.cluster.nameForConnect,
-            cloud_discovery_token=cls.cluster.token)
+            cloud_discovery_token=cls.cluster.token,
+            cluster_connect_timeout=1800)  # If something happened wrong, it times out in 30 minutes
 
     def test_connect_enterprise_cluster_with_certificates(self):
 

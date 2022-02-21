@@ -13,7 +13,7 @@ from hzrc.client import HzRemoteController
 from hzrc.ttypes import CloudCluster
 
 
-class TestAwsEnterpriseClusterTestsWithSsl(unittest.TestCase):
+class AwsEnterpriseClusterTestsWithSsl(unittest.TestCase):
     cluster: CloudCluster = None
     client: HazelcastClient = None
     rc: HzRemoteController = None
@@ -31,7 +31,8 @@ class TestAwsEnterpriseClusterTestsWithSsl(unittest.TestCase):
             ssl_cafile=abspath(os.path.join(cls.cluster.certificatePath + "ca.pem")),
             ssl_certfile=abspath(os.path.join(cls.cluster.certificatePath + "cert.pem")),
             ssl_keyfile=abspath(os.path.join(cls.cluster.certificatePath + "key.pem")),
-            ssl_password=cls.cluster.tlsPassword)
+            ssl_password=cls.cluster.tlsPassword,
+            cluster_connect_timeout=1800)  # If something happened wrong, it times out in 30 minutes
 
     def test_try_connect_enterprise_ssl_cluster_without_certificates(self):
         value = False
