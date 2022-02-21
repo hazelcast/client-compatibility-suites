@@ -84,6 +84,7 @@ jobs:
         working-directory: HazelcastCloudTests/PythonHazelcastCloudTests
         
       - uses: actions/upload-artifact@v2
+        if: always()
         with:
           name: rc-logs-standard-cluster
           path: rc_standard_cluster.log
