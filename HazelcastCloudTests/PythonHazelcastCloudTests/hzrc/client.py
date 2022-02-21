@@ -32,7 +32,7 @@ class HzRemoteController(RemoteController.Iface):
 
     def exit(self):
         self.remote_controller.exit()
-        self.remote_controller.iprot.trans.close()
+        self.remote_controller._iprot.trans.close()
 
     def createCluster(self, hz_version, xml_config):
         return self.remote_controller.createCluster(hz_version, xml_config)
@@ -75,6 +75,9 @@ class HzRemoteController(RemoteController.Iface):
 
     def createStandardCluster(self, hazelcastVersion, isTlsEnabled):
         return self.remote_controller.createHazelcastCloudStandardCluster(hazelcastVersion, isTlsEnabled)
+
+    def createEnterpriseCluster(self, cloudProvider, hazelcastVersion, isTlsEnabled):
+        return self.remote_controller.createHazelcastCloudEnterpriseCluster(cloudProvider, hazelcastVersion, isTlsEnabled)
 
     def getCluster(self, id):
         return self.remote_controller.getHazelcastCloudCluster(id)
