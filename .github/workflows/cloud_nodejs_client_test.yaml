@@ -1,4 +1,4 @@
-name: Hazelcast cloud test with python client
+name: Hazelcast cloud test with nodejs client
 
 on:
   workflow_dispatch:
@@ -18,11 +18,11 @@ on:
       hzVersion:
         description: Version of hazelcast (For cloud standard cluster, it has different versions, i.e 5.0.2-2)
         required: true
-        
+
 jobs:
   test_standard_cluster:
     runs-on: ubuntu-latest
-    name: Hazelcast cloud standard cluster tests with python
+    name: Hazelcast cloud standard cluster tests with nodejs
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v2
@@ -40,20 +40,27 @@ jobs:
       - name: Checkout to ${{ github.event.inputs.branch_name }}
         uses: actions/checkout@v2
         with:
-          repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
+          repository: ${{ github.event.inputs.organization_name }}/hazelcast-nodejs-client
           path: client
           ref: ${{ github.event.inputs.branch_name }}
           
-      - name: Copy the client code to Hazelcast Cloud Test suites
+      - name: Install dependencies and compile client
         run: |
-          cp -a $GITHUB_WORKSPACE/client/hazelcast $GITHUB_WORKSPACE/HazelcastCloudTests/PythonHazelcastCloudTests/hazelcast
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements-test.txt
-        working-directory: HazelcastCloudTests/PythonHazelcastCloudTests
+          npm install
+          npm run compile
+        working-directory: client
         
+      - name: Copy reqired files to under test folders
+        run: |
+          cp -a $GITHUB_WORKSPACE/client/lib $GITHUB_WORKSPACE/HazelcastCloudTests/nodejshazelcastcloudtests/lib
+          cp -a $GITHUB_WORKSPACE/client/node_modules $GITHUB_WORKSPACE/HazelcastCloudTests/nodejshazelcastcloudtests/node_modules
+          cp -a $GITHUB_WORKSPACE/client/package.json $GITHUB_WORKSPACE/HazelcastCloudTests/nodejshazelcastcloudtests/
+          cp -a $GITHUB_WORKSPACE/client/package-lock.json $GITHUB_WORKSPACE/HazelcastCloudTests/nodejshazelcastcloudtests/
+          
+      - name: Debugging with tmate
+        uses: mxschmitt/action-tmate@v3.11
+
+          
       - name: Start RC for UAT
         if: ${{ github.event.inputs.base_url == 'https://uat.hazelcast.cloud' }}
         env:
@@ -73,14 +80,14 @@ jobs:
         run: |
           python start_remote_controller.py --use-simple-server &> rc_standard_cluster.log &
           sleep 30
-
+          
       - name: Run cloud tests
         env: 
           baseUrl: ${{ github.event.inputs.base_url }}
           hzVersion: ${{ github.event.inputs.hzVersion }}
         run: | 
-          pytest -o log_cli=true ./standard_cluster_test.py
-        working-directory: HazelcastCloudTests/PythonHazelcastCloudTests
+          npx mocha test.js --exit
+        working-directory: HazelcastCloudTests/nodejshazelcastcloudtests
         
       - uses: actions/upload-artifact@v2
         if: always()
