@@ -78,12 +78,12 @@ jobs:
       - name: Run non-enterprise tests
         shell: pwsh
         if: ${{ matrix.kind == 'os' }}
-        run: ./hz.ps1 -tf "namespace == Hazelcast.Tests.Remote" -server ${{ matrix.version }} test
+        run: ./hz.ps1 -server ${{ matrix.version }} test
         working-directory: client
       - name: Run all tests
         shell: pwsh
         if: ${{ matrix.kind == 'enterprise' }}
-        run: ./hz.ps1 -enterprise -tf "namespace == Hazelcast.Tests.Remote" -server ${{ matrix.version }} test
+        run: ./hz.ps1 -enterprise -server ${{ matrix.version }} test
         working-directory: client
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
