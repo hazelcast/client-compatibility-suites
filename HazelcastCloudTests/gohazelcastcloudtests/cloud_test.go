@@ -26,10 +26,8 @@ func TestMain(m *testing.M) {
 
 func setupForStandardClusterTests() error {
 	var err error
-	//sslEnabledCluster, err = it.CreateHazelcastCloudStandardCluster(os.Getenv("hzVersion"), true)
-	sslEnabledCluster, err = it.GetHazelcastCloudCluster("1536")
-	//sslDisabledCluster, err = it.CreateHazelcastCloudStandardCluster(os.Getenv("hzVersion"), false)
-	sslDisabledCluster, err = it.GetHazelcastCloudCluster("1537")
+	sslEnabledCluster, err = it.CreateHazelcastCloudStandardCluster(os.Getenv("hzVersion"), true)
+	sslDisabledCluster, err = it.CreateHazelcastCloudStandardCluster(os.Getenv("hzVersion"), false)
 	return err
 }
 
