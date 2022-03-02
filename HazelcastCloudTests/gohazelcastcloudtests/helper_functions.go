@@ -17,6 +17,10 @@ func MapPutGetAndVerify(t *testing.T, givenMap *hazelcast.Map){
 	fmt.Println("Putting random keys and values to map and then verify")
 	ctx := context.Background()
 	givenMap.Clear(ctx)
+	initialSize, err := givenMap.Size(ctx)
+	assert.Nil(t, err)
+	assert.Equal(t, initialSize, 0, "Map was cleared, size should be 0")
+
 	rand.Seed(time.Now().UTC().UnixNano())
 	iterationCounter := 0
 	for iterationCounter < 20{
