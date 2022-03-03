@@ -20,8 +20,7 @@ func TestMain(m *testing.M) {
 		panic(err.Error())
 	}
 	defer shutdownForStandardClusterTests()
-	code := m.Run()
-	os.Exit(code)
+	m.Run()
 }
 
 func setupForStandardClusterTests() error {
