@@ -1,12 +1,8 @@
-name: Test Node.js client against the released IMDG servers
+name: Test Node.js client against the released IMDG servers (same except repo changed)
 
 on:
   workflow_dispatch:
     inputs:
-      organization_name:
-        description: Default is hazelcast, but if you would like to run the workflow with your forked repo, set your github username
-        required: true
-        default: hazelcast
       branch_name:
         description: Name of the branch to test client from
         required: true
@@ -57,13 +53,13 @@ jobs:
       - name: Checkout to master
         uses: actions/checkout@v2
         with:
-          repository: ${{ github.event.inputs.organization_name }}/hazelcast-nodejs-client
+          repository: srknzl/hazelcast-nodejs-client
           path: master
           ref: master
       - name: Checkout to ${{ github.event.inputs.branch_name }}
         uses: actions/checkout@v2
         with:
-          repository: ${{ github.event.inputs.organization_name }}/hazelcast-nodejs-client
+          repository: srknzl/hazelcast-nodejs-client
           path: client
           ref: ${{ github.event.inputs.branch_name }}
       - name: Install dependencies and compile client
@@ -75,26 +71,23 @@ jobs:
         run: |
           npm install
         working-directory: master
-      - name: Download and prepare the release pack
+      - name: Copy client code into master
         run: |
-          node scripts/download-release-candidate.js -b ${{ github.event.inputs.branch_name }} -u github_actions -p ${{ secrets.GITHUB_TOKEN }} -o release-candidate.zip
-          unzip release-candidate.zip
-          sha256sum --check release-pack.sha256
-          tar xvzf hazelcast-client-*.tgz
-          rm -rf lib
-          mv package/lib .
-        working-directory: master
+          rm -rf $GITHUB_WORKSPACE/master/lib
+          rm $GITHUB_WORKSPACE/master/package.json
+          cp -a $GITHUB_WORKSPACE/client/lib $GITHUB_WORKSPACE/master/lib
+          cp -a $GITHUB_WORKSPACE/client/package.json $GITHUB_WORKSPACE/master/package.json
       - name: Start RC
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
         run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.kind }}
       - name: Run non-enterprise tests
         if: ${{ matrix.kind == 'os' }}
-        run: node node_modules/mocha/bin/mocha --recursive test/integration/backward_compatible
+        run: node node_modules/mocha/bin/mocha --recursive test
         working-directory: master
       - name: Run all tests
         if: ${{ matrix.kind == 'enterprise' }}
-        run: node node_modules/mocha/bin/mocha --recursive test/integration/backward_compatible
+        run: node node_modules/mocha/bin/mocha --recursive test/
         working-directory: master
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
