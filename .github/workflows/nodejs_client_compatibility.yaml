@@ -75,15 +75,12 @@ jobs:
         run: |
           npm install
         working-directory: master
-      - name: Download and prepare the release pack
+      - name: Copy client code into master
         run: |
-          node scripts/download-release-candidate.js -b ${{ github.event.inputs.branch_name }} -u github_actions -p ${{ secrets.GITHUB_TOKEN }} -o release-candidate.zip
-          unzip release-candidate.zip
-          sha256sum --check release-pack.sha256
-          tar xvzf hazelcast-client-*.tgz
-          rm -rf lib
-          mv package/lib .
-        working-directory: master
+          rm -rf $GITHUB_WORKSPACE/master/lib
+          rm $GITHUB_WORKSPACE/master/package.json
+          cp -a $GITHUB_WORKSPACE/client/lib $GITHUB_WORKSPACE/master/lib
+          cp -a $GITHUB_WORKSPACE/client/package.json $GITHUB_WORKSPACE/master/package.json
       - name: Start RC
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}

@@ -95,28 +95,20 @@ jobs:
    steps:
       - name: Checkout
         uses: actions/checkout@v2
-
+        
       - name: Checkout the client repo
         uses: actions/checkout@v2
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-nodejs-client
           path: KubernetesInternalClients/nodejs/clientSourceCode
-          ref: master
-
-      - name: Install dependencies
-        run: npm install
-        working-directory: KubernetesInternalClients/nodejs/clientSourceCode
-
-      - name: Download and prepare release pack from branch ${{ github.event.inputs.nodejs_run }}
+          ref: ${{ github.event.inputs.nodejs_run }}
+          
+      - name: Build client project
         run: |
-          node scripts/download-release-candidate.js -b ${{ github.event.inputs.nodejs_run }} -u github_actions -p ${{ secrets.GITHUB_TOKEN }} -o release-candidate.zip
-          unzip release-candidate.zip
-          sha256sum --check release-pack.sha256
-          tar xvzf hazelcast-client-*.tgz
-          rm -rf lib
-          mv package/lib .
-        working-directory: KubernetesInternalClients/nodejs/clientSourceCode
-
+            cd KubernetesInternalClients/nodejs/clientSourceCode
+            npm install
+            npm run compile
+            
       - name: Build client application
         run: |-
           docker build -t hazelcast-nodejs-client:test KubernetesInternalClients/nodejs

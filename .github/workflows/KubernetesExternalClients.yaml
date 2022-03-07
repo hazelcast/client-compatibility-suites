@@ -183,22 +183,8 @@ jobs:
       with:
         repository: ${{ github.event.inputs.organization_name }}/hazelcast-nodejs-client
         path: KubernetesExternalClients/nodejs/clientSourceCode
-        ref: master
-
-    - name: Install dependencies
-      run: npm install
-      working-directory: KubernetesExternalClients/nodejs/clientSourceCode
-
-    - name: Download and prepare release pack from branch ${{ github.event.inputs.nodejs_run }}
-      run: |
-        node scripts/download-release-candidate.js -b ${{ github.event.inputs.nodejs_run }} -u github_actions -p ${{ secrets.GITHUB_TOKEN }} -o release-candidate.zip
-        unzip release-candidate.zip
-        sha256sum --check release-pack.sha256
-        tar xvzf hazelcast-client-*.tgz
-        rm -rf lib
-        mv package/lib .
-      working-directory: KubernetesExternalClients/nodejs/clientSourceCode
-
+        ref: ${{ github.event.inputs.nodejs_run }}
+        
     - name: Run test
       run: |
         cp KubernetesExternalClients/nodejs/client.js KubernetesExternalClients/nodejs/clientSourceCode/
