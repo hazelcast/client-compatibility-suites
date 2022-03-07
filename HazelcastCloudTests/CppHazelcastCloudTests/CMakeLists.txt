@@ -13,24 +13,14 @@ message(
   STATUS
     "Found hazelcast-cpp-client version \"${hazelcast-cpp-client_VERSION}\"")
 
-find_package(GTest 1.11 REQUIRED)
-find_package(Thrift 0.15 REQUIRED)
-
-add_custom_command(
-  OUTPUT gen-cpp/RemoteController.h gen-cpp/RemoteController.cpp
-         gen-cpp/remote_controller_types.cpp gen-cpp/remote_controller_types.h
-  COMMAND ${THRIFT_COMPILER} --gen cpp:no_skeleton
-          ${CMAKE_CURRENT_SOURCE_DIR}/remote_controller.thrift
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/remote_controller.thrift
-  COMMENT "Generating remote-controller"
-  VERBATIM)
+find_package(GTest 1.10 REQUIRED)
+find_package(Thrift 0.13 REQUIRED)
 
 # Generated Remote Controller sources
 set(SOURCES
-    ${CMAKE_CURRENT_BINARY_DIR}/gen-cpp/RemoteController.h
-    ${CMAKE_CURRENT_BINARY_DIR}/gen-cpp/RemoteController.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/gen-cpp/remote_controller_types.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/gen-cpp/remote_controller_types.h)
+    rc/RemoteController.h rc/RemoteController.cpp
+    rc/remote_controller_types.cpp rc/remote_controller_types.h
+    rc/remote_controller_constants.h rc/remote_controller_constants.cpp)
 
 # Project sources
 list(APPEND SOURCES util.hpp util.cpp some_test.cpp)
@@ -39,5 +29,3 @@ add_executable(cloud_tests ${SOURCES})
 target_link_libraries(
   cloud_tests PRIVATE hazelcast-cpp-client::hazelcast-cpp-client thrift::thrift
                       GTest::gtest GTest::gtest_main)
-target_include_directories(cloud_tests
-                           PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/gen-cpp)

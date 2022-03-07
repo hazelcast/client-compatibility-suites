@@ -6,14 +6,15 @@
 
 namespace {
 
+
 TEST(SomeTest, SomeCase)
 {
     auto rc = hazelcast::util::make_remote_controller_client();
 
-    //    hazelcast::util::rc::CloudCluster cc;
-    //    rc.createHazelcastCloudStandardCluster(cc, "5.0.2-2", false);
+    hazelcast::util::rc::CloudCluster cc;
+    rc.createHazelcastCloudStandardCluster(cc, "5.0.2-2", false);
 
-    //    std::cout << "name: " << cc.name << std::endl;
+    //    std::cout << "name: " << cc.nameForConnect << std::endl;
     //    std::cout << "token: " << cc.token << std::endl;
 
     hazelcast::client::client_config cfg;
@@ -32,5 +33,7 @@ TEST(SomeTest, SomeCase)
     EXPECT_EQ(std::string("bar"),
               (map->get<std::string, std::string>("foo").get()));
 }
+
+
 
 } // namespace

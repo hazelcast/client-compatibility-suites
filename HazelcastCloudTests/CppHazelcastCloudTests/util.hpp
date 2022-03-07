@@ -1,6 +1,6 @@
 #pragma once
 
-#include <RemoteController.h>
+#include "rc/RemoteController.h"
 
 namespace hazelcast {
 namespace util {
