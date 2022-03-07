@@ -23,5 +23,7 @@ make_remote_controller_client()
     return { protocol };
 }
 
+rc::RemoteControllerClient rc_cli{make_remote_controller_client()};
+
 } // namespace util
 } // namespace hazelcast

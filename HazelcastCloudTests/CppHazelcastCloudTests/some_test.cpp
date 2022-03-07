@@ -26,7 +26,10 @@ TEST_F(SomeFixture, test2) {}
 class SomeParametrizedTest : public ::testing::TestWithParam<std::vector<bool>>
 {
 public:
-    static void SetUpTestSuite() { rc.getHazelcastCloudCluster(cc, "1552"); }
+    static void SetUpTestSuite()
+    {
+        hazelcast::util::rc_cli.getHazelcastCloudCluster(cc, "1552");
+    }
 
     hazelcast::client::client_config create_client_config()
     {
@@ -55,20 +58,25 @@ public:
 
     static void TearDownTestSuite()
     {
-        // rc.deleteHazelcastCloudCluster(cc.id);
+        // rc_cli.deleteHazelcastCloudCluster(cc.id);
     }
 
-    static hazelcast::util::rc::RemoteControllerClient rc;
     static hazelcast::util::rc::CloudCluster cc;
     hazelcast::client::hazelcast_client cli;
 };
 
-hazelcast::util::rc::RemoteControllerClient SomeParametrizedTest::rc{
-    hazelcast::util::make_remote_controller_client()
-};
 hazelcast::util::rc::CloudCluster SomeParametrizedTest::cc;
 
 TEST_P(SomeParametrizedTest, test1)
+{
+    auto map = cli.get_map("some-map").get();
+
+    map->put<std::string, std::string>("foo", "bar").get();
+
+    EXPECT_EQ(std::string("bar"),
+              (map->get<std::string, std::string>("foo").get()));
+}
+TEST_P(SomeParametrizedTest, test2)
 {
     auto map = cli.get_map("some-map").get();
 
@@ -87,11 +95,9 @@ INSTANTIATE_TEST_SUITE_P(SomeParametrizedTest,
 
 TEST(SomeTest, SomeCase)
 {
-    auto rc = hazelcast::util::make_remote_controller_client();
-
     hazelcast::util::rc::CloudCluster cc;
     // rc.createHazelcastCloudStandardCluster(cc, "5.0.2-2", false);
-    rc.getHazelcastCloudCluster(cc, "1552");
+    hazelcast::util::rc_cli.getHazelcastCloudCluster(cc, "1552");
     //    std::cout << "name: " << cc.nameForConnect << std::endl;
     //    std::cout << "token: " << cc.token << std::endl;
 

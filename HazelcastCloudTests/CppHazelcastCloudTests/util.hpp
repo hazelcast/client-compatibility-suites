@@ -7,8 +7,7 @@ namespace util {
 
 namespace rc = hazelcast::client::test::remote;
 
-rc::RemoteControllerClient
-make_remote_controller_client();
+extern rc::RemoteControllerClient rc_cli;
 
 } // namespace util
 } // namespace hazelcast

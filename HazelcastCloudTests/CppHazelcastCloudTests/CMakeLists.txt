@@ -23,7 +23,7 @@ set(SOURCES
     rc/remote_controller_constants.h rc/remote_controller_constants.cpp)
 
 # Project sources
-list(APPEND SOURCES util.hpp util.cpp some_test.cpp)
+list(APPEND SOURCES util.hpp util.cpp some_test.cpp other_test.cpp)
 
 add_executable(cloud_tests ${SOURCES})
 target_link_libraries(
