@@ -3,294 +3,72 @@ import time
 import unittest
 from os.path import abspath
 
+import pytest as pytest
+from parameterized import parameterized
+
 import hazelcast
 import logging
 import random
 
+from Helper import HelperMethods
 from hazelcast import HazelcastClient
 from hazelcast.discovery import HazelcastCloudDiscovery
+from hazelcast.errors import IllegalStateError
 from hzrc.client import HzRemoteController
 from hzrc.ttypes import CloudCluster
 
 
-class StandardClusterTestsWithSsl(unittest.TestCase):
-    cluster: CloudCluster = None
-    smartClient: HazelcastClient = None
-    unisocketClient: HazelcastClient = None
-    rc: HzRemoteController = None
-    HazelcastCloudDiscovery._CLOUD_URL_BASE = os.getenv('baseUrl').replace("https://", "")
-
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.rc = HzRemoteController("127.0.0.1", 9701)
-        cls.cluster = cls.rc.createStandardCluster(os.getenv('hzVersion'), True)
-        cls.smartClient = hazelcast.HazelcastClient(
-            cluster_name=cls.cluster.nameForConnect,
-            cloud_discovery_token=cls.cluster.token,
-            statistics_enabled=True,
-            ssl_enabled=True,
-            ssl_cafile=abspath(os.path.join(cls.cluster.certificatePath + "ca.pem")),
-            ssl_certfile=abspath(os.path.join(cls.cluster.certificatePath + "cert.pem")),
-            ssl_keyfile=abspath(os.path.join(cls.cluster.certificatePath + "key.pem")),
-            ssl_password=cls.cluster.tlsPassword)
-
-        cls.unisocketClient = hazelcast.HazelcastClient(
-            cluster_name=cls.cluster.nameForConnect,
-            cloud_discovery_token=cls.cluster.token,
-            statistics_enabled=True,
-            ssl_enabled=True,
-            ssl_cafile=abspath(os.path.join(cls.cluster.certificatePath + "ca.pem")),
-            ssl_certfile=abspath(os.path.join(cls.cluster.certificatePath + "cert.pem")),
-            ssl_keyfile=abspath(os.path.join(cls.cluster.certificatePath + "key.pem")),
-            ssl_password=cls.cluster.tlsPassword,
-            smart_routing=False)
-
-    def test_try_connect_ssl_cluster_without_certificates(self):
-        value = False
-        try:
-            hazelcast.HazelcastClient(
-                cluster_name=self.cluster.nameForConnect,
-                cloud_discovery_token=self.cluster.token,
-                cluster_connect_timeout=10)
-        except:
-            value = True
-        self.assertTrue(value, "Client shouldn't able to connect to ssl cluster without certificates")
-
-    def test_connect_ssl_cluster_with_certificates(self):
-        map1 = self.smartClient.get_map("map_for_test_connect_ssl_cluster_with_certificates").blocking()
-        map1.clear()
-        while map1.size() < 20:
-            random_key = random.randint(1, 100000)
-            try:
-                map1.put("key" + str(random_key), "value" + str(random_key))
-            except:
-                logging.exception("Put operation failed!")
-
-        self.assertEqual(map1.size(), 20, "Map size should be 20")
-
-    def test_scale_up_ssl_cluster(self):
-        self.rc.scaleUpDownStandardCluster(self.cluster.id, 4)
-        map2 = self.smartClient.get_map("map_for_test_scale_up_ssl_cluster").blocking()
-        while map2.size() < 20:
-            random_key = random.randint(1, 100000)
-            try:
-                map2.put("key" + str(random_key), "value" + str(random_key))
-            except:
-                logging.exception("Put operation failed!")
-
-        self.assertEqual(map2.size(), 20, "Map size should be 20")
-
-        self.rc.scaleUpDownStandardCluster(self.cluster.id, -4)
-        while map2.size() < 40:
-            random_key = random.randint(1, 100000)
-            try:
-                map2.put("key" + str(random_key), "value" + str(random_key))
-            except:
-                logging.exception("Put operation failed!")
-
-        self.assertEqual(map2.size(), 40, "Map size should be 20")
-
-    def test_restart_cluster(self):
-        self.rc.stopCluster(self.cluster.id)
-        self.rc.resumeCluster(self.cluster.id)
-        time.sleep(10)
-        map3 = self.smartClient.get_map("map_for_test_restart_cluster").blocking()
-        while map3.size() < 20:
-            random_key = random.randint(1, 100000)
-            try:
-                map3.put("key" + str(random_key), "value" + str(random_key))
-            except:
-                logging.exception("Put operation failed!")
-
-        self.assertEqual(map3.size(), 20, "Map size should be 20")
-
-    def test_try_connect_ssl_cluster_without_certificates_unisocket(self):
-        value = False
-        try:
-            hazelcast.HazelcastClient(
-                cluster_name=self.cluster.nameForConnect,
-                cloud_discovery_token=self.cluster.token,
-                cluster_connect_timeout=10,
-                smart_routing=False)
-        except:
-            value = True
-        self.assertTrue(value, "Client shouldn't able to connect to ssl cluster without certificates")
-
-    def test_connect_ssl_cluster_with_certificates_unisocket(self):
-        map1 = self.unisocketClient.get_map("map_for_test_connect_ssl_cluster_with_certificates_unisocket").blocking()
-        map1.clear()
-        while map1.size() < 20:
-            random_key = random.randint(1, 100000)
-            try:
-                map1.put("key" + str(random_key), "value" + str(random_key))
-            except:
-                logging.exception("Put operation failed!")
-
-        self.assertEqual(map1.size(), 20, "Map size should be 20")
-
-    def test_scale_up_ssl_cluster_unisocket(self):
-        self.rc.scaleUpDownStandardCluster(self.cluster.id, 4)
-        map2 = self.unisocketClient.get_map("map_for_test_scale_up_ssl_cluster_unisocket").blocking()
-        while map2.size() < 20:
-            random_key = random.randint(1, 100000)
-            try:
-                map2.put("key" + str(random_key), "value" + str(random_key))
-            except:
-                logging.exception("Put operation failed!")
-
-        self.assertEqual(map2.size(), 20, "Map size should be 20")
-
-        self.rc.scaleUpDownStandardCluster(self.cluster.id, -4)
-        while map2.size() < 40:
-            random_key = random.randint(1, 100000)
-            try:
-                map2.put("key" + str(random_key), "value" + str(random_key))
-            except:
-                logging.exception("Put operation failed!")
-
-        self.assertEqual(map2.size(), 40, "Map size should be 20")
-
-    def test_restart_cluster_unisocket(self):
-        self.rc.stopCluster(self.cluster.id)
-        self.rc.resumeCluster(self.cluster.id)
-        time.sleep(10)
-        map3 = self.unisocketClient.get_map("map_for_test_restart_cluster_unisocket").blocking()
-        while map3.size() < 20:
-            random_key = random.randint(1, 100000)
-            try:
-                map3.put("key" + str(random_key), "value" + str(random_key))
-            except:
-                logging.exception("Put operation failed!")
-
-        self.assertEqual(map3.size(), 20, "Map size should be 20")
-
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        cls.smartClient.shutdown()
-        cls.unisocketClient.shutdown()
-        cls.rc.deleteCluster(cls.cluster.id)
-        cls.rc.exit()
-
-
 class StandardClusterTests(unittest.TestCase):
-    cluster: CloudCluster = None
-    smartClient: HazelcastClient = None
-    unisocketClient: HazelcastClient = None
+    ssl_enabled_cluster: CloudCluster = None
+    ssl_disabled_cluster: CloudCluster = None
     rc: HzRemoteController = None
     HazelcastCloudDiscovery._CLOUD_URL_BASE = os.getenv('baseUrl').replace("https://", "")
 
     @classmethod
     def setUpClass(cls) -> None:
         cls.rc = HzRemoteController("127.0.0.1", 9701)
-        cls.cluster = cls.rc.createStandardCluster(os.getenv('hzVersion'), False)
-        cls.smartClient = hazelcast.HazelcastClient(
-            cluster_name=cls.cluster.nameForConnect,
-            cloud_discovery_token=cls.cluster.token)
+        #cls.ssl_enabled_cluster = cls.rc.createStandardCluster(os.getenv('hzVersion'), True)
+        cls.ssl_disabled_cluster = cls.rc.createStandardCluster(os.getenv('hzVersion'), False)
+        cls.ssl_enabled_cluster = cls.rc.getCluster("1559")
 
-        cls.smartClient = hazelcast.HazelcastClient(
-            cluster_name=cls.cluster.nameForConnect,
-            cloud_discovery_token=cls.cluster.token,
-            smart_routing=False)
+    @parameterized.expand([(True, True), (True, False), (False, True), (False, False)])
+    def test_ssl_cluster(self, is_smart, is_ssl_enabled):
+        if is_ssl_enabled:
+            client = hazelcast.HazelcastClient(
+                **HelperMethods.create_client_config_with_ssl(self.ssl_enabled_cluster.nameForConnect, self.ssl_enabled_cluster.token, is_smart,
+                                                              self.ssl_enabled_cluster.certificatePath, self.ssl_enabled_cluster.tlsPassword))
+        else:
+            client = hazelcast.HazelcastClient(**HelperMethods.create_client_config(self.ssl_enabled_cluster.nameForConnect, self.ssl_enabled_cluster.token, is_smart))
+        HelperMethods.map_put_get_and_verify(self, client.get_map("map_for_ssl_cluster").blocking())
+        print("Scaling up cluster from 2 node to 4")
+        self.rc.scaleUpDownStandardCluster(self.ssl_enabled_cluster.id, 2)
+        HelperMethods.map_put_get_and_verify(self, client.get_map("map_for_ssl_cluster").blocking())
 
-    def test_connect_cluster(self):
-        map1 = self.smartClient.get_map("map_for_test_connect_cluster").blocking()
-        map1.clear()
-        while map1.size() < 20:
-            random_key = random.randint(1, 100000)
-            try:
-                map1.put("key" + str(random_key), "value" + str(random_key))
-            except:
-                logging.exception("Put operation failed!")
+        print("Scaling down cluster from 4 node to 2")
+        self.rc.scaleUpDownStandardCluster(self.ssl_enabled_cluster.id, -2)
+        HelperMethods.map_put_get_and_verify(self, client.get_map("map_for_ssl_cluster").blocking())
 
-        self.assertEqual(map1.size(), 20, "Map size should be 20")
+        print("Stopping cluster")
+        self.rc.stopCluster(self.ssl_enabled_cluster.id)
 
-    def test_scale_up_cluster(self):
-        self.rc.scaleUpDownStandardCluster(self.cluster.id, 4)
-        map2 = self.smartClient.get_map("map_for_test_scale_up_cluster").blocking()
-        while map2.size() < 20:
-            random_key = random.randint(1, 100000)
-            try:
-                map2.put("key" + str(random_key), "value" + str(random_key))
-            except:
-                logging.exception("Put operation failed!")
+        print("Resuming cluster")
+        self.rc.resumeCluster(self.ssl_enabled_cluster.id)
 
-        self.assertEqual(map2.size(), 20, "Map size should be 20")
+        print("Wait 5 seconds to be sure client is connected")
+        time.sleep(5)
+        HelperMethods.map_put_get_and_verify(self, client.get_map("map_for_ssl_cluster").blocking())
 
-        self.rc.scaleUpDownStandardCluster(self.cluster.id, -4)
-        while map2.size() < 40:
-            random_key = random.randint(1, 100000)
-            try:
-                map2.put("key" + str(random_key), "value" + str(random_key))
-            except:
-                logging.exception("Put operation failed!")
+        client.shutdown()
 
-        self.assertEqual(map2.size(), 40, "Map size should be 40")
-
-    def test_restart_cluster(self):
-        self.rc.stopCluster(self.cluster.id)
-        self.rc.resumeCluster(self.cluster.id)
-        time.sleep(10)
-        map3 = self.smartClient.get_map("map_for_test_restart_cluster").blocking()
-        while map3.size() < 20:
-            random_key = random.randint(1, 100000)
-            try:
-                map3.put("key" + str(random_key), "value" + str(random_key))
-            except:
-                logging.exception("Put operation failed!")
-
-        self.assertEqual(map3.size(), 20, "Map size should be 20")
-
-    def test_connect_cluster_unisocket(self):
-        map1 = self.smartClient.get_map("map_for_test_connect_cluster_unisocket").blocking()
-        map1.clear()
-        while map1.size() < 20:
-            random_key = random.randint(1, 100000)
-            try:
-                map1.put("key" + str(random_key), "value" + str(random_key))
-            except:
-                logging.exception("Put operation failed!")
-
-        self.assertEqual(map1.size(), 20, "Map size should be 20")
-
-    def test_scale_up_cluster_unisocket(self):
-        self.rc.scaleUpDownStandardCluster(self.cluster.id, 4)
-        map2 = self.smartClient.get_map("map_for_test_scale_up_cluster_unisocket").blocking()
-        while map2.size() < 20:
-            random_key = random.randint(1, 100000)
-            try:
-                map2.put("key" + str(random_key), "value" + str(random_key))
-            except:
-                logging.exception("Put operation failed!")
-
-        self.assertEqual(map2.size(), 20, "Map size should be 20")
-
-        self.rc.scaleUpDownStandardCluster(self.cluster.id, -4)
-        while map2.size() < 40:
-            random_key = random.randint(1, 100000)
-            try:
-                map2.put("key" + str(random_key), "value" + str(random_key))
-            except:
-                logging.exception("Put operation failed!")
-
-        self.assertEqual(map2.size(), 40, "Map size should be 40")
-
-    def test_restart_cluster_unisocket(self):
-        self.rc.stopCluster(self.cluster.id)
-        self.rc.resumeCluster(self.cluster.id)
-        time.sleep(10)
-        map3 = self.smartClient.get_map("map_for_test_restart_cluster_unisocket").blocking()
-        while map3.size() < 20:
-            random_key = random.randint(1, 100000)
-            try:
-                map3.put("key" + str(random_key), "value" + str(random_key))
-            except:
-                logging.exception("Put operation failed!")
-
-        self.assertEqual(map3.size(), 20, "Map size should be 20")
+    @parameterized.expand([(True,), (False,)])
+    def test_try_connect_ssl_cluster_without_certificates(self, is_smart):
+        with self.assertRaises(IllegalStateError):
+            config = HelperMethods.create_client_config(self.ssl_enabled_cluster.nameForConnect, self.ssl_enabled_cluster.token, is_smart)
+            config["ssl_enabled"] = True
+            config["cluster_connect_timeout"] = 10
+            hazelcast.HazelcastClient(**config)
 
     @classmethod
     def tearDownClass(cls) -> None:
-        cls.smartClient.shutdown()
-        cls.rc.deleteCluster(cls.cluster.id)
+        #cls.rc.deleteCluster(cls.cluster.id)
         cls.rc.exit()
