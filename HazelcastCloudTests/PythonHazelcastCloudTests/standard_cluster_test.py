@@ -32,30 +32,36 @@ class StandardClusterTests(unittest.TestCase):
         cls.ssl_enabled_cluster = cls.rc.getCluster("1559")
         cls.ssl_disabled_cluster = cls.rc.getCluster("1561")
 
-    @parameterized.expand([(True, True), (True, False), (False, True), (False, False)])
+    @parameterized.expand([(True, True), (False, True), (True, False), (False, False)])
     def test_ssl_cluster(self, is_smart, is_ssl_enabled):
         if is_ssl_enabled:
+            hazelcast.client._logger.info("Create ssl enabled client config for smart routing " + str(is_smart))
             client = hazelcast.HazelcastClient(
                 **HelperMethods.create_client_config_with_ssl(self.ssl_enabled_cluster.nameForConnect, self.ssl_enabled_cluster.token, is_smart,
                                                               self.ssl_enabled_cluster.certificatePath, self.ssl_enabled_cluster.tlsPassword))
+            cluster = self.ssl_enabled_cluster
         else:
-            client = hazelcast.HazelcastClient(**HelperMethods.create_client_config(self.ssl_enabled_cluster.nameForConnect, self.ssl_enabled_cluster.token, is_smart))
-        HelperMethods.map_put_get_and_verify(self, client.get_map("map_for_ssl_cluster").blocking())
-        print("Scaling up cluster from 2 node to 4")
-        self.rc.scaleUpDownStandardCluster(self.ssl_enabled_cluster.id, 2)
-        HelperMethods.map_put_get_and_verify(self, client.get_map("map_for_ssl_cluster").blocking())
+            hazelcast.client._logger.info("Create ssl disabled client config for smart routing " + str(is_smart))
+            client = hazelcast.HazelcastClient(**HelperMethods.create_client_config(self.ssl_disabled_cluster.nameForConnect, self.ssl_disabled_cluster.token, is_smart))
+            cluster = self.ssl_disabled_cluster
 
-        print("Scaling down cluster from 4 node to 2")
-        self.rc.scaleUpDownStandardCluster(self.ssl_enabled_cluster.id, -2)
         HelperMethods.map_put_get_and_verify(self, client.get_map("map_for_ssl_cluster").blocking())
 
-        print("Stopping cluster")
-        self.rc.stopCluster(self.ssl_enabled_cluster.id)
+        hazelcast.client._logger.info("Scaling up cluster from 2 node to 4")
+        self.rc.scaleUpDownStandardCluster(cluster.id, 2)
+        HelperMethods.map_put_get_and_verify(self, client.get_map("map_for_ssl_cluster").blocking())
 
-        print("Resuming cluster")
-        self.rc.resumeCluster(self.ssl_enabled_cluster.id)
+        hazelcast.client._logger("Scaling down cluster from 4 node to 2")
+        self.rc.scaleUpDownStandardCluster(cluster.id, -2)
+        HelperMethods.map_put_get_and_verify(self, client.get_map("map_for_ssl_cluster").blocking())
 
-        print("Wait 5 seconds to be sure client is connected")
+        hazelcast.client._logger("Stopping cluster")
+        self.rc.stopCluster(cluster.id)
+
+        hazelcast.client._logger("Resuming cluster")
+        self.rc.resumeCluster(cluster.id)
+
+        hazelcast.client._logger("Wait 5 seconds to be sure client is connected")
         time.sleep(5)
         HelperMethods.map_put_get_and_verify(self, client.get_map("map_for_ssl_cluster").blocking())
 
