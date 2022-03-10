@@ -27,10 +27,8 @@ class StandardClusterTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.rc = HzRemoteController("127.0.0.1", 9701)
-        #cls.ssl_enabled_cluster = cls.rc.createStandardCluster(os.getenv('hzVersion'), True)
-        #cls.ssl_disabled_cluster = cls.rc.createStandardCluster(os.getenv('hzVersion'), False)
-        cls.ssl_enabled_cluster = cls.rc.getCluster("1559")
-        cls.ssl_disabled_cluster = cls.rc.getCluster("1561")
+        cls.ssl_enabled_cluster = cls.rc.createStandardCluster(os.getenv('hzVersion'), True)
+        cls.ssl_disabled_cluster = cls.rc.createStandardCluster(os.getenv('hzVersion'), False)
 
     @parameterized.expand([(True, True), (False, True), (True, False), (False, False)])
     def test_ssl_cluster(self, is_smart, is_ssl_enabled):
@@ -77,5 +75,6 @@ class StandardClusterTests(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        #cls.rc.deleteCluster(cls.cluster.id)
+        cls.rc.deleteCluster(cls.ssl_enabled_cluster.id)
+        cls.rc.deleteCluster(cls.ssl_disabled_cluster.id)
         cls.rc.exit()
