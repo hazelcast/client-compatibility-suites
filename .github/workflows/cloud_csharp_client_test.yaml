@@ -56,7 +56,7 @@ jobs:
           cp -R $GITHUB_WORKSPACE/HazelcastCloudTests/csharphazelcastcloudtests/CloudTests $GITHUB_WORKSPACE/client/src/CloudTests
           
       - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
+        uses: mxschmitt/action-tmate@v2
          
       - name: Start RC for UAT
         if: ${{ github.event.inputs.base_url == 'https://uat.hazelcast.cloud' }}
