@@ -52,8 +52,11 @@ jobs:
       - name: Copy reqired files to under test folders
         run: |
           rm -rf $GITHUB_WORKSPACE/client/src/Hazelcast.Net.Testing/Remote
+          ls
           cp -R $GITHUB_WORKSPACE/HazelcastCloudTests/csharphazelcastcloudtests/Remote $GITHUB_WORKSPACE/client/src/Hazelcast.Net.Testing/Remote
+          ls
           cp -R $GITHUB_WORKSPACE/HazelcastCloudTests/csharphazelcastcloudtests/CloudTests $GITHUB_WORKSPACE/client/src/CloudTests
+          ls $GITHUB_WORKSPACE/client/src/CloudTests
           
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v2
