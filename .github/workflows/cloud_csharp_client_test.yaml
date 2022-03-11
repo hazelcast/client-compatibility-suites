@@ -83,7 +83,7 @@ jobs:
         run: | 
           dotnet build -c Release
           dotnet test bin/Release/net5.0/CloudTests.dll
-        working-directory: $GITHUB_WORKSPACE/client/src/CloudTests
+        working-directory: client/src/CloudTests
           
       - uses: actions/upload-artifact@v2
         if: always()
