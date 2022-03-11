@@ -21,17 +21,17 @@ namespace CloudTests
             if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("hzVersion")))
                 hzVersion = Environment.GetEnvironmentVariable("hzVersion");
             
-            //sslEnabledCluster = await RcClient.CreateHazelcastCloudStandardCluster(_hzVersion, false);
-            //_sslDisabledCluster = await RcClient.CreateHazelcastCloudStandardCluster(hzVersion, false);
-            _sslDisabledCluster = await RcClient.GetHazelcastCloudCluster("1584");
-            _sslEnabledCluster = await RcClient.GetHazelcastCloudCluster("1565");
+            _sslEnabledCluster = await RcClient.CreateHazelcastCloudStandardCluster(_hzVersion, true);
+            _sslDisabledCluster = await RcClient.CreateHazelcastCloudStandardCluster(hzVersion, false);
+            //_sslDisabledCluster = await RcClient.GetHazelcastCloudCluster("1584");
+            //_sslEnabledCluster = await RcClient.GetHazelcastCloudCluster("1565");
         }
 
         [OneTimeTearDown]
         public async Task DeleteClusters()
         {
-            //await RcClient.DeleteHazelcastCloudCluster(sslEnabledCluster.Id);
-            //await RcClient.DeleteHazelcastCloudCluster(sslDisabledCluster.Id);
+            await RcClient.DeleteHazelcastCloudCluster(sslEnabledCluster.Id);
+            await RcClient.DeleteHazelcastCloudCluster(sslDisabledCluster.Id);
         }
 
         [TestCase(true, true)]
