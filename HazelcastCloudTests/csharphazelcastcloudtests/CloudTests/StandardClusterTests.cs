@@ -38,7 +38,7 @@ namespace CloudTests
         [TestCase(true, false)]
         [TestCase(false, true)]
         [TestCase(false, false)]
-        [Timeout(40_000)]
+        [Timeout(300_000)]
         public async Task TestCloudConnection(bool isSmart, bool isSslEnabled)
         {
             HazelcastOptions options;
