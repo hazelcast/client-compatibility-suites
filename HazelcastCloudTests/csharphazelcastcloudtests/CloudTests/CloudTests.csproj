@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Hazelcast.Net.Testing\Hazelcast.Net.Testing.csproj" />
+      <ProjectReference Include="..\Hazelcast.Net\Hazelcast.Net.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="ApacheThrift" Version="0.15.0" />
+      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
+      <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
+    </ItemGroup>
+
+</Project>

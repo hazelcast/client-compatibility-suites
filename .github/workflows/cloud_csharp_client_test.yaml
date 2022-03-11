@@ -1,0 +1,94 @@
+name: Hazelcast cloud test with csharp client
+
+on:
+  workflow_dispatch:
+    inputs:
+      organization_name:
+        description: Default is hazelcast, but if you would like to run the workflow with your forked repo, set your github username
+        required: true
+        default: hazelcast
+      branch_name:
+        description: Name of the branch to test client from
+        required: true
+        default: master
+      base_url:
+        description: Base url of the cloud env. I.e https://uat.hazelcast.cloud
+        required: true
+        default: https://uat.hazelcast.cloud
+      hzVersion:
+        description: Version of hazelcast (For cloud standard cluster, it has different versions, i.e 5.0.2-2)
+        required: true
+
+jobs:
+  test_standard_cluster:
+    runs-on: ubuntu-latest
+    name: Hazelcast cloud standard cluster tests with csharp
+    steps:
+      - name: Checkout to scripts
+        uses: actions/checkout@v2
+        
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+          
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+          
+      - name: Setup .NET Core 5.0.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+          
+      - name: Checkout to ${{ github.event.inputs.branch_name }}
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ github.event.inputs.organization_name }}/hazelcast-csharp-client
+          path: client
+          ref: ${{ github.event.inputs.branch_name }}
+        
+      - name: Copy reqired files to under test folders
+        run: |
+          rm -rf $GITHUB_WORKSPACE/client/src/Hazelcast.Net.Testing/Remote
+          cp -R $GITHUB_WORKSPACE/HazelcastCloudTests/csharphazelcastcloudtests/Remote $GITHUB_WORKSPACE/client/src/Hazelcast.Net.Testing/Remote
+          cp -R $GITHUB_WORKSPACE/HazelcastCloudTests/csharphazelcastcloudtests/CloudTests $GITHUB_WORKSPACE/client/src/CloudTests
+          
+      - name: Debugging with tmate
+        uses: mxschmitt/action-tmate@v3.11
+         
+      - name: Start RC for UAT
+        if: ${{ github.event.inputs.base_url == 'https://uat.hazelcast.cloud' }}
+        env:
+          baseUrl: ${{ github.event.inputs.base_url }} 
+          apiKey: ${{ secrets.APIKEY_UAT }}
+          apiSecret: ${{ secrets.APISECRET_UAT }}
+        run: |
+          python start_remote_controller.py &> rc_standard_cluster.log &
+          sleep 30
+          
+      - name: Start RC for PROD
+        if: ${{ github.event.inputs.base_url == 'https://cloud.hazelcast.com' }}
+        env:
+          baseUrl: ${{ github.event.inputs.base_url }} 
+          apiKey: ${{ secrets.APIKEY_PROD }}
+          apiSecret: ${{ secrets.APISECRET_PROD }}
+        run: |
+          python start_remote_controller.py &> rc_standard_cluster.log &
+          sleep 30
+          
+      - name: Run cloud tests
+        env: 
+          baseUrl: ${{ github.event.inputs.base_url }}
+          hzVersion: ${{ github.event.inputs.hzVersion }}
+        run: | 
+          dotnet build -c Release
+          dotnet test bin/Release/net5.0/CloudTests.dll
+        working-directory: $GITHUB_WORKSPACE/client/src/CloudTests
+          
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: rc_standard_cluster
+          path: rc_standard_cluster.log
