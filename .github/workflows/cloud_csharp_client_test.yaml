@@ -76,13 +76,17 @@ jobs:
           python start_remote_controller.py &> rc_standard_cluster.log &
           sleep 30
           
+      - name: Build project
+        run: |
+          dotnet build -c Release
+        working-directory: client/src/CloudTests
+                   
       - name: Run cloud tests
         env: 
           baseUrl: ${{ github.event.inputs.base_url }}
           hzVersion: ${{ github.event.inputs.hzVersion }}
-        run: | 
-          dotnet build -c Release
-          dotnet test bin/Release/net5.0/CloudTests.dll
+        run: |
+          dotnet test bin/Release/net5.0/CloudTests.dll --verbosity n
         working-directory: client/src/CloudTests
           
       - uses: actions/upload-artifact@v2
