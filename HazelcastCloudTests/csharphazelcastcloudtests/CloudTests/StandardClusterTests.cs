@@ -59,24 +59,24 @@ namespace CloudTests
             await using var map = await client.GetMapAsync<string, string>("MapForTest");
             await Helper.MapPutGetAndVerify(map);
             
-            // Console.WriteLine("Scale up cluster from 2 node to 4");
-            // await RcClient.ScaleUpDownHazelcastCloudStandardCluster(_tmpClusterObject.Id, 2);
-            // await Helper.MapPutGetAndVerify(map);
-            //
-            // Console.WriteLine("Scale down cluster from 4 node to 2");
-            // await RcClient.ScaleUpDownHazelcastCloudStandardCluster(_tmpClusterObject.Id, -2);
-            // await Helper.MapPutGetAndVerify(map);
-            //
-            // Console.WriteLine("Stop cluster");
-            // await RcClient.StopHazelcastCloudCluster(_tmpClusterObject.Id);
-            //
-            // Console.WriteLine("Resume cluster");
-            // await RcClient.ResumeHazelcastCloudCluster(_tmpClusterObject.Id);
-            //
-            // Console.WriteLine("Wait 5 seconds to be sure client is connected again");
-            // Thread.Sleep(5000);
-            //
-            // await Helper.MapPutGetAndVerify(map);
+            Console.WriteLine("Scale up cluster from 2 node to 4");
+            await RcClient.ScaleUpDownHazelcastCloudStandardCluster(_tmpClusterObject.Id, 2);
+            await Helper.MapPutGetAndVerify(map);
+            
+            Console.WriteLine("Scale down cluster from 4 node to 2");
+            await RcClient.ScaleUpDownHazelcastCloudStandardCluster(_tmpClusterObject.Id, -2);
+            await Helper.MapPutGetAndVerify(map);
+            
+            Console.WriteLine("Stop cluster");
+            await RcClient.StopHazelcastCloudCluster(_tmpClusterObject.Id);
+            
+            Console.WriteLine("Resume cluster");
+            await RcClient.ResumeHazelcastCloudCluster(_tmpClusterObject.Id);
+            
+            Console.WriteLine("Wait 5 seconds to be sure client is connected again");
+            Thread.Sleep(5000);
+            
+            await Helper.MapPutGetAndVerify(map);
             await client.DisposeAsync();
         }
         
