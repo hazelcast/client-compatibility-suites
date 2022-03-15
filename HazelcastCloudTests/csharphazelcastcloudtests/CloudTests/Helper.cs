@@ -41,7 +41,7 @@ namespace CloudTests
         public static HazelcastOptions CreateClientConfigWithoutSsl(string nameForConnect, string token, bool isSmartClient)
         {
             var options = new HazelcastOptionsBuilder().WithHConsoleLogger()
-                .With("Logging:LogLevel:Hazelcast", "Information")
+                .With("Logging:LogLevel:Hazelcast", "WARNING")
                 .Build();
             options.ClusterName = nameForConnect;
             options.Networking.Cloud.DiscoveryToken = token;
