@@ -58,6 +58,7 @@ namespace CloudTests
 
         public static async Task MapPutGetAndVerify(IHMap<string, string> map)
         {
+            Console.WriteLine("Randomly putting values to map and verify");
             await map.ClearAsync();
             var random = new Random();
             for (var i = 0; i < 20; i++)
