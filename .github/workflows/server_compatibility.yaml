@@ -526,7 +526,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Set client matrix
         id: set-matrix
-        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client go --option tag )"
+        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client go --option tag --use-latest-patch-versions )"
         
   test_go_client:
     needs: [upload_jars, setup_go_client_matrix]
