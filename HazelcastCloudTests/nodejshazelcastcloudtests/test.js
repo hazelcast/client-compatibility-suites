@@ -11,8 +11,9 @@ describe('SslEnabledStandardClusterTests', function () {
     let unisocketClient
     let sslEnabledCluster
     before(async function (){
-        //sslEnabledCluster = await RC.createHazelcastCloudStandardCluster(process.env.hzVersion, true)
-        sslEnabledCluster = await  RC.getHazelcastCloudCluster("1532");
+        RC.loginToHazelcastCloudUsingEnvironment()
+        sslEnabledCluster = await RC.createHazelcastCloudStandardCluster(process.env.hzVersion, true)
+        //sslEnabledCluster = await  RC.getHazelcastCloudCluster("1532");
     });
 
     it('TryConnectSslClusterWithoutCertificatesSmartClient', async function() {
@@ -68,6 +69,7 @@ describe('SslDisabledStandardClusterTests', function () {
     let unisocketClient
     let sslDisabledCluster
     before(async function (){
+        RC.loginToHazelcastCloudUsingEnvironment()
         //sslDisabledCluster = await RC.createHazelcastCloudStandardCluster(process.env.hzVersion, false)
         sslDisabledCluster = await RC.getHazelcastCloudCluster("1531");
     });
