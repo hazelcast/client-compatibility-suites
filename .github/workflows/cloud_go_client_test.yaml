@@ -40,7 +40,7 @@ jobs:
       - name: Change go.mod file depended branch name and go mod tidy
         run: |
           cd HazelcastCloudTests/gohazelcastcloudtests
-          sed -i "s/<InputBranchName>/${{ github.event.inputs.go_run }}/g" go.mod
+          sed -i "s/<InputBranchName>/${{ github.event.inputs.branch_name }}/g" go.mod
           go mod tidy
 
       - name: Start RC for UAT

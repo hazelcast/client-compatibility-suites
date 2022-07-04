@@ -3,6 +3,7 @@ package gohazelcastcloudtests
 import (
 	"context"
 	"fmt"
+	"github.com/hazelcast/hazelcast-go-client"
 	"github.com/hazelcast/hazelcast-go-client/types"
 	"github.com/stretchr/testify/assert"
 	it "gohazelcastcloudtests/remote-controller"
