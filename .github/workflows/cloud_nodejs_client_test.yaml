@@ -80,8 +80,8 @@ jobs:
           
       - name: Run cloud tests
         env: 
-          baseUrl: ${{ github.event.inputs.base_url }}
-          hzVersion: ${{ github.event.inputs.hzVersion }}
+          BASE_URL: ${{ github.event.inputs.base_url }}
+          HZ_VERSION: ${{ github.event.inputs.hzVersion }}
         run: | 
           npx mocha test.js --exit
         working-directory: HazelcastCloudTests/nodejshazelcastcloudtests
