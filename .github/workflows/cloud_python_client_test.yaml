@@ -46,13 +46,13 @@ jobs:
           
       - name: Copy the client code to Hazelcast Cloud Test suites
         run: |
-          cp -a $GITHUB_WORKSPACE/client/hazelcast $GITHUB_WORKSPACE/HazelcastCloudTests/PythonHazelcastCloudTests/hazelcast
+          cp -a $GITHUB_WORKSPACE/client/hazelcast $GITHUB_WORKSPACE/HazelcastCloudTests/pythonhazelcastcloudtests/hazelcast
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements-test.txt
-        working-directory: HazelcastCloudTests/PythonHazelcastCloudTests
+        working-directory: HazelcastCloudTests/pythonhazelcastcloudtests
         
       - name: Start RC for UAT
         if: ${{ github.event.inputs.base_url == 'https://uat.hazelcast.cloud' }}
@@ -80,7 +80,7 @@ jobs:
           hzVersion: ${{ github.event.inputs.hzVersion }}
         run: | 
           pytest -o log_cli=true ./standard_cluster_test.py
-        working-directory: HazelcastCloudTests/PythonHazelcastCloudTests
+        working-directory: HazelcastCloudTests/pythonhazelcastcloudtests
         
       - uses: actions/upload-artifact@v2
         if: always()
