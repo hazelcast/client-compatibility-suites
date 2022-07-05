@@ -46,20 +46,20 @@ jobs:
           
       - name: Copy the client code to Hazelcast Cloud Test suites
         run: |
-          cp -a $GITHUB_WORKSPACE/client/hazelcast $GITHUB_WORKSPACE/HazelcastCloudTests/PythonHazelcastCloudTests/hazelcast
+          cp -a $GITHUB_WORKSPACE/client/hazelcast $GITHUB_WORKSPACE/HazelcastCloudTests/pythonhazelcastcloudtests/hazelcast
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements-test.txt
-        working-directory: HazelcastCloudTests/PythonHazelcastCloudTests
+        working-directory: HazelcastCloudTests/pythonhazelcastcloudtests
         
       - name: Start RC for UAT
         if: ${{ github.event.inputs.base_url == 'https://uat.hazelcast.cloud' }}
         env:
-          baseUrl: ${{ github.event.inputs.base_url }} 
-          apiKey: ${{ secrets.APIKEY_UAT }}
-          apiSecret: ${{ secrets.APISECRET_UAT }}
+          BASE_URL: ${{ github.event.inputs.base_url }} 
+          API_KEY: ${{ secrets.APIKEY_UAT }}
+          API_SECRET: ${{ secrets.APISECRET_UAT }}
         run: |
           python start_remote_controller.py --use-simple-server &> rc_standard_cluster.log &
           sleep 30
@@ -67,20 +67,20 @@ jobs:
       - name: Start RC for PROD
         if: ${{ github.event.inputs.base_url == 'https://cloud.hazelcast.com' }}
         env:
-          baseUrl: ${{ github.event.inputs.base_url }} 
-          apiKey: ${{ secrets.APIKEY_PROD }}
-          apiSecret: ${{ secrets.APISECRET_PROD }}
+          BASE_URL: ${{ github.event.inputs.base_url }} 
+          API_KEY: ${{ secrets.APIKEY_PROD }}
+          API_SECRET: ${{ secrets.APISECRET_PROD }}
         run: |
           python start_remote_controller.py --use-simple-server &> rc_standard_cluster.log &
           sleep 30
 
       - name: Run cloud tests
         env: 
-          baseUrl: ${{ github.event.inputs.base_url }}
-          hzVersion: ${{ github.event.inputs.hzVersion }}
+          BASE_URL: ${{ github.event.inputs.base_url }}
+          HZ_VERSION: ${{ github.event.inputs.hzVersion }}
         run: | 
           pytest -o log_cli=true ./standard_cluster_test.py
-        working-directory: HazelcastCloudTests/PythonHazelcastCloudTests
+        working-directory: HazelcastCloudTests/pythonhazelcastcloudtests
         
       - uses: actions/upload-artifact@v2
         if: always()
