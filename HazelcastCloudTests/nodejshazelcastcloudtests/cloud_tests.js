@@ -11,7 +11,7 @@ describe('SslEnabledStandardClusterTests', function () {
     let unisocketClient
     let sslEnabledCluster
     before(async function (){
-        RC.loginToHazelcastCloudUsingEnvironment()
+        await RC.loginToHazelcastCloudUsingEnvironment()
         sslEnabledCluster = await RC.createHazelcastCloudStandardCluster(process.env.HZ_VERSION, true)
     });
 
@@ -60,6 +60,7 @@ describe('SslEnabledStandardClusterTests', function () {
     });
 
     after(async function (){
+        await RC.deleteHazelcastCloudCluster(sslEnabledCluster.id)
     });
 });
 
@@ -68,7 +69,7 @@ describe('SslDisabledStandardClusterTests', function () {
     let unisocketClient
     let sslDisabledCluster
     before(async function (){
-        RC.loginToHazelcastCloudUsingEnvironment()
+        await RC.loginToHazelcastCloudUsingEnvironment()
         sslDisabledCluster = await RC.createHazelcastCloudStandardCluster(process.env.HZ_VERSION, false)
     });
 
@@ -89,5 +90,6 @@ describe('SslDisabledStandardClusterTests', function () {
     });
 
     after(async function (){
+        await RC.deleteHazelcastCloudCluster(sslDisabledCluster.id)
     });
 });
