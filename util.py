@@ -341,6 +341,7 @@ def download_via_maven(
         "mvn",
         "-q",
         "dependency:get",
+        "-Dtransitive=false",
         "-DrepoUrl=" + repo,
         "-Dartifact=" + artifact,
         "-Ddest=" + dst,
