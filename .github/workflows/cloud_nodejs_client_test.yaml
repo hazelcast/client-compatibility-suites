@@ -83,7 +83,7 @@ jobs:
           BASE_URL: ${{ github.event.inputs.base_url }}
           HZ_VERSION: ${{ github.event.inputs.hzVersion }}
         run: | 
-          npx mocha test.js --exit
+          npx mocha cloud_tests.js --exit
         working-directory: HazelcastCloudTests/nodejshazelcastcloudtests
         
       - uses: actions/upload-artifact@v2
