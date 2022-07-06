@@ -35,4 +35,4 @@ jobs:
           HZ_VERSION: ${{ github.event.inputs.hzVersion }}
         run: | 
           mvn clean test "-Dhazelcast-version=${{ github.event.inputs.java_client_version }}"
-        working-directory: HazelcastCloudTests/javahazelcastcloudtest
+        working-directory: HazelcastCloudTests/javahazelcastcloudtests
