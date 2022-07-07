@@ -27,7 +27,7 @@ class StandardClusterTests(unittest.TestCase):
         cls.ssl_disabled_cluster = cls.rc.createHazelcastCloudStandardCluster(os.getenv('HZ_VERSION'), False)
 
     # There is an issue to connect ssl cluster, it is disabled for now
-    @parameterized.expand([(True, False), (False, False)])
+    @parameterized.expand([(True, True), (False, True), (True, False), (False, False)])
     def test_standard_cluster(self, is_smart, is_ssl_enabled):
         if is_ssl_enabled:
             self.logger.info("Create ssl enabled client config for smart routing " + str(is_smart))
