@@ -390,8 +390,10 @@ jobs:
       - name: Set HAZELCAST_SERVER_VERSION # required for client 4.1.0 to handle the bug.
         if: ${{ matrix.client_tag == 'v4.1.0' }}
         shell: bash
-        run: export HAZELCAST_SERVER_VERSION=${{ github.event.inputs.hz_version }}
+        run: echo "HAZELCAST_SERVER_VERSION=$HAZELCAST_SERVER_VERSION"
         working-directory: tag          
+        env:
+          HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}
       - name: Run non-enterprise tests
         if: ${{ matrix.server_kind == 'os' }}
         shell: bash
