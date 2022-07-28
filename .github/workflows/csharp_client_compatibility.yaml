@@ -70,11 +70,7 @@ jobs:
       - name: Build
         shell: pwsh
         run: ./hz.ps1 -localRestore build
-        working-directory: client
-      - name: Set HAZELCAST_SERVER_VERSION 
-        if: ${{ matrix.client_tag  == 'v4.1.0' }}
-        shell: bash
-        run: export HAZELCAST_SERVER_VERSION=${{ github.event.inputs.hz_version }}          
+        working-directory: client      
       - name: Run non-enterprise tests
         shell: pwsh
         if: ${{ matrix.kind == 'os' }}
