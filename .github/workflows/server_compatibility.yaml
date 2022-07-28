@@ -332,6 +332,10 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+      - name: Setup .NET Core 6.0.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
       - name: Setup .NET Core 5.0.x
         uses: actions/setup-dotnet@v1
         with:
@@ -388,6 +392,11 @@ jobs:
         shell: bash
         run: ./hz.sh clean,build,test -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
         working-directory: tag
+      - name: Set HAZELCAST_SERVER_VERSION 
+        if: ${{ ${{ matrix.client_tag }} == 'v4.1.0' }}
+        shell: bash
+        run: export HAZELCAST_SERVER_VERSION=${{ github.event.inputs.hz_version }}
+        working-directory: tag        
       - name: Run all tests
         if: ${{ matrix.server_kind == 'enterprise' }}
         shell: bash
