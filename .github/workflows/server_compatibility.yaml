@@ -393,7 +393,7 @@ jobs:
         run: ./hz.sh clean,build,test -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
         working-directory: tag
       - name: Set HAZELCAST_SERVER_VERSION 
-        if: ${{ ${{ matrix.client_tag }} == 'v4.1.0' }}
+        if: ${{ matrix.client_tag == 'v4.1.0' }}
         shell: bash
         run: export HAZELCAST_SERVER_VERSION=${{ github.event.inputs.hz_version }}
         working-directory: tag        
