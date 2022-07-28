@@ -392,7 +392,7 @@ jobs:
         shell: bash
         run: ./hz.sh clean,build,test -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
         working-directory: tag
-      - name: Set HAZELCAST_SERVER_VERSION 
+      - name: Set HAZELCAST_SERVER_VERSION # required for client 4.1.0 to handle the bug.
         if: ${{ matrix.client_tag == 'v4.1.0' }}
         shell: bash
         run: export HAZELCAST_SERVER_VERSION=${{ github.event.inputs.hz_version }}
@@ -535,7 +535,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Set client matrix
         id: set-matrix
-        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client go --option tag )"
+        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client go --option tag --use-latest-patch-versions )"
         
   test_go_client:
     needs: [upload_jars, setup_go_client_matrix]
