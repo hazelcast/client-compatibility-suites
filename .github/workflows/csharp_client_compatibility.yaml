@@ -37,7 +37,7 @@ jobs:
         version: ${{ fromJson(needs.setup_server_matrix.outputs.matrix) }}
         kind: [os, enterprise]
         os: [ ubuntu-latest, windows-latest ]
-    name: Test CSharp client against ${{ matrix.kind }} ${{ matrix.version }} server on ${{ matrix.os }}
+    name: Test CSharp ${{ github.event.inputs.branch_name }} branch against ${{ matrix.kind }} ${{ matrix.version }} server on ${{ matrix.os }}
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v2
@@ -71,6 +71,10 @@ jobs:
         shell: pwsh
         run: ./hz.ps1 -localRestore build
         working-directory: client
+      - name: Set HAZELCAST_SERVER_VERSION 
+        if: ${{ matrix.client_tag  == 'v4.1.0' }}
+        shell: bash
+        run: export HAZELCAST_SERVER_VERSION=${{ github.event.inputs.hz_version }}          
       - name: Run non-enterprise tests
         shell: pwsh
         if: ${{ matrix.kind == 'os' }}

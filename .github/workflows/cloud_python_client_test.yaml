@@ -1,0 +1,89 @@
+name: Hazelcast cloud test with python client
+
+on:
+  workflow_dispatch:
+    inputs:
+      organization_name:
+        description: Default is hazelcast, but if you would like to run the workflow with your forked repo, set your github username
+        required: true
+        default: hazelcast
+      branch_name:
+        description: Name of the branch to test client from
+        required: true
+        default: master
+      base_url:
+        description: Base url of the cloud env. I.e https://uat.hazelcast.cloud
+        required: true
+        default: https://uat.hazelcast.cloud
+      hzVersion:
+        description: Version of hazelcast (For cloud standard cluster, it has different versions, i.e 5.0.2-2)
+        required: true
+        
+jobs:
+  test_standard_cluster:
+    runs-on: ubuntu-latest
+    name: Hazelcast cloud standard cluster tests with python
+    steps:
+      - name: Checkout to scripts
+        uses: actions/checkout@v2
+        
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+          
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+          
+      - name: Checkout to ${{ github.event.inputs.branch_name }}
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
+          path: client
+          ref: ${{ github.event.inputs.branch_name }}
+          
+      - name: Copy the client code to Hazelcast Cloud Test suites
+        run: |
+          cp -a $GITHUB_WORKSPACE/client/hazelcast $GITHUB_WORKSPACE/HazelcastCloudTests/pythonhazelcastcloudtests/hazelcast
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-test.txt
+        working-directory: HazelcastCloudTests/pythonhazelcastcloudtests
+        
+      - name: Start RC for UAT
+        if: ${{ github.event.inputs.base_url == 'https://uat.hazelcast.cloud' }}
+        env:
+          BASE_URL: ${{ github.event.inputs.base_url }} 
+          API_KEY: ${{ secrets.APIKEY_UAT }}
+          API_SECRET: ${{ secrets.APISECRET_UAT }}
+        run: |
+          python start_remote_controller.py --use-simple-server &> rc_standard_cluster.log &
+          sleep 30
+          
+      - name: Start RC for PROD
+        if: ${{ github.event.inputs.base_url == 'https://cloud.hazelcast.com' }}
+        env:
+          BASE_URL: ${{ github.event.inputs.base_url }} 
+          API_KEY: ${{ secrets.APIKEY_PROD }}
+          API_SECRET: ${{ secrets.APISECRET_PROD }}
+        run: |
+          python start_remote_controller.py --use-simple-server &> rc_standard_cluster.log &
+          sleep 30
+
+      - name: Run cloud tests
+        env: 
+          BASE_URL: ${{ github.event.inputs.base_url }}
+          HZ_VERSION: ${{ github.event.inputs.hzVersion }}
+        run: | 
+          pytest -o log_cli=true ./standard_cluster_test.py
+        working-directory: HazelcastCloudTests/pythonhazelcastcloudtests
+        
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: rc_standard_cluster
+          path: rc_standard_cluster.log
