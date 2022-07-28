@@ -76,6 +76,10 @@ jobs:
         if: ${{ matrix.kind == 'os' }}
         run: ./hz.ps1 -server ${{ matrix.version }} test
         working-directory: client
+      - name: Set HAZELCAST_SERVER_VERSION 
+        if: ${{ matrix.client_tag  == 'v4.1.0' }}
+        shell: bash
+        run: export HAZELCAST_SERVER_VERSION=${{ github.event.inputs.hz_version }}        
       - name: Run all tests
         shell: pwsh
         if: ${{ matrix.kind == 'enterprise' }}
