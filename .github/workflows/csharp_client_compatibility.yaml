@@ -85,4 +85,5 @@ jobs:
         working-directory: client
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+          HAZELCAST_SERVER_VERSION: ${{ matrix.version }}      
         
