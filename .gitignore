@@ -5,6 +5,9 @@ __pycache__/
 
 # C extensions
 *.so
+HazelcastCloudTests/csharphazelcastcloudtests/CloudTests/bin
+HazelcastCloudTests/csharphazelcastcloudtests/CloudTests/obj
+.vs/
 
 # Distribution / packaging
 .Python

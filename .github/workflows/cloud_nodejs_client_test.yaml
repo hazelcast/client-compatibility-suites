@@ -56,17 +56,14 @@ jobs:
           cp -a $GITHUB_WORKSPACE/client/node_modules $GITHUB_WORKSPACE/HazelcastCloudTests/nodejshazelcastcloudtests/node_modules
           cp -a $GITHUB_WORKSPACE/client/package.json $GITHUB_WORKSPACE/HazelcastCloudTests/nodejshazelcastcloudtests/
           cp -a $GITHUB_WORKSPACE/client/package-lock.json $GITHUB_WORKSPACE/HazelcastCloudTests/nodejshazelcastcloudtests/
-          
-      - name: Debugging with tmate
-        uses: mxschmitt/action-tmate@v3.11
 
           
       - name: Start RC for UAT
         if: ${{ github.event.inputs.base_url == 'https://uat.hazelcast.cloud' }}
         env:
-          baseUrl: ${{ github.event.inputs.base_url }} 
-          apiKey: ${{ secrets.APIKEY_UAT }}
-          apiSecret: ${{ secrets.APISECRET_UAT }}
+          BASE_URL: ${{ github.event.inputs.base_url }} 
+          API_KEY: ${{ secrets.APIKEY_UAT }}
+          API_SECRET: ${{ secrets.APISECRET_UAT }}
         run: |
           python start_remote_controller.py &> rc_standard_cluster.log &
           sleep 30
@@ -74,19 +71,19 @@ jobs:
       - name: Start RC for PROD
         if: ${{ github.event.inputs.base_url == 'https://cloud.hazelcast.com' }}
         env:
-          baseUrl: ${{ github.event.inputs.base_url }} 
-          apiKey: ${{ secrets.APIKEY_PROD }}
-          apiSecret: ${{ secrets.APISECRET_PROD }}
+          BASE_URL: ${{ github.event.inputs.base_url }} 
+          API_KEY: ${{ secrets.APIKEY_PROD }}
+          API_SECRET: ${{ secrets.APISECRET_PROD }}
         run: |
           python start_remote_controller.py &> rc_standard_cluster.log &
           sleep 30
           
       - name: Run cloud tests
         env: 
-          baseUrl: ${{ github.event.inputs.base_url }}
-          hzVersion: ${{ github.event.inputs.hzVersion }}
+          BASE_URL: ${{ github.event.inputs.base_url }}
+          HZ_VERSION: ${{ github.event.inputs.hzVersion }}
         run: | 
-          npx mocha test.js --exit
+          npx mocha cloud_tests.js --exit
         working-directory: HazelcastCloudTests/nodejshazelcastcloudtests
         
       - uses: actions/upload-artifact@v2

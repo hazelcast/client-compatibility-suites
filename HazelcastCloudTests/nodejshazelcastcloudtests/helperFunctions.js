@@ -78,12 +78,12 @@ async function stopResumeScaleUpDownCluster(clusterId, map)
     await mapPutGetAndVerify(map);
 
     console.log("Scaling up cloud cluster");
-    await RC.scaleUpDownHazelcastCloudStandardCluster(clusterId, 2);
+    await RC.setHazelcastCloudClusterMemberCount(clusterId, 4);
 
     await mapPutGetAndVerify(map);
 
     console.log("Scaling down cloud cluster");
-    await  RC.scaleUpDownHazelcastCloudStandardCluster(clusterId, -2);
+    await  RC.setHazelcastCloudClusterMemberCount(clusterId, 2);
 
     await mapPutGetAndVerify(map);
 }

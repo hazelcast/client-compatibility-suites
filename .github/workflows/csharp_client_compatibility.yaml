@@ -37,7 +37,7 @@ jobs:
         version: ${{ fromJson(needs.setup_server_matrix.outputs.matrix) }}
         kind: [os, enterprise]
         os: [ ubuntu-latest, windows-latest ]
-    name: Test CSharp client against ${{ matrix.kind }} ${{ matrix.version }} server on ${{ matrix.os }}
+    name: Test CSharp ${{ github.event.inputs.branch_name }} branch against ${{ matrix.kind }} ${{ matrix.version }} server on ${{ matrix.os }}
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v2
@@ -45,18 +45,14 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - name: Setup .NET Core 5.0.x
+      - name: Install .NET
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 5.0.x
-      - name: Setup .NET Core 3.1.x
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 3.1.x
-      - name: Setup .NET Core 2.1.x
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 2.1.x
+          dotnet-version: |
+            2.1.x
+            3.1.x
+            5.0.x
+            6.0.x
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
@@ -74,17 +70,20 @@ jobs:
       - name: Build
         shell: pwsh
         run: ./hz.ps1 -localRestore build
-        working-directory: client
+        working-directory: client      
       - name: Run non-enterprise tests
         shell: pwsh
         if: ${{ matrix.kind == 'os' }}
-        run: ./hz.ps1 -tf "namespace == Hazelcast.Tests.Remote" -server ${{ matrix.version }} test
+        run: ./hz.ps1 -server ${{ matrix.version }} test
         working-directory: client
+        env:
+          HAZELCAST_SERVER_VERSION: ${{ matrix.version }}      
       - name: Run all tests
         shell: pwsh
         if: ${{ matrix.kind == 'enterprise' }}
-        run: ./hz.ps1 -enterprise -tf "namespace == Hazelcast.Tests.Remote" -server ${{ matrix.version }} test
+        run: ./hz.ps1 -enterprise -server ${{ matrix.version }} test
         working-directory: client
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+          HAZELCAST_SERVER_VERSION: ${{ matrix.version }}      
         

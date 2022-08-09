@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2021, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -18,95 +18,18 @@ package it
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/json"
-	"fmt"
 	"math/rand"
-	"os"
-	"reflect"
-	"runtime/debug"
-	"strconv"
-	"sync"
-	"testing"
 	"time"
 
 	"github.com/apache/thrift/lib/go/thrift"
-	"github.com/stretchr/testify/assert"
-	"go.uber.org/goleak"
-
-	hz "github.com/hazelcast/hazelcast-go-client"
-	"github.com/hazelcast/hazelcast-go-client/logger"
 	"github.com/hazelcast/hazelcast-go-client/serialization"
 )
 
-const (
-	EnvDisableSmart       = "DISABLE_SMART"
-	EnvDisableNonsmart    = "DISABLE_NONSMART"
-	EnvEnableTraceLogging = "ENABLE_TRACE"
-	EnvMemberCount        = "MEMBER_COUNT"
-	EnvEnableLeakCheck    = "ENABLE_LEAKCHECK"
-	EnvEnableSSL          = "ENABLE_SSL"
-	EnvHzVersion          = "HZ_VERSION"
-)
-
-const DefaultPort = 7701
-const DefaultClusterName = "integration-test"
-
 var Rc *RemoteControllerClient
-var rcMu = &sync.RWMutex{}
-var defaultTestCluster *TestCluster
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
-}
-
-func Tester(t *testing.T, f func(t *testing.T, client *hz.Client)) {
-	TesterWithConfigBuilder(t, nil, f)
-}
-
-func TesterWithConfigBuilder(t *testing.T, cbCallback func(config *hz.Config), f func(t *testing.T, client *hz.Client)) {
-	ensureRemoteController(true)
-	runner := func(t *testing.T, smart bool) {
-		if LeakCheckEnabled() {
-			t.Logf("enabled leak check")
-			defer goleak.VerifyNone(t)
-		}
-		config := defaultTestCluster.DefaultConfig()
-		if cbCallback != nil {
-			cbCallback(&config)
-		}
-		logLevel := logger.WarnLevel
-		if TraceLoggingEnabled() {
-			logLevel = logger.TraceLevel
-		}
-		config.Logger.Level = logLevel
-		config.Cluster.Unisocket = !smart
-		ctx := context.Background()
-		client := MustClient(hz.StartNewClientWithConfig(ctx, config))
-		defer func() {
-			if err := client.Shutdown(ctx); err != nil {
-				t.Logf("Test warning, client did not shut down: %s", err.Error())
-			}
-		}()
-		f(t, client)
-	}
-	if SmartEnabled() {
-		t.Run("Smart Client", func(t *testing.T) {
-			runner(t, true)
-		})
-	}
-	if NonSmartEnabled() {
-		t.Run("Non-Smart Client", func(t *testing.T) {
-			runner(t, false)
-		})
-	}
-}
-
-func AssertEquals(t *testing.T, target, value interface{}) {
-	if !reflect.DeepEqual(target, value) {
-		t.Log(string(debug.Stack()))
-		t.Fatalf("target: %#v != %#v", target, value)
-	}
 }
 
 const SamplePortableFactoryID = 1
@@ -172,69 +95,6 @@ func MustValue(value interface{}, err error) interface{} {
 	return value
 }
 
-// MustSlice returns a slice of values if err is nil, otherwise it panics.
-func MustSlice(slice []interface{}, err error) []interface{} {
-	if err != nil {
-		panic(err)
-	}
-	return slice
-}
-
-// MustBool returns value if err is nil, otherwise it panics.
-func MustBool(value bool, err error) bool {
-	if err != nil {
-		panic(err)
-	}
-	return value
-}
-
-// MustClient returns client if err is nil, otherwise it panics.
-func MustClient(client *hz.Client, err error) *hz.Client {
-	if err != nil {
-		panic(err)
-	}
-	return client
-}
-
-func TraceLoggingEnabled() bool {
-	return os.Getenv(EnvEnableTraceLogging) == "1"
-}
-
-func SmartEnabled() bool {
-	return os.Getenv(EnvDisableSmart) != "1"
-}
-
-func NonSmartEnabled() bool {
-	return os.Getenv(EnvDisableNonsmart) != "1"
-}
-
-func LeakCheckEnabled() bool {
-	return os.Getenv(EnvEnableLeakCheck) == "1"
-}
-
-func SSLEnabled() bool {
-	return os.Getenv(EnvEnableSSL) == "1"
-}
-
-func HzVersion() string {
-	version := os.Getenv(EnvHzVersion)
-	if version == "" {
-		version = "4.2"
-	}
-	return version
-}
-
-func MemberCount() int {
-	if memberCountStr := os.Getenv(EnvMemberCount); memberCountStr != "" {
-		if memberCount, err := strconv.Atoi(memberCountStr); err != nil {
-			panic(err)
-		} else {
-			return memberCount
-		}
-	}
-	return 1
-}
-
 func CreateDefaultRemoteController() *RemoteControllerClient {
 	return CreateRemoteController("localhost:9701")
 }
@@ -249,27 +109,6 @@ func CreateRemoteController(addr string) *RemoteControllerClient {
 	return rc
 }
 
-func ensureRemoteController(launchDefaultCluster bool) *RemoteControllerClient {
-	rcMu.Lock()
-	defer rcMu.Unlock()
-	if Rc == nil {
-		Rc = CreateDefaultRemoteController()
-		if ping, err := Rc.Ping(context.Background()); err != nil {
-			panic(err)
-		} else if !ping {
-			panic("remote controller not accesible")
-		}
-	}
-	if launchDefaultCluster && defaultTestCluster == nil {
-		if SSLEnabled() {
-			defaultTestCluster = startNewCluster(Rc, MemberCount(), xmlSSLConfig(DefaultClusterName, DefaultPort), DefaultPort)
-		} else {
-			defaultTestCluster = startNewCluster(Rc, MemberCount(), xmlConfig(DefaultClusterName, DefaultPort), DefaultPort)
-		}
-	}
-	return Rc
-}
-
 type TestCluster struct {
 	RC          *RemoteControllerClient
 	ClusterID   string
@@ -277,210 +116,36 @@ type TestCluster struct {
 	Port        int
 }
 
-func StartNewCluster(memberCount int) *TestCluster {
-	return StartNewClusterWithOptions(DefaultClusterName, DefaultPort, memberCount)
-}
-
-func StartNewClusterWithOptions(clusterName string, port, memberCount int) *TestCluster {
-	ensureRemoteController(false)
-	config := xmlConfig(clusterName, port)
-	if SSLEnabled() {
-		config = xmlSSLConfig(clusterName, port)
-	}
-	return startNewCluster(Rc, memberCount, config, port)
-}
-
-func StartNewClusterWithConfig(memberCount int, config string, port int) *TestCluster {
-	ensureRemoteController(false)
-	return startNewCluster(Rc, memberCount, config, port)
-}
-
-func startNewCluster(rc *RemoteControllerClient, memberCount int, config string, port int) *TestCluster {
-	cluster := MustValue(rc.CreateClusterKeepClusterName(context.Background(), HzVersion(), config)).(*Cluster)
-	memberUUIDs := make([]string, 0, memberCount)
-	for i := 0; i < memberCount; i++ {
-		member := MustValue(rc.StartMember(context.Background(), cluster.ID)).(*Member)
-		memberUUIDs = append(memberUUIDs, member.UUID)
-	}
-	return &TestCluster{
-		RC:          rc,
-		ClusterID:   cluster.ID,
-		MemberUUIDs: memberUUIDs,
-		Port:        port,
-	}
-}
-
-func (c TestCluster) Shutdown() {
-	for _, memberUUID := range c.MemberUUIDs {
-		c.RC.ShutdownMember(context.Background(), c.ClusterID, memberUUID)
-	}
-}
-
-func (c TestCluster) DefaultConfig() hz.Config {
-	config := hz.Config{}
-	config.Cluster.Name = c.ClusterID
-	config.Cluster.Network.SetAddresses(fmt.Sprintf("localhost:%d", c.Port))
-	if SSLEnabled() {
-		config.Cluster.Network.SSL.Enabled = true
-		config.Cluster.Network.SSL.SetTLSConfig(&tls.Config{InsecureSkipVerify: true})
-	}
-	if TraceLoggingEnabled() {
-		config.Logger.Level = logger.TraceLevel
-	}
-	return config
-}
-
-func xmlConfig(clusterName string, port int) string {
-	return fmt.Sprintf(`
-        <hazelcast xmlns="http://www.hazelcast.com/schema/config"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xsi:schemaLocation="http://www.hazelcast.com/schema/config
-            http://www.hazelcast.com/schema/config/hazelcast-config-4.0.xsd">
-            <cluster-name>%s</cluster-name>
-            <network>
-               <port>%d</port>
-            </network>
-			<map name="test-map">
-				<map-store enabled="true">
-					<class-name>com.hazelcast.client.test.SampleMapStore</class-name>
-				</map-store>
-			</map>
-			<serialization>
-				<data-serializable-factories>
-					<data-serializable-factory factory-id="66">com.hazelcast.client.test.IdentifiedFactory</data-serializable-factory>
-					<data-serializable-factory factory-id="666">com.hazelcast.client.test.IdentifiedDataSerializableFactory</data-serializable-factory>
-				</data-serializable-factories>
-			</serialization>
-        </hazelcast>
-	`, clusterName, port)
-}
-
-func xmlSSLConfig(clusterName string, port int) string {
-	return fmt.Sprintf(`
-		<hazelcast xmlns="http://www.hazelcast.com/schema/config"
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:schemaLocation="http://www.hazelcast.com/schema/config
-           http://www.hazelcast.com/schema/config/hazelcast-config-4.0.xsd">
-			<cluster-name>%s</cluster-name>
-			<network>
-			   <port>%d</port>
-				<ssl enabled="true">
-					<factory-class-name>
-						com.hazelcast.nio.ssl.ClasspathSSLContextFactory
-					</factory-class-name>
-					<properties>
-						<property name="keyStore">com/hazelcast/nio/ssl-mutual-auth/server1.keystore</property>
-						<property name="keyStorePassword">password</property>
-						<property name="keyManagerAlgorithm">SunX509</property>
-						<property name="protocol">TLSv1.2</property>
-					</properties>
-				</ssl>
-			</network>
-			<map name="test-map">
-				<map-store enabled="true">
-					<class-name>com.hazelcast.client.test.SampleMapStore</class-name>
-				</map-store>
-			</map>
-			<serialization>
-				<data-serializable-factories>
-					<data-serializable-factory factory-id="66">com.hazelcast.client.test.IdentifiedFactory</data-serializable-factory>
-					<data-serializable-factory factory-id="666">com.hazelcast.client.test.IdentifiedDataSerializableFactory</data-serializable-factory>
-				</data-serializable-factories>
-			</serialization>
-		</hazelcast>
-			`, clusterName, port)
-}
-
-func getLoggerLevel() logger.Level {
-	if TraceLoggingEnabled() {
-		return logger.TraceLevel
-	}
-	return logger.WarnLevel
-}
-
-func getDefaultClient(config *hz.Config) *hz.Client {
-	config.Logger.Level = getLoggerLevel()
-	client, err := hz.StartNewClientWithConfig(context.Background(), *config)
-	if err != nil {
-		panic(err)
-	}
-	return client
-}
-
-// Eventually asserts that given condition will be met in 2 minutes,
-// checking target function every 200 milliseconds.
-func Eventually(t *testing.T, condition func() bool, msgAndArgs ...interface{}) {
-	if !assert.Eventually(t, condition, time.Minute*2, time.Millisecond*200, msgAndArgs) {
-		t.FailNow()
-	}
-}
-
-// Never asserts that the given condition doesn't satisfy in 3 seconds,
-// checking target function every 200 milliseconds.
-//
-func Never(t *testing.T, condition func() bool, msgAndArgs ...interface{}) {
-	if !assert.Never(t, condition, time.Second*3, time.Millisecond*200, msgAndArgs) {
-		t.FailNow()
-	}
-}
-
-// WaitEventually waits for the waitgroup for 2 minutes
-// Fails the test if 2 mimutes is reached.
-func WaitEventually(t *testing.T, wg *sync.WaitGroup) {
-	WaitEventuallyWithTimeout(t, wg, time.Minute*2)
-}
-
-// WaitEventuallyWithTimeout waits for the waitgroup for the specified max timeout.
-// Fails the test if given timeout is reached.
-func WaitEventuallyWithTimeout(t *testing.T, wg *sync.WaitGroup, timeout time.Duration) {
-	c := make(chan struct{})
-	go func() {
-		defer close(c)
-		wg.Wait()
-	}()
-	timer := time.NewTimer(timeout)
-	defer timer.Stop()
-	select {
-	case <-c:
-		//done successfully
-	case <-timer.C:
-		t.FailNow()
-	}
-}
-
 // Cloud APIs
 
-func LoginToHazelcastCloud(uri string, apiKey string, apiSecret string) error {
-	ensureRemoteController(false)
-	return Rc.LoginToHazelcastCloud(context.Background(), uri, apiKey, apiSecret)
+func LoginToHazelcastCloudUsingEnvironment(ctx context.Context) error {
+	return Rc.LoginToHazelcastCloudUsingEnvironment(ctx)
 }
 
-func CreateHazelcastCloudStandardCluster(hzVersion string, isTlsEnabled bool) (*CloudCluster, error) {
-	return Rc.CreateHazelcastCloudStandardCluster(context.Background(), hzVersion, isTlsEnabled)
+func LoginToHazelcastCloud(ctx context.Context, uri string, apiKey string, apiSecret string) error {
+	return Rc.LoginToHazelcastCloud(ctx, uri, apiKey, apiSecret)
 }
 
-func GetHazelcastCloudCluster(clusterId string) (*CloudCluster, error) {
-	return Rc.GetHazelcastCloudCluster(context.Background(), clusterId)
+func CreateHazelcastCloudStandardCluster(ctx context.Context, hzVersion string, isTlsEnabled bool) (*CloudCluster, error) {
+	return Rc.CreateHazelcastCloudStandardCluster(ctx, hzVersion, isTlsEnabled)
 }
 
-func CreateHazelcastCloudEnterpriseCluster(cloudProvider string, hzVersion string, isTlsEnabled bool)(*CloudCluster, error) {
-	return Rc.CreateHazelcastCloudEnterpriseCluster(context.Background(),cloudProvider, hzVersion, isTlsEnabled)
+func GetHazelcastCloudCluster(ctx context.Context, clusterID string) (*CloudCluster, error) {
+	return Rc.GetHazelcastCloudCluster(ctx, clusterID)
 }
 
-func ScaleUpDownHazelcastCloudCluster(clusterId string, scaleNumber int32)(bool, error){
-	return Rc.ScaleUpDownHazelcastCloudStandardCluster(context.Background(), clusterId, scaleNumber)
+func SetHazelcastCloudClusterMemberCount(ctx context.Context, clusterID string, totalMemberCount int32) error {
+	return Rc.SetHazelcastCloudClusterMemberCount(ctx, clusterID, totalMemberCount)
 }
 
-func StopHazelcastCloudCluster(clusterId string)(*CloudCluster, error) {
-	return Rc.StopHazelcastCloudCluster(context.Background(), clusterId)
+func StopHazelcastCloudCluster(ctx context.Context, clusterID string) (*CloudCluster, error) {
+	return Rc.StopHazelcastCloudCluster(ctx, clusterID)
 }
 
-func ResumeHazelcastCloudCluster(clusterId string)(*CloudCluster, error) {
-	return Rc.ResumeHazelcastCloudCluster(context.Background(),clusterId)
+func ResumeHazelcastCloudCluster(ctx context.Context, clusterID string) (*CloudCluster, error) {
+	return Rc.ResumeHazelcastCloudCluster(ctx, clusterID)
 }
 
-func DeleteHazelcastCloudCluster(clusterId string)(bool, error) {
-	return Rc.DeleteHazelcastCloudCluster(context.Background(), clusterId)
+func DeleteHazelcastCloudCluster(ctx context.Context, clusterID string) error {
+	return Rc.DeleteHazelcastCloudCluster(ctx, clusterID)
 }
-
-

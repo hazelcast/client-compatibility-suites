@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2021, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,6 +90,10 @@ HzRemoteController.prototype.loginToHazelcastCloud = function (uri, apiKey, apiS
     return this.client.loginToHazelcastCloud(uri, apiKey, apiSecret, callback)
 };
 
+HzRemoteController.prototype.loginToHazelcastCloudUsingEnvironment = function (callback) {
+    return this.client.loginToHazelcastCloudUsingEnvironment(callback)
+}
+
 HzRemoteController.prototype.createHazelcastCloudStandardCluster = function (hzVersion, isTlsEnabled, callback) {
     return this.client.createHazelcastCloudStandardCluster(hzVersion, isTlsEnabled, callback)
 };
@@ -98,12 +102,8 @@ HzRemoteController.prototype.getHazelcastCloudCluster = function (clusterId, cal
     return this.client.getHazelcastCloudCluster(clusterId, callback)
 };
 
-HzRemoteController.prototype.createHazelcastCloudEnterpriseCluster = function (cloudProvider, hzVersion, isTlsEnabled, callback) {
-  return this.client.createHazelcastCloudEnterpriseCluster(cloudProvider, hzVersion, isTlsEnabled, callback)
-};
-
-HzRemoteController.prototype.scaleUpDownHazelcastCloudStandardCluster = function (clusterId, scaleNumber, callback) {
-  return this.client.scaleUpDownHazelcastCloudStandardCluster(clusterId, scaleNumber, callback)
+HzRemoteController.prototype.setHazelcastCloudClusterMemberCount = function (clusterId, totalMemberCount, callback) {
+    return this.client.setHazelcastCloudClusterMemberCount(clusterId, totalMemberCount, callback)
 }
 
 HzRemoteController.prototype.stopHazelcastCloudCluster = function (clusterId, callback) {
