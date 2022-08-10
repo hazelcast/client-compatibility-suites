@@ -37,7 +37,7 @@ jobs:
         with:
           java-version: 8
           
-      - name: Setup .NET Core 5.0.x
+      - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 6.0.x
