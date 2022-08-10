@@ -86,7 +86,7 @@ jobs:
           baseUrl: ${{ github.event.inputs.base_url }}
           hzVersion: ${{ github.event.inputs.hzVersion }}
         run: |
-          dotnet test bin/Release/net5.0/CloudTests.dll --verbosity n
+          dotnet test bin/Release/net6.0/CloudTests.dll --verbosity n
         working-directory: client/src/CloudTests
           
       - uses: actions/upload-artifact@v2
