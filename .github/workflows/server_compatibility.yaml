@@ -390,7 +390,7 @@ jobs:
       - name: Extract Default Config XML
         shell: bash
         run: |           
-          jar xf ./temp/lib/extracted/hazelcast.jar hazelcast-default.xml
+          jar xf ./temp/lib/hazelcast.jar hazelcast-default.xml
           cp ./temp/lib/hazelcast-default.xml ./temp/lib/hazelcast-${{ github.event.inputs.hz_version }}-SNAPSHOT.xml
         working-directory: tag
       - name: Run non-enterprise tests
