@@ -387,12 +387,6 @@ jobs:
         run: |
           git submodule update --init
         working-directory: tag
-      - name: Extract Default Config XML
-        shell: bash
-        run: |           
-          jar xf ./temp/lib/hazelcast-${{ github.event.inputs.hz_version }}-SNAPSHOT.jar hazelcast-default.xml
-          cp ./hazelcast-default.xml ./temp/lib/hazelcast-${{ github.event.inputs.hz_version }}-SNAPSHOT.xml
-        working-directory: tag
       - name: Run non-enterprise tests
         if: ${{ matrix.server_kind == 'os' }}
         shell: bash
