@@ -3,6 +3,10 @@ name: Test Server Backwards Compatibility
 on:
   workflow_dispatch:
     inputs:
+      organization_name:
+        description: Name of the organization to build JARs from. If you want to run the tests with the JARs from your fork, set this to your username.
+        required: true
+        default: hazelcast
       branch_name:
         description: Name of the branch to build JARs from
         required: true
@@ -10,7 +14,7 @@ on:
       hz_version:
         description: Version of the JARs that will be built, without the SNAPSHOT suffix.
         required: true
-        default: 5.0
+        default: "5.0"
       run_python:
         description: Whether or not to run Python client tests. Set to something else to not run the tests.
         required: true
@@ -43,13 +47,13 @@ jobs:
       - name: Checkout to Hazelcast
         uses: actions/checkout@v2
         with:
-          repository: hazelcast/hazelcast
+          repository: ${{ github.event.inputs.organization_name }}/hazelcast
           path: hazelcast
           ref: ${{ github.event.inputs.branch_name }}
       - name: Checkout to Hazelcast Enterprise
         uses: actions/checkout@v2
         with:
-          repository: hazelcast/hazelcast-enterprise
+          repository: ${{ github.event.inputs.organization_name }}/hazelcast-enterprise
           path: hazelcast-enterprise
           ref: ${{ github.event.inputs.branch_name }}
           token: ${{ secrets.GH_PAT }}
