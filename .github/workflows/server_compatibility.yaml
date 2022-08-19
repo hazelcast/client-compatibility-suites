@@ -568,6 +568,12 @@ jobs:
         with:
           name: hazelcast
           path: client
+      - name: Download Hazelcast SQL JAR (if exists)
+        continue-on-error: true
+        uses: actions/download-artifact@v2
+        with:
+          name: hazelcast-sql
+          path: client
       - name: Download Hazelcast Enterprise JAR
         uses: actions/download-artifact@v2
         with:
