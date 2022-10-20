@@ -59,9 +59,11 @@ jobs:
           token: ${{ secrets.GH_PAT }}
       - name: Checkout to scripts
         uses: actions/checkout@v2
+        with:
+          path: master
       - name: Apply tests-jar diff for 5.2.0
         if: ${{ github.event.inputs.hz_version == '5.2.0' }}
-        run: git apply $GITHUB_WORKSPACE/tests-jar.diff
+        run: git apply $GITHUB_WORKSPACE/master/tests-jar.diff
         working-directory: hazelcast-enterprise
       - name: Build JARs
         run: mvn clean install -DskipTests=True
