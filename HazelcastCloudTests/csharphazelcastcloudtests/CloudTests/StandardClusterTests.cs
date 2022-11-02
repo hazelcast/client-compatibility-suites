@@ -26,8 +26,6 @@ namespace CloudTests
 
             _sslEnabledCluster = await RcClient.CreateHazelcastCloudStandardCluster(hzVersion, true);
             _sslDisabledCluster = await RcClient.CreateHazelcastCloudStandardCluster(hzVersion, false);
-            //_sslDisabledCluster = await RcClient.GetHazelcastCloudCluster("1584");
-            //_sslEnabledCluster = await RcClient.GetHazelcastCloudCluster("1565");
         }
 
         [OneTimeTearDown]
@@ -92,24 +90,17 @@ namespace CloudTests
         [TestCase(true)]
         [TestCase(false)]
         [Timeout(30_000)]
-        public async Task TryConnectSslClusterWithoutCertificates(bool isSmart)
+        public void TryConnectSslClusterWithoutCertificates(bool isSmart)
         {
             var options = Helper.CreateClientConfigWithoutSsl(_sslEnabledCluster.NameForConnect,
                 _sslEnabledCluster.Token, isSmart);
             options.Networking.Ssl.Enabled = true;
             options.Networking.ConnectionRetry.ClusterConnectionTimeoutMilliseconds = 10000;
             var logger = options.LoggerFactory.Service.CreateLogger("test");
-            bool value = false;
-            try
-            {
-                logger.LogInformation("Try connecting ssl cluster without certificates");
-                await using var client = await HazelcastClientFactory.StartNewClientAsync(options);
-            }
-            catch
-            {
-                value = true;
-            }
-            Assert.IsTrue(value, "Client shouldn't be able to connect ssl cluster without certificates");
+
+            logger.LogInformation("Try connecting ssl cluster without certificates");
+            Assert.ThrowsAsync<Exception>(async () => await HazelcastClientFactory.StartNewClientAsync(options), "Client shouldn't be able to connect ssl cluster without certificates");
+
         }
     }
 }

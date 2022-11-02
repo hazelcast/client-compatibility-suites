@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Security.Authentication;
 using System.Threading.Tasks;
@@ -66,13 +67,23 @@ namespace CloudTests
             logger.LogInformation("Randomly putting values to map and verify");
             await map.ClearAsync();
             var random = new Random();
-            for (var i = 0; i < 20; i++)
+            var entrySize = 20;
+
+            var randomUniqueNums = new HashSet<int>();
+
+            while (randomUniqueNums.Count < entrySize)
+                randomUniqueNums.Add(random.Next(100_000));
+
+            foreach (var num in randomUniqueNums)
             {
-                var randomValue = random.Next(100_000);
-                await map.PutAsync("key_" + randomValue, "value_" + randomValue);
-                Assert.AreEqual("value_" + randomValue, await map.GetAsync("key_" + randomValue)) ;
+                var key = $"key_{num}";
+                var val = $"value_{num}";
+
+                await map.PutAsync(key, val);
+                Assert.AreEqual(val, await map.GetAsync(key));
             }
-            Assert.AreEqual(await map.GetSizeAsync(), 20, "Size should be 20");
+
+            Assert.AreEqual(await map.GetSizeAsync(), randomUniqueNums.Count, $"Size should be {randomUniqueNums.Count}");
         }
     }
 }
