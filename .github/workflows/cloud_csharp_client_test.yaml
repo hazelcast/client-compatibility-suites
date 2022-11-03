@@ -23,9 +23,6 @@ jobs:
   test_standard_cluster:
     runs-on: ubuntu-latest
     name: Hazelcast cloud standard cluster tests with csharp
-    strategy: 
-      matrix: 
-        fwks: [netcoreapp3.1,net5.0,net6.0]
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v2
@@ -43,7 +40,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 6.0
+          dotnet-version: 6.0.x
           
       - name: Checkout to ${{ github.event.inputs.branch_name }}
         uses: actions/checkout@v2
@@ -81,7 +78,7 @@ jobs:
           
       - name: Build project
         run: |
-          dotnet build -c Release -f ${{matrix.fwks}}
+          dotnet build -c Release -f net6.0
         working-directory: client/src/CloudTests
                    
       - name: Run cloud tests
@@ -90,7 +87,7 @@ jobs:
           hzVersion: ${{ github.event.inputs.hzVersion }}
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hzVersion }}
         run: |
-          format('dotnet test bin/Release/{0}/CloudTests.dll --verbosity n',${{matrix.fwks}})
+          dotnet test bin/Release/net6.0/CloudTests.dll --verbosity n
         working-directory: client/src/CloudTests
           
       - uses: actions/upload-artifact@v2
