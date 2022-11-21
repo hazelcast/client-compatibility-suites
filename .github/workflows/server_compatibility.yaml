@@ -432,7 +432,7 @@ jobs:
         run: echo "::set-output name=matrix::$( python get_client_matrix.py --client cpp --option tag --use-latest-patch-versions )"
   test_cpp_clients:
     needs: [ upload_jars, setup_cpp_client_matrix ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
