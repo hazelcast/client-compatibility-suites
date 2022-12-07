@@ -49,14 +49,26 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: '1.18'
-            
+
+      - name: Checkout to test artifacts
+        uses: actions/checkout@v2
+        with:
+          repository: hazelcast/private-test-artifacts
+          path: certs
+          ref: data
+          token: ${{ secrets.GH_PAT }}
+
       - name: Checkout the ${{ github.event.inputs.branch_name }}     
         uses: actions/checkout@v2
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-go-client
           path: client
           ref: ${{ github.event.inputs.branch_name }}
-          
+
+      - name: Copy certificates JAR to destination with the appropriate name
+        run: |
+          cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/client/hazelcast-enterprise-${{ matrix.version }}-tests.jar
+
       - name: Test
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}

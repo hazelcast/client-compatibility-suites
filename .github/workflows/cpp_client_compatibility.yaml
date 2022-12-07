@@ -47,15 +47,23 @@ jobs:
             distribution: 'adopt'
             java-version: '8'
             check-latest: true
-            
+
+      - name: Checkout to test artifacts
+        if: ${{ matrix.kind == 'enterprise' }}
+        uses: actions/checkout@v2
+        with:
+          repository: hazelcast/private-test-artifacts
+          path: certs
+          ref: data
+          token: ${{ secrets.GH_PAT }}
+
       - name: Checkout the ${{ github.event.inputs.branch_name }}     
         uses: actions/checkout@v2
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-cpp-client
           path: client
           ref: ${{ github.event.inputs.branch_name }}
-        
-            
+
       - name: Install Necessary Packages
         run: |
           sudo apt-get update
@@ -83,7 +91,12 @@ jobs:
               -DBUILD_TESTS=ON                                             \
               -DBUILD_EXAMPLES=OFF
         working-directory: client
-              
+
+      - name: Copy certificates JAR to destination with the appropriate name
+        if: ${{ matrix.kind == 'enterprise' }}
+        run: |
+          cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/client/scripts/hazelcast-enterprise-${{ matrix.version }}-tests.jar
+
       - name: Test
         env:
           BUILD_DIR: build

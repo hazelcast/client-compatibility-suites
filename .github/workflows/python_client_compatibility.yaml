@@ -38,6 +38,14 @@ jobs:
         kind: [os, enterprise]
     name: Test Python client against ${{ matrix.kind }} ${{ matrix.version }} server
     steps:
+      - name: Checkout to test artifacts
+        if: ${{ matrix.kind == 'enterprise' }}
+        uses: actions/checkout@v2
+        with:
+          repository: hazelcast/private-test-artifacts
+          path: certs
+          ref: data
+          token: ${{ secrets.GH_PAT }}
       - name: Checkout to scripts
         uses: actions/checkout@v2
       - name: Setup Python
@@ -50,6 +58,10 @@ jobs:
           java-version: 8
       - name: Download JARs
         run: python download_server_jars.py --version ${{ matrix.version }} --server-kind ${{ matrix.kind }} --dst jars
+      - name: Copy certificates JAR to destination with the appropriate name
+        if: ${{ matrix.kind == 'enterprise' }}
+        run: |
+          cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/jars/hazelcast-enterprise-${{ matrix.version }}-tests.jar
       - name: Checkout to master
         uses: actions/checkout@v2
         with:

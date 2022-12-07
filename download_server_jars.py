@@ -70,6 +70,5 @@ if __name__ == "__main__":
 
     if server_kind == ServerKind.ENTERPRISE:
         download_via_maven(enterprise_repo, "hazelcast-enterprise", version, dst)
-        download_via_maven(enterprise_repo, "hazelcast-enterprise", version, dst, True)
     else:
         download_via_maven(repo, "hazelcast", version, dst)
