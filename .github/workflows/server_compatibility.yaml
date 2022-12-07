@@ -107,6 +107,7 @@ jobs:
         # - Rename the certs.jar with that -> mv command
         run: |
           mv certs.jar "${$(find $GITHUB_WORKSPACE/hazelcast/hazelcast/target -maxdepth 1 -mindepth 1 -name "hazelcast*" -a -name "*tests.jar" | sed "s/.*\///")//hazelcast/hazelcast-enterprise}"
+        working-directory: certs
       - name: Upload certificates as Hazelcast Enterprise tests JAR
         uses: actions/upload-artifact@v2
         with:
