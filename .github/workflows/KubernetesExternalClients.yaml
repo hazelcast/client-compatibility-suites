@@ -192,12 +192,7 @@ jobs:
         npm install
         npm run compile
         sed -i "s/<EXTERNAL-IP>/${{needs.create-gke-cluster.outputs.external-ip}}/g" client.js
-        node client.js &> output.txt && tail -n 20 output.txt &> last20lines.txt
-        cat last20lines.txt
-        if [ $(grep -o 'Current map size:' last20lines.txt | wc -l) != $"14" ]; then exit 1; fi
-        
-#Count set it as 14 for verification because last 6 lines has shotdown logs of nodejs and there should be 14 'Current map size:'
-#TODO: More reliabe verification. 
+        node client.js
 
   run_csharp:
     name: Run Csharp compatibility test
