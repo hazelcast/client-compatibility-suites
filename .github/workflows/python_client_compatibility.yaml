@@ -38,6 +38,8 @@ jobs:
         kind: [os, enterprise]
     name: Test Python client against ${{ matrix.kind }} ${{ matrix.version }} server
     steps:
+      - name: Checkout to scripts
+        uses: actions/checkout@v2
       - name: Checkout to test artifacts
         if: ${{ matrix.kind == 'enterprise' }}
         uses: actions/checkout@v2
@@ -46,8 +48,6 @@ jobs:
           path: certs
           ref: data
           token: ${{ secrets.GH_PAT }}
-      - name: Checkout to scripts
-        uses: actions/checkout@v2
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
