@@ -100,13 +100,10 @@ jobs:
           path: hazelcast-enterprise/hazelcast-enterprise/target/hazelcast-enterprise-*[!s].jar
           retention-days: 1
       - name: Rename certs.jar as Hazelcast Enterprise tests JAR
-        # - Find a file named "hazelcast*-tests.jar" in the $GITHUB_WORKSPACE/hazelcast/hazelcast/target -> find command
-        # - Get rid of the file path, so that we only have the file name -> piped sed command
-        # - Replace the hazelcast with hazelcast-enterprise so that we can end up with the expected
-        #   enterprise test file name -> parameter expansion
-        # - Rename the certs.jar with that -> mv command
         run: |
-          mv certs.jar "${$(find $GITHUB_WORKSPACE/hazelcast/hazelcast/target -maxdepth 1 -mindepth 1 -name "hazelcast*" -a -name "*tests.jar" | sed "s/.*\///")//hazelcast/hazelcast-enterprise}"
+          HZ_TESTS_JAR_NAME=$(basename $(ls $GITHUB_WORKSPACE/hazelcast/hazelcast/target/hazelcast-*-tests.jar))
+          HZ_ENTERPRISE_TESTS_JAR_NAME=$(echo $HZ_TESTS_JAR_NAME | sed "s/hazelcast/hazelcast-enterprise/") 
+          mv certs.jar $HZ_ENTERPRISE_TESTS_JAR_NAME
         working-directory: certs
       - name: Upload certificates as Hazelcast Enterprise tests JAR
         uses: actions/upload-artifact@v2
