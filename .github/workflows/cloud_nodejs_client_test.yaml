@@ -12,7 +12,7 @@ on:
         required: true
         default: master
       base_url:
-        description: Base url of the cloud env. Must be one of https://uat.hazelcast.cloud, https://cloud.hazelcast.cloud, https://viridian.hazelcast.cloud
+        description: Base url of the cloud env. Must be one of https://uat.hazelcast.cloud, https://cloud.hazelcast.com, https://viridian.hazelcast.com
         required: true
         default: https://uat.hazelcast.cloud
       hzVersion:
