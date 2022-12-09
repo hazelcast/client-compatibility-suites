@@ -12,7 +12,7 @@ on:
         required: true
         default: master
       base_url:
-        description: Base url of the cloud env. I.e https://uat.hazelcast.cloud
+        description: Base url of the cloud env. Must be one of https://uat.hazelcast.cloud, https://cloud.hazelcast.cloud, https://viridian.hazelcast.cloud
         required: true
         default: https://uat.hazelcast.cloud
       hzVersion:
@@ -57,7 +57,6 @@ jobs:
           cp -a $GITHUB_WORKSPACE/client/package.json $GITHUB_WORKSPACE/HazelcastCloudTests/nodejshazelcastcloudtests/
           cp -a $GITHUB_WORKSPACE/client/package-lock.json $GITHUB_WORKSPACE/HazelcastCloudTests/nodejshazelcastcloudtests/
 
-          
       - name: Start RC for UAT
         if: ${{ github.event.inputs.base_url == 'https://uat.hazelcast.cloud' }}
         env:
@@ -68,8 +67,18 @@ jobs:
           python start_remote_controller.py &> rc_standard_cluster.log &
           sleep 30
           
-      - name: Start RC for PROD
+      - name: Start RC for Hazelcast Cloud
         if: ${{ github.event.inputs.base_url == 'https://cloud.hazelcast.com' }}
+        env:
+          BASE_URL: ${{ github.event.inputs.base_url }} 
+          API_KEY: ${{ secrets.APIKEY_PROD }}
+          API_SECRET: ${{ secrets.APISECRET_PROD }}
+        run: |
+          python start_remote_controller.py &> rc_standard_cluster.log &
+          sleep 30
+
+      - name: Start RC for Viridian
+        if: ${{ github.event.inputs.base_url == 'https://viridian.hazelcast.com' }}
         env:
           BASE_URL: ${{ github.event.inputs.base_url }} 
           API_KEY: ${{ secrets.APIKEY_PROD }}
