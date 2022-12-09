@@ -39,6 +39,14 @@ jobs:
         os: [ ubuntu-latest, windows-latest ]
     name: Test CSharp ${{ github.event.inputs.branch_name }} branch against ${{ matrix.kind }} ${{ matrix.version }} server on ${{ matrix.os }}
     steps:
+      - name: Checkout to test artifacts
+        if: ${{ matrix.kind == 'enterprise' }}
+        uses: actions/checkout@v2
+        with:
+          repository: hazelcast/private-test-artifacts
+          path: certs
+          ref: data
+          token: ${{ secrets.GH_PAT }}
       - name: Checkout to scripts
         uses: actions/checkout@v2
       - name: Setup Python
@@ -77,7 +85,12 @@ jobs:
         run: ./hz.ps1 -server ${{ matrix.version }} test
         working-directory: client
         env:
-          HAZELCAST_SERVER_VERSION: ${{ matrix.version }}      
+          HAZELCAST_SERVER_VERSION: ${{ matrix.version }}
+      - name: Copy certificates JAR to destination with the appropriate name
+        if: ${{ matrix.kind == 'enterprise' }}
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/client/temp/lib
+          cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/client/temp/lib/hazelcast-enterprise-${{ matrix.version }}-tests.jar
       - name: Run all tests
         shell: pwsh
         if: ${{ matrix.kind == 'enterprise' }}

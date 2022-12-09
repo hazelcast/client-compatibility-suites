@@ -44,6 +44,13 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 8
+      - name: Checkout to test artifacts
+        uses: actions/checkout@v2
+        with:
+          repository: hazelcast/private-test-artifacts
+          path: certs
+          ref: data
+          token: ${{ secrets.GH_PAT }}
       - name: Checkout to Hazelcast
         uses: actions/checkout@v2
         with:
@@ -61,10 +68,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: master
-      - name: Apply tests-jar diff for 5.2.1
-        if: ${{ github.event.inputs.hz_version == '5.2.1' }}
-        run: git apply $GITHUB_WORKSPACE/master/tests-jar.diff
-        working-directory: hazelcast-enterprise
       - name: Build JARs
         run: mvn clean install -DskipTests=True
         working-directory: hazelcast
@@ -96,11 +99,20 @@ jobs:
           name: hazelcast-enterprise
           path: hazelcast-enterprise/hazelcast-enterprise/target/hazelcast-enterprise-*[!s].jar
           retention-days: 1
-      - name: Upload Hazelcast Enterprise tests JAR
+      - name: Rename certs.jar as Hazelcast Enterprise tests JAR
+        # - Find a file named "hazelcast*-tests.jar" in the $GITHUB_WORKSPACE/hazelcast/hazelcast/target -> find command
+        # - Get rid of the file path, so that we only have the file name -> piped sed command
+        # - Replace the hazelcast with hazelcast-enterprise so that we can end up with the expected
+        #   enterprise test file name -> parameter expansion
+        # - Rename the certs.jar with that -> mv command
+        run: |
+          mv certs.jar "${$(find $GITHUB_WORKSPACE/hazelcast/hazelcast/target -maxdepth 1 -mindepth 1 -name "hazelcast*" -a -name "*tests.jar" | sed "s/.*\///")//hazelcast/hazelcast-enterprise}"
+        working-directory: certs
+      - name: Upload certificates as Hazelcast Enterprise tests JAR
         uses: actions/upload-artifact@v2
         with:
           name: hazelcast-enterprise-tests
-          path: hazelcast-enterprise/hazelcast-enterprise/target/hazelcast-enterprise-*-tests.jar
+          path: certs/hazelcast-enterprise-*-tests.jar
           retention-days: 1
   setup_python_client_matrix:
     name: Setup the Python client test matrix
