@@ -15,12 +15,12 @@ public class CloudCluster {
         this.name = name;
     }
 
-    public String getNameForConnect() {
-        return nameForConnect;
+    public String getReleaseName() {
+        return releaseName;
     }
 
-    public void setNameForConnect(String nameForConnect) {
-        this.nameForConnect = nameForConnect;
+    public void setReleaseName(String releaseName) {
+        this.releaseName = releaseName;
     }
 
     public String getHazelcastVersion() {
@@ -71,10 +71,10 @@ public class CloudCluster {
         this.tlsPassword = tlsPassword;
     }
 
-    public CloudCluster(String id, String name, String nameForConnect, String hazelcastVersion, boolean isTlsEnabled, String state, String token, String certificatePath, String tlsPassword) {
+    public CloudCluster(String id, String name, String releaseName, String hazelcastVersion, boolean isTlsEnabled, String state, String token, String certificatePath, String tlsPassword) {
         this.id = id;
         this.name = name;
-        this.nameForConnect = nameForConnect;
+        this.releaseName = releaseName;
         this.hazelcastVersion = hazelcastVersion;
         this.isTlsEnabled = isTlsEnabled;
         this.state = state;
@@ -85,7 +85,7 @@ public class CloudCluster {
 
     public String id;
     public String name;
-    public String nameForConnect;
+    public String releaseName;
     public String hazelcastVersion;
     public boolean isTlsEnabled;
     public String state;

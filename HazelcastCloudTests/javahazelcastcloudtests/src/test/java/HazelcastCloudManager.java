@@ -1,5 +1,3 @@
-package com.hazelcast.remotecontroller;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.*;
@@ -23,7 +21,7 @@ public class HazelcastCloudManager {
     private String baseUrl;
     private final ObjectMapper mapper = new ObjectMapper();
     private String bearerToken;
-    private static final Logger LOG = LogManager.getLogger(Main.class);
+    private static final Logger LOG = LogManager.getLogger(HazelcastCloudManager.class);
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private Call call;
     private static final int timeoutForClusterStateWait = 5;
