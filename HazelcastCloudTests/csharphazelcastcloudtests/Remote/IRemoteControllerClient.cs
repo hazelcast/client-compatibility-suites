@@ -140,35 +140,26 @@ namespace Hazelcast.Testing.Remote
         Task<Response> ExecuteOnControllerAsync(string clusterId, string script, Lang lang, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Login to hazelcast cloud.
+        /// Login to cloud.
         /// </summary>
         /// <param name="uri">Cloud env uri</param>
         /// <param name="apiKey">Api key for cloud</param>
         /// <param name="apiSecret">Api secret for cloud</param>
-        Task LoginToHazelcastCloud(string uri, string apiKey, string apiSecret, CancellationToken cancellationToken = default);
+        Task LoginToCloud(string uri, string apiKey, string apiSecret, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Login to hazelcast cloud by using ENV parameters.
+        /// Login to cloud by using ENV parameters.
         /// </summary>
-        Task LoginToHazelcastCloudUsingEnvironment(CancellationToken cancellationToken = default);
+        Task LoginToCloudUsingEnvironment(CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Creates a standard cluster in Hazelcast Cloud
+        /// Creates a cluster in cloud
         /// </summary>
         /// <param name="hzVersion"></param>
         /// <param name="isTlsEnabled"></param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
         /// <returns>Cloud cluster information</returns>
-        Task<CloudCluster> CreateHazelcastCloudStandardCluster(string hzVersion, bool isTlsEnabled, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Set cluster size
-        /// </summary>
-        /// <param name="cloudClusterId"></param>
-        /// <param name="totalMemberCount"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        Task SetHazelcastCloudClusterMemberCount(string cloudClusterId, int totalMemberCount, CancellationToken cancellationToken = default);
+        Task<CloudCluster> CreateCloudCluster(string hzVersion, bool isTlsEnabled, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get cloud cluster information
@@ -176,7 +167,7 @@ namespace Hazelcast.Testing.Remote
         /// <param name="cloudClusterId"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<CloudCluster> GetHazelcastCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default);
+        Task<CloudCluster> GetCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Stop given cluster on the cloud
@@ -184,21 +175,21 @@ namespace Hazelcast.Testing.Remote
         /// <param name="cloudClusterId"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<CloudCluster> StopHazelcastCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default);
+        Task<CloudCluster> StopCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Resume clster on the cloud
+        /// Resume cluster on the cloud
         /// </summary>
         /// <param name="cloudClusterId"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<CloudCluster> ResumeHazelcastCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default);
+        Task<CloudCluster> ResumeCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Delete given cluster on the cloud
         /// </summary>
         /// <param name="cloudClusterId"></param>
         /// <param name="cancellationToken"></param>
-        Task DeleteHazelcastCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default);
+        Task DeleteCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default);
     }
 }

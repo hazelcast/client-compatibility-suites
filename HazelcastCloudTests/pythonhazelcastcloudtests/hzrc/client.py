@@ -72,30 +72,25 @@ class HzRemoteController(RemoteController.Iface):
 
     # Cloud APIs
 
-    def loginToHazelcastCloudUsingEnvironment(self):
-        return self.remote_controller.loginToHazelcastCloudUsingEnvironment()
+    def loginToCloudUsingEnvironment(self):
+        return self.remote_controller.loginToCloudUsingEnvironment()
 
-    def loginToHazelcastCloud(self, uri, api_key, api_secret):
-        return self.remote_controller.loginToHazelcastCloud(uri, api_key, api_secret)
+    def loginToCloud(self, uri, api_key, api_secret):
+        return self.remote_controller.loginToCloud(uri, api_key, api_secret)
 
-    def createHazelcastCloudStandardCluster(self, hz_version, is_tls_enabled):
-        return self.remote_controller.createHazelcastCloudStandardCluster(
+    def createCloudCluster(self, hz_version, is_tls_enabled):
+        return self.remote_controller.createCloudCluster(
             hz_version, is_tls_enabled
         )
 
-    def getHazelcastCloudCluster(self, cloud_cluster_id):
-        return self.remote_controller.getHazelcastCloudCluster(cloud_cluster_id)
+    def getCloudCluster(self, cloud_cluster_id):
+        return self.remote_controller.getCloudCluster(cloud_cluster_id)
 
-    def setHazelcastCloudClusterMemberCount(self, cloud_cluster_id, total_member_count):
-        return self.remote_controller.setHazelcastCloudClusterMemberCount(
-            cloud_cluster_id, total_member_count
-        )
+    def stopCloudCluster(self, cloud_cluster_id):
+        return self.remote_controller.stopCloudCluster(cloud_cluster_id)
 
-    def stopHazelcastCloudCluster(self, cloud_cluster_id):
-        return self.remote_controller.stopHazelcastCloudCluster(cloud_cluster_id)
+    def resumeCloudCluster(self, cloud_cluster_id):
+        return self.remote_controller.resumeCloudCluster(cloud_cluster_id)
 
-    def resumeHazelcastCloudCluster(self, cloud_cluster_id):
-        return self.remote_controller.resumeHazelcastCloudCluster(cloud_cluster_id)
-
-    def deleteHazelcastCloudCluster(self, cloud_cluster_id):
-        return self.remote_controller.deleteHazelcastCloudCluster(cloud_cluster_id)
+    def deleteCloudCluster(self, cloud_cluster_id):
+        return self.remote_controller.deleteCloudCluster(cloud_cluster_id)

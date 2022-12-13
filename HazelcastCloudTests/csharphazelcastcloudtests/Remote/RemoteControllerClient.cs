@@ -172,33 +172,29 @@ namespace Hazelcast.Testing.Remote
         public Task<Response> ExecuteOnControllerAsync(string clusterId, string script, Lang lang, CancellationToken cancellationToken = default)
             => WithLock(token => executeOnController(clusterId, script, lang, token), cancellationToken);
 
-        public Task LoginToHazelcastCloud(string uri, string apiKey, string apiSecret, CancellationToken cancellationToken)
-            => WithLock(token => loginToHazelcastCloud(uri, apiKey, apiSecret, token), cancellationToken);
+        public Task LoginToCloud(string uri, string apiKey, string apiSecret, CancellationToken cancellationToken)
+            => WithLock(token => loginToCloud(uri, apiKey, apiSecret, token), cancellationToken);
 
-        public Task<CloudCluster> CreateHazelcastCloudStandardCluster(string hzVersion, bool isTlsEnabled, CancellationToken cancellationToken = default)
-            => WithLock(token => createHazelcastCloudStandardCluster(hzVersion, isTlsEnabled, token), cancellationToken);
-
-        /// <inheritdoc />
-        public Task LoginToHazelcastCloudUsingEnvironment(CancellationToken token = default) => loginToHazelcastCloudUsingEnvironment(token);
+        public Task<CloudCluster> CreateCloudCluster(string hzVersion, bool isTlsEnabled, CancellationToken cancellationToken = default)
+            => WithLock(token => createCloudCluster(hzVersion, isTlsEnabled, token), cancellationToken);
 
         /// <inheritdoc />
-        public Task SetHazelcastCloudClusterMemberCount(string cloudClusterId, int totalMemberCount, CancellationToken cancellationToken = default)
-            => WithLock(token => setHazelcastCloudClusterMemberCount(cloudClusterId, totalMemberCount, token), cancellationToken);
+        public Task LoginToCloudUsingEnvironment(CancellationToken token = default) => loginToCloudUsingEnvironment(token);
 
         /// <inheritdoc />
-        public Task<CloudCluster> GetHazelcastCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default)
-        => WithLock<CloudCluster>(token => getHazelcastCloudCluster(cloudClusterId, token), cancellationToken);
+        public Task<CloudCluster> GetCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default)
+        => WithLock<CloudCluster>(token => getCloudCluster(cloudClusterId, token), cancellationToken);
 
         /// <inheritdoc />
-        public Task<CloudCluster> StopHazelcastCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default)
-        => WithLock<CloudCluster>(token => stopHazelcastCloudCluster(cloudClusterId, token), cancellationToken);
+        public Task<CloudCluster> StopCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default)
+        => WithLock<CloudCluster>(token => stopCloudCluster(cloudClusterId, token), cancellationToken);
 
         /// <inheritdoc />
-        public Task<CloudCluster> ResumeHazelcastCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default)
-        => WithLock<CloudCluster>(token => resumeHazelcastCloudCluster(cloudClusterId, token), cancellationToken);
+        public Task<CloudCluster> ResumeCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default)
+        => WithLock<CloudCluster>(token => resumeCloudCluster(cloudClusterId, token), cancellationToken);
 
         /// <inheritdoc />
-        public Task DeleteHazelcastCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default)
-        => WithLock(token => deleteHazelcastCloudCluster(cloudClusterId, token), cancellationToken);
+        public Task DeleteCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default)
+        => WithLock(token => deleteCloudCluster(cloudClusterId, token), cancellationToken);
     }
 }
