@@ -16,12 +16,12 @@ public class HazelcastCloudStandardClusterTests {
     static CloudCluster sslDisabledCluster;
     static CloudCluster sslEnabledCluster;
     static CloudCluster tempCluster;
-    static HazelcastCloudManager cloudManager;
+    static CloudManager cloudManager;
     private static final Logger TestCasesLogger = LogManager.getLogger(HazelcastCloudStandardClusterTests.class);
 
     @BeforeAll
     public static void setUpClass() throws CloudException {
-        cloudManager = new HazelcastCloudManager();
+        cloudManager = new CloudManager();
         cloudManager.loginToCloudUsingEnvironment();
         sslDisabledCluster = cloudManager.createCloudCluster(System.getenv("HZ_VERSION"), false);
         sslEnabledCluster = cloudManager.createCloudCluster(System.getenv("HZ_VERSION"), true);

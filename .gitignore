@@ -143,3 +143,8 @@ cython_debug/
 .DS_Store
 .directory
 *.pyc
+
+# Csharp objects
+HazelcastCloudTests/csharphazelcastcloudtests/CloudTests/obj/
+KubernetesExternalClients/csharp/KubernetesTest/obj/
+KubernetesInternalClients/csharp/KubernetesTest/obj/

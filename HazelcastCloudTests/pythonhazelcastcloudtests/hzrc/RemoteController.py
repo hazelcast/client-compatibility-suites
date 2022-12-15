@@ -133,7 +133,7 @@ class Iface(object):
 
     def loginToCloud(self, baseUrl, apiKey, apiSecret):
         """
-        Logins to the cloud, sets the bearerToken, baseUrl variables in HazelcastCloudManager to make it ready to use cloud API
+        Logins to the cloud, sets the bearerToken, baseUrl variables in CloudManager to make it ready to use cloud API
         @throws CloudException
 
         @param baseUrl -> Base url of the cloud environment. i.e. https://uat.hazelcast.cloud
@@ -721,7 +721,7 @@ class Client(Iface):
 
     def loginToCloud(self, baseUrl, apiKey, apiSecret):
         """
-        Logins to the cloud, sets the bearerToken, baseUrl variables in HazelcastCloudManager to make it ready to use cloud API
+        Logins to the cloud, sets the bearerToken, baseUrl variables in CloudManager to make it ready to use cloud API
         @throws CloudException
 
         @param baseUrl -> Base url of the cloud environment. i.e. https://uat.hazelcast.cloud

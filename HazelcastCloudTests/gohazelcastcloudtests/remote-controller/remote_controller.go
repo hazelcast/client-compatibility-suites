@@ -1112,7 +1112,7 @@ type RemoteController interface {
   // Reads the environment variables and calls loginToCloud() method with these variables.
   // @throws CloudException
   LoginToCloudUsingEnvironment(ctx context.Context) (err error)
-  // Logins to the cloud, sets the bearerToken, baseUrl variables in HazelcastCloudManager to make it ready to use cloud API
+  // Logins to the cloud, sets the bearerToken, baseUrl variables in CloudManager to make it ready to use cloud API
   // @throws CloudException
   // 
   // @param baseUrl -> Base url of the cloud environment. i.e. https://uat.hazelcast.cloud
@@ -1407,7 +1407,7 @@ func (p *RemoteControllerClient) LoginToCloudUsingEnvironment(ctx context.Contex
   return nil
 }
 
-// Logins to the cloud, sets the bearerToken, baseUrl variables in HazelcastCloudManager to make it ready to use cloud API
+// Logins to the cloud, sets the bearerToken, baseUrl variables in CloudManager to make it ready to use cloud API
 // @throws CloudException
 // 
 // @param baseUrl -> Base url of the cloud environment. i.e. https://uat.hazelcast.cloud
