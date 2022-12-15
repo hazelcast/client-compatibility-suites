@@ -12,17 +12,17 @@ on:
         required: true
         default: master
       base_url:
-        description: Base url of the cloud env. I.e https://uat.hazelcast.cloud
+        description: Base url of the cloud env. I.e https://api.dev.viridian.hazelcast.cloud
         required: true
-        default: https://uat.hazelcast.cloud
+        default: https://api.dev.viridian.hazelcast.cloud
       hzVersion:
-        description: Version of hazelcast (For cloud standard cluster, it has different versions, i.e 5.0.2-2)
+        description: Version of hazelcast
         required: true
 
 jobs:
-  test_standard_cluster:
+  test_cloud_csharp:
     runs-on: ubuntu-latest
-    name: Hazelcast cloud standard cluster tests with csharp
+    name: Cloud tests with csharp
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v3
@@ -63,7 +63,7 @@ jobs:
           apiKey: ${{ secrets.APIKEY_UAT }}
           apiSecret: ${{ secrets.APISECRET_UAT }}
         run: |
-          python start_remote_controller.py &> rc_standard_cluster.log &
+          python start_remote_controller.py &> rc.log &
           sleep 30
           
       - name: Start RC for PROD
@@ -73,9 +73,19 @@ jobs:
           apiKey: ${{ secrets.APIKEY_PROD }}
           apiSecret: ${{ secrets.APISECRET_PROD }}
         run: |
-          python start_remote_controller.py &> rc_standard_cluster.log &
+          python start_remote_controller.py &> rc.log &
           sleep 30
-          
+
+      - name: Start RC for Viridian
+        if: ${{ github.event.inputs.base_url == 'https://api.dev.viridian.hazelcast.cloud' }}
+        env:
+          baseUrl: ${{ github.event.inputs.base_url }}
+          apiKey: ${{ secrets.APIKEY_VIRIDIAN }}
+          apiSecret: ${{ secrets.APISECRET_VIRIDIAN }}
+        run: |
+          python start_remote_controller.py &> rc.log &
+          sleep 30
+
       - name: Build project
         run: |
           dotnet build -c Release -f net6.0
@@ -93,5 +103,5 @@ jobs:
       - uses: actions/upload-artifact@v2
         if: always()
         with:
-          name: rc_standard_cluster
-          path: rc_standard_cluster.log
+          name: rc
+          path: rc.log

@@ -7,17 +7,17 @@ on:
         description: Java client version without SNAPSHOT suffix
         required: true
       base_url:
-        description: Base url of the cloud env. I.e https://uat.hazelcast.cloud
+        description: Base url of the cloud env. I.e https://api.dev.viridian.hazelcast.cloud
         required: true
-        default: https://uat.hazelcast.cloud
+        default: https://api.dev.viridian.hazelcast.cloud
       hzVersion:
-        description: Version of hazelcast (For cloud standard cluster, it has different versions, i.e 5.0.2-2)
+        description: Version of hazelcast
         required: true
 
 jobs:
-  test_standard_cluster:
+  test_cloud_java:
     runs-on: ubuntu-latest
-    name: Hazelcast cloud standard cluster tests with Java
+    name: Cloud tests with Java
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v2
@@ -27,12 +27,22 @@ jobs:
         with:
           java-version: 8
           
-      - name: Run cloud tests
+      - name: Run cloud tests for UAT
         env: 
           BASE_URL: ${{ github.event.inputs.base_url }}
           API_KEY: ${{ secrets.APIKEY_UAT }}
           API_SECRET: ${{ secrets.APISECRET_UAT }}
           HZ_VERSION: ${{ github.event.inputs.hzVersion }}
         run: | 
+          mvn clean test "-Dhazelcast-version=${{ github.event.inputs.java_client_version }}"
+        working-directory: HazelcastCloudTests/javahazelcastcloudtests
+
+      - name: Run cloud tests for Viridian
+        env:
+          BASE_URL: ${{ github.event.inputs.base_url }}
+          API_KEY: ${{ secrets.APIKEY_VIRIDIAN }}
+          API_SECRET: ${{ secrets.APISECRET_VIRIDIAN }}
+          HZ_VERSION: ${{ github.event.inputs.hzVersion }}
+        run: |
           mvn clean test "-Dhazelcast-version=${{ github.event.inputs.java_client_version }}"
         working-directory: HazelcastCloudTests/javahazelcastcloudtests
