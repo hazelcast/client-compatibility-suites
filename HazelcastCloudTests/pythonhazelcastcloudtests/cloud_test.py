@@ -28,7 +28,7 @@ class StandardClusterTests(unittest.TestCase):
 
     # There is an issue to connect ssl cluster, it is disabled for now
     @parameterized.expand([(True, True), (False, True), (True, False), (False, False)])
-    def test_standard_cluster(self, is_smart, is_ssl_enabled):
+    def test_cloud(self, is_smart, is_ssl_enabled):
         if is_ssl_enabled:
             self.logger.info("Create ssl enabled client config for smart routing " + str(is_smart))
             client = hazelcast.HazelcastClient(
@@ -44,7 +44,7 @@ class StandardClusterTests(unittest.TestCase):
                                                      self.ssl_disabled_cluster.token, is_smart))
             cluster = self.ssl_disabled_cluster
 
-        HelperMethods.map_put_get_and_verify(self, client.get_map("map_for_ssl_cluster").blocking())
+        HelperMethods.map_put_get_and_verify(self, client.get_map("map_for_test_cloud").blocking())
 
         self.logger.info("Stopping cluster")
         self.rc.stopCloudCluster(cluster.id)
@@ -54,7 +54,7 @@ class StandardClusterTests(unittest.TestCase):
 
         self.logger.info("Wait 5 seconds to be sure client is connected")
         time.sleep(5)
-        HelperMethods.map_put_get_and_verify(self, client.get_map("map_for_ssl_cluster").blocking())
+        HelperMethods.map_put_get_and_verify(self, client.get_map("map_for_test_cloud").blocking())
 
         client.shutdown()
 

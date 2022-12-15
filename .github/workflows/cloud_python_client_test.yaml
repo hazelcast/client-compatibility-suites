@@ -89,7 +89,7 @@ jobs:
           BASE_URL: ${{ github.event.inputs.base_url }}
           HZ_VERSION: ${{ github.event.inputs.hzVersion }}
         run: | 
-          pytest -o log_cli=true ./standard_cluster_test.py
+          pytest -o log_cli=true ./cloud_test.py
         working-directory: HazelcastCloudTests/pythonhazelcastcloudtests
         
       - uses: actions/upload-artifact@v2
