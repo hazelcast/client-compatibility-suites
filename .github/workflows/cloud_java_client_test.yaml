@@ -1,4 +1,4 @@
-name: Hazelcast cloud test with Java client
+name: Cloud test with Java client
 
 on:
   workflow_dispatch:

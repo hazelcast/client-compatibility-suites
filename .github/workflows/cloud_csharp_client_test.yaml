@@ -1,4 +1,4 @@
-name: Hazelcast cloud test with csharp client
+name: Cloud test with csharp client
 
 on:
   workflow_dispatch:

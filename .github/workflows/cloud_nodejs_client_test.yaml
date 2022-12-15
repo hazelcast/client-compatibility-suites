@@ -1,4 +1,4 @@
-name: Hazelcast cloud test with nodejs client
+name: Cloud test with nodejs client
 
 on:
   workflow_dispatch:

@@ -1,4 +1,4 @@
-name: Hazelcast cloud test with go client
+name: Cloud test with go client
 
 on:
   workflow_dispatch:

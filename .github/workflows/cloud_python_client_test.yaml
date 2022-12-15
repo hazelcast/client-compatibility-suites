@@ -1,4 +1,4 @@
-name: Hazelcast cloud test with python client
+name: Cloud test with python client
 
 on:
   workflow_dispatch:
@@ -44,7 +44,7 @@ jobs:
           path: client
           ref: ${{ github.event.inputs.branch_name }}
           
-      - name: Copy the client code to Hazelcast Cloud Test suites
+      - name: Copy the client code to cloud test suites
         run: |
           cp -a $GITHUB_WORKSPACE/client/hazelcast $GITHUB_WORKSPACE/HazelcastCloudTests/pythonhazelcastcloudtests/hazelcast
 
