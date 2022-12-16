@@ -95,7 +95,7 @@ jobs:
       - name: Copy certificates JAR to destination with the appropriate name
         if: ${{ matrix.kind == 'enterprise' }}
         run: |
-          cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/client/scripts/hazelcast-enterprise-${{ matrix.version }}-tests.jar
+          cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/client/hazelcast-enterprise-${{ matrix.version }}-tests.jar
 
       - name: Test
         env:
