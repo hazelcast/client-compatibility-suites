@@ -57,7 +57,6 @@ jobs:
           ls $GITHUB_WORKSPACE/client/src/CloudTests
          
       - name: Start RC for Viridian
-        if: ${{ github.event.inputs.base_url == 'https://api.dev.viridian.hazelcast.cloud' }}
         env:
           baseUrl: ${{ github.event.inputs.base_url }}
           apiKey: ${{ secrets.APIKEY_VIRIDIAN }}

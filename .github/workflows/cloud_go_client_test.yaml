@@ -49,7 +49,6 @@ jobs:
           go mod tidy
 
       - name: Start RC for Viridian
-        if: ${{ github.event.inputs.base_url == 'https://api.dev.viridian.hazelcast.cloud' }}
         env:
           BASE_URL: ${{ github.event.inputs.base_url }}
           API_KEY: ${{ secrets.APIKEY_VIRIDIAN }}
