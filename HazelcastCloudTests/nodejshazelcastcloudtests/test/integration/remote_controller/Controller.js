@@ -86,36 +86,36 @@ HzRemoteController.prototype.executeOnController = function(clusterId, script, l
     return this.client.executeOnController(clusterId, script, lang, callback);
 };
 
-HzRemoteController.prototype.loginToHazelcastCloud = function (uri, apiKey, apiSecret, callback) {
-    return this.client.loginToHazelcastCloud(uri, apiKey, apiSecret, callback)
+HzRemoteController.prototype.loginToCloud = function (uri, apiKey, apiSecret, callback) {
+    return this.client.loginToCloud(uri, apiKey, apiSecret, callback)
 };
 
-HzRemoteController.prototype.loginToHazelcastCloudUsingEnvironment = function (callback) {
-    return this.client.loginToHazelcastCloudUsingEnvironment(callback)
+HzRemoteController.prototype.loginToCloudUsingEnvironment = function (callback) {
+    return this.client.loginToCloudUsingEnvironment(callback)
 }
 
-HzRemoteController.prototype.createHazelcastCloudStandardCluster = function (hzVersion, isTlsEnabled, callback) {
-    return this.client.createHazelcastCloudStandardCluster(hzVersion, isTlsEnabled, callback)
+HzRemoteController.prototype.createCloudCluster = function (hzVersion, isTlsEnabled, callback) {
+    return this.client.createCloudCluster(hzVersion, isTlsEnabled, callback)
 };
 
-HzRemoteController.prototype.getHazelcastCloudCluster = function (clusterId, callback) {
-    return this.client.getHazelcastCloudCluster(clusterId, callback)
+HzRemoteController.prototype.getCloudCluster = function (clusterId, callback) {
+    return this.client.getCloudCluster(clusterId, callback)
 };
 
-HzRemoteController.prototype.setHazelcastCloudClusterMemberCount = function (clusterId, totalMemberCount, callback) {
-    return this.client.setHazelcastCloudClusterMemberCount(clusterId, totalMemberCount, callback)
+HzRemoteController.prototype.setCloudClusterMemberCount = function (clusterId, totalMemberCount, callback) {
+    return this.client.setCloudClusterMemberCount(clusterId, totalMemberCount, callback)
 }
 
-HzRemoteController.prototype.stopHazelcastCloudCluster = function (clusterId, callback) {
-    return this.client.stopHazelcastCloudCluster(clusterId, callback)
+HzRemoteController.prototype.stopCloudCluster = function (clusterId, callback) {
+    return this.client.stopCloudCluster(clusterId, callback)
 };
 
-HzRemoteController.prototype.resumeHazelcastCloudCluster = function (clusterId, callback){
-    return this.client.resumeHazelcastCloudCluster(clusterId, callback)
+HzRemoteController.prototype.resumeCloudCluster = function (clusterId, callback){
+    return this.client.resumeCloudCluster(clusterId, callback)
 };
 
-HzRemoteController.prototype.deleteHazelcastCloudCluster = function (clusterId, callback){
-    return this.client.deleteHazelcastCloudCluster(clusterId, callback)
+HzRemoteController.prototype.deleteCloudCluster = function (clusterId, callback){
+    return this.client.deleteCloudCluster(clusterId, callback)
 };
 
 module.exports = HzRemoteController;

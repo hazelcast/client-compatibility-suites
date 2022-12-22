@@ -122,9 +122,9 @@ function executeOnController(clusterId, script, lang) {
     return deferred.promise;
 }
 
-function loginToHazelcastCloudUsingEnvironment() {
+function loginToCloudUsingEnvironment() {
     const deferred = deferredPromise();
-    controller.loginToHazelcastCloudUsingEnvironment((err, res) => {
+    controller.loginToCloudUsingEnvironment((err, res) => {
         if (err) {
             return deferred.reject(err);
         }
@@ -133,9 +133,9 @@ function loginToHazelcastCloudUsingEnvironment() {
     return deferred.promise;
 }
 
-function loginToHazelcastCloud(uri, apiKey, apiSecret) {
+function loginToCloud(uri, apiKey, apiSecret) {
     const deferred = deferredPromise();
-    controller.loginToHazelcastCloud(uri, apiKey, apiSecret, (err, res) => {
+    controller.loginToCloud(uri, apiKey, apiSecret, (err, res) => {
         if (err) {
             return deferred.reject(err);
         }
@@ -144,9 +144,9 @@ function loginToHazelcastCloud(uri, apiKey, apiSecret) {
     return deferred.promise;
 }
 
-function getHazelcastCloudCluster(clusterId) {
+function getCloudCluster(clusterId) {
     const deferred = deferredPromise();
-    controller.getHazelcastCloudCluster(clusterId, (err, res) => {
+    controller.getCloudCluster(clusterId, (err, res) => {
         if (err) {
             return deferred.reject(err);
         }
@@ -155,9 +155,9 @@ function getHazelcastCloudCluster(clusterId) {
     return deferred.promise;
 }
 
-function createHazelcastCloudStandardCluster(hzVersion, isTlsEnabled) {
+function createCloudCluster(hzVersion, isTlsEnabled) {
     const deferred = deferredPromise();
-    controller.createHazelcastCloudStandardCluster(hzVersion, isTlsEnabled, (err, res) => {
+    controller.createCloudCluster(hzVersion, isTlsEnabled, (err, res) => {
         if (err)
         {
             return deferred.reject(err);
@@ -167,9 +167,9 @@ function createHazelcastCloudStandardCluster(hzVersion, isTlsEnabled) {
     return deferred.promise;
 }
 
-function setHazelcastCloudClusterMemberCount(clusterId, totalMemberCount) {
+function stopCloudCluster(clusterId) {
     const deferred = deferredPromise();
-    controller.setHazelcastCloudClusterMemberCount(clusterId, totalMemberCount, (err, res) => {
+    controller.stopCloudCluster(clusterId, (err, res) => {
         if (err)
         {
             return deferred.reject(err);
@@ -179,9 +179,9 @@ function setHazelcastCloudClusterMemberCount(clusterId, totalMemberCount) {
     return deferred.promise;
 }
 
-function stopHazelcastCloudCluster(clusterId) {
+function resumeCloudCluster(clusterId) {
     const deferred = deferredPromise();
-    controller.stopHazelcastCloudCluster(clusterId, (err, res) => {
+    controller.resumeCloudCluster(clusterId, (err, res) => {
         if (err)
         {
             return deferred.reject(err);
@@ -191,21 +191,9 @@ function stopHazelcastCloudCluster(clusterId) {
     return deferred.promise;
 }
 
-function resumeHazelcastCloudCluster(clusterId) {
+function deleteCloudCluster(clusterId) {
     const deferred = deferredPromise();
-    controller.resumeHazelcastCloudCluster(clusterId, (err, res) => {
-        if (err)
-        {
-            return deferred.reject(err);
-        }
-        return deferred.resolve(res);
-    });
-    return deferred.promise;
-}
-
-function deleteHazelcastCloudCluster(clusterId) {
-    const deferred = deferredPromise();
-    controller.deleteHazelcastCloudCluster(clusterId, (err, res) => {
+    controller.deleteCloudCluster(clusterId, (err, res) => {
         if (err)
         {
             return deferred.reject(err);
@@ -224,11 +212,10 @@ exports.shutdownCluster = shutdownCluster;
 exports.executeOnController = executeOnController;
 exports.terminateMember = terminateMember;
 exports.terminateCluster = terminateCluster;
-exports.loginToHazelcastCloudUsingEnvironment = loginToHazelcastCloudUsingEnvironment;
-exports.loginToHazelcastCloud = loginToHazelcastCloud;
-exports.getHazelcastCloudCluster = getHazelcastCloudCluster;
-exports.createHazelcastCloudStandardCluster = createHazelcastCloudStandardCluster;
-exports.setHazelcastCloudClusterMemberCount = setHazelcastCloudClusterMemberCount;
-exports.stopHazelcastCloudCluster = stopHazelcastCloudCluster;
-exports.resumeHazelcastCloudCluster = resumeHazelcastCloudCluster;
-exports.deleteHazelcastCloudCluster = deleteHazelcastCloudCluster;
+exports.loginToCloudUsingEnvironment = loginToCloudUsingEnvironment;
+exports.loginToCloud = loginToCloud;
+exports.getCloudCluster = getCloudCluster;
+exports.createCloudCluster = createCloudCluster;
+exports.stopCloudCluster = stopCloudCluster;
+exports.resumeCloudCluster = resumeCloudCluster;
+exports.deleteCloudCluster = deleteCloudCluster;
