@@ -54,26 +54,6 @@ jobs:
           pip install -r requirements-test.txt
         working-directory: HazelcastCloudTests/pythonhazelcastcloudtests
         
-      - name: Start RC for UAT
-        if: ${{ github.event.inputs.base_url == 'https://uat.hazelcast.cloud' }}
-        env:
-          BASE_URL: ${{ github.event.inputs.base_url }} 
-          API_KEY: ${{ secrets.APIKEY_UAT }}
-          API_SECRET: ${{ secrets.APISECRET_UAT }}
-        run: |
-          python start_remote_controller.py --use-simple-server &> rc.log &
-          sleep 30
-          
-      - name: Start RC for PROD
-        if: ${{ github.event.inputs.base_url == 'https://cloud.hazelcast.com' }}
-        env:
-          BASE_URL: ${{ github.event.inputs.base_url }} 
-          API_KEY: ${{ secrets.APIKEY_PROD }}
-          API_SECRET: ${{ secrets.APISECRET_PROD }}
-        run: |
-          python start_remote_controller.py --use-simple-server &> rc.log &
-          sleep 30
-
       - name: Start RC for Viridian
         if: ${{ github.event.inputs.base_url == 'https://api.dev.viridian.hazelcast.cloud' }}
         env:

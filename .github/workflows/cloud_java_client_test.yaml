@@ -27,16 +27,6 @@ jobs:
         with:
           java-version: 8
           
-      - name: Run cloud tests for UAT
-        env: 
-          BASE_URL: ${{ github.event.inputs.base_url }}
-          API_KEY: ${{ secrets.APIKEY_UAT }}
-          API_SECRET: ${{ secrets.APISECRET_UAT }}
-          HZ_VERSION: ${{ github.event.inputs.hzVersion }}
-        run: | 
-          mvn clean test "-Dhazelcast-version=${{ github.event.inputs.java_client_version }}"
-        working-directory: HazelcastCloudTests/javahazelcastcloudtests
-
       - name: Run cloud tests for Viridian
         env:
           BASE_URL: ${{ github.event.inputs.base_url }}

@@ -49,33 +49,13 @@ jobs:
           path: client
           ref: ${{ github.event.inputs.branch_name }}
         
-      - name: Copy reqired files to under test folders
+      - name: Copy required files to under test folders
         run: |
           rm -rf $GITHUB_WORKSPACE/client/src/Hazelcast.Net.Testing/Remote
           cp -R $GITHUB_WORKSPACE/HazelcastCloudTests/csharphazelcastcloudtests/Remote $GITHUB_WORKSPACE/client/src/Hazelcast.Net.Testing/Remote/
           cp -R $GITHUB_WORKSPACE/HazelcastCloudTests/csharphazelcastcloudtests/CloudTests $GITHUB_WORKSPACE/client/src/CloudTests/
           ls $GITHUB_WORKSPACE/client/src/CloudTests
          
-      - name: Start RC for UAT
-        if: ${{ github.event.inputs.base_url == 'https://uat.hazelcast.cloud' }}
-        env:
-          baseUrl: ${{ github.event.inputs.base_url }} 
-          apiKey: ${{ secrets.APIKEY_UAT }}
-          apiSecret: ${{ secrets.APISECRET_UAT }}
-        run: |
-          python start_remote_controller.py &> rc.log &
-          sleep 30
-          
-      - name: Start RC for PROD
-        if: ${{ github.event.inputs.base_url == 'https://cloud.hazelcast.com' }}
-        env:
-          baseUrl: ${{ github.event.inputs.base_url }} 
-          apiKey: ${{ secrets.APIKEY_PROD }}
-          apiSecret: ${{ secrets.APISECRET_PROD }}
-        run: |
-          python start_remote_controller.py &> rc.log &
-          sleep 30
-
       - name: Start RC for Viridian
         if: ${{ github.event.inputs.base_url == 'https://api.dev.viridian.hazelcast.cloud' }}
         env:
