@@ -79,6 +79,11 @@
             <artifactId>hazelcast-enterprise</artifactId>
             <version>${hazelcast-version}-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast-remote-controller</artifactId>
+            <version>0.8-SNAPSHOT</version>
+        </dependency>
     </dependencies>
     <repositories>
         <repository>
