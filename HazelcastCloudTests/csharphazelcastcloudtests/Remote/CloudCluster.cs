@@ -29,7 +29,7 @@ using Thrift.Processor;
 #pragma warning disable IDE1006  // parts of the code use IDL spelling
 #pragma warning disable IDE0083  // pattern matching "that is not SomeType" requires net5.0 but we still support earlier versions
 
-namespace Hazelcast.Remote
+namespace Hazelcast.Testing.Remote
 {
 
   public partial class CloudCluster : TBase

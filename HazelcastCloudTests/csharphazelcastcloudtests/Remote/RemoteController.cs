@@ -25,11 +25,12 @@ using Thrift.Transport.Server;
 using Thrift.Processor;
 
 
+#nullable disable                // suppress C# 8.0 nullable contexts (we still support earlier versions)
 #pragma warning disable IDE0079  // remove unnecessary pragmas
 #pragma warning disable IDE1006  // parts of the code use IDL spelling
 #pragma warning disable IDE0083  // pattern matching "that is not SomeType" requires net5.0 but we still support earlier versions
 
-namespace Hazelcast.Remote
+namespace Hazelcast.Testing.Remote
 {
   public partial class RemoteController
   {
@@ -41,11 +42,11 @@ namespace Hazelcast.Remote
 
       global::System.Threading.Tasks.Task<bool> exit(CancellationToken cancellationToken = default);
 
-      global::System.Threading.Tasks.Task<global::Hazelcast.Remote.Cluster> createCluster(string hzVersion, string xmlconfig, CancellationToken cancellationToken = default);
+      global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.Cluster> createCluster(string hzVersion, string xmlconfig, CancellationToken cancellationToken = default);
 
-      global::System.Threading.Tasks.Task<global::Hazelcast.Remote.Cluster> createClusterKeepClusterName(string hzVersion, string xmlconfig, CancellationToken cancellationToken = default);
+      global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.Cluster> createClusterKeepClusterName(string hzVersion, string xmlconfig, CancellationToken cancellationToken = default);
 
-      global::System.Threading.Tasks.Task<global::Hazelcast.Remote.Member> startMember(string clusterId, CancellationToken cancellationToken = default);
+      global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.Member> startMember(string clusterId, CancellationToken cancellationToken = default);
 
       global::System.Threading.Tasks.Task<bool> shutdownMember(string clusterId, string memberId, CancellationToken cancellationToken = default);
 
@@ -59,9 +60,9 @@ namespace Hazelcast.Remote
 
       global::System.Threading.Tasks.Task<bool> terminateCluster(string clusterId, CancellationToken cancellationToken = default);
 
-      global::System.Threading.Tasks.Task<global::Hazelcast.Remote.Cluster> splitMemberFromCluster(string memberId, CancellationToken cancellationToken = default);
+      global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.Cluster> splitMemberFromCluster(string memberId, CancellationToken cancellationToken = default);
 
-      global::System.Threading.Tasks.Task<global::Hazelcast.Remote.Cluster> mergeMemberToCluster(string clusterId, string memberId, CancellationToken cancellationToken = default);
+      global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.Cluster> mergeMemberToCluster(string clusterId, string memberId, CancellationToken cancellationToken = default);
 
       /// <summary>
       /// Reads the environment variables and calls loginToCloud() method with these variables.
@@ -92,7 +93,7 @@ namespace Hazelcast.Remote
       /// </summary>
       /// <param name="hazelcastVersion"></param>
       /// <param name="isTlsEnabled"></param>
-      global::System.Threading.Tasks.Task<global::Hazelcast.Remote.CloudCluster> createCloudCluster(string hazelcastVersion, bool isTlsEnabled, CancellationToken cancellationToken = default);
+      global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.CloudCluster> createCloudCluster(string hazelcastVersion, bool isTlsEnabled, CancellationToken cancellationToken = default);
 
       /// <summary>
       /// Get information of the given cluster
@@ -102,7 +103,7 @@ namespace Hazelcast.Remote
       /// @param cloudClusterId -> Id of the cluster
       /// </summary>
       /// <param name="cloudClusterId"></param>
-      global::System.Threading.Tasks.Task<global::Hazelcast.Remote.CloudCluster> getCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default);
+      global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.CloudCluster> getCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default);
 
       /// <summary>
       /// Stops the given cluster
@@ -112,7 +113,7 @@ namespace Hazelcast.Remote
       /// @param cloudClusterId -> Id of the cluster
       /// </summary>
       /// <param name="cloudClusterId"></param>
-      global::System.Threading.Tasks.Task<global::Hazelcast.Remote.CloudCluster> stopCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default);
+      global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.CloudCluster> stopCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default);
 
       /// <summary>
       /// Resumes the given cluster
@@ -122,7 +123,7 @@ namespace Hazelcast.Remote
       /// @param cloudClusterId
       /// </summary>
       /// <param name="cloudClusterId"></param>
-      global::System.Threading.Tasks.Task<global::Hazelcast.Remote.CloudCluster> resumeCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default);
+      global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.CloudCluster> resumeCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default);
 
       /// <summary>
       /// Deletes the given cluster
@@ -134,7 +135,7 @@ namespace Hazelcast.Remote
       /// <param name="cloudClusterId"></param>
       global::System.Threading.Tasks.Task deleteCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default);
 
-      global::System.Threading.Tasks.Task<global::Hazelcast.Remote.Response> executeOnController(string clusterId, string script, global::Hazelcast.Remote.Lang lang, CancellationToken cancellationToken = default);
+      global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.Response> executeOnController(string clusterId, string script, global::Hazelcast.Testing.Remote.Lang lang, CancellationToken cancellationToken = default);
 
     }
 
@@ -266,7 +267,7 @@ namespace Hazelcast.Remote
         throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "exit failed: unknown result");
       }
 
-      public async global::System.Threading.Tasks.Task<global::Hazelcast.Remote.Cluster> createCluster(string hzVersion, string xmlconfig, CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.Cluster> createCluster(string hzVersion, string xmlconfig, CancellationToken cancellationToken = default)
       {
         await send_createCluster(hzVersion, xmlconfig, cancellationToken);
         return await recv_createCluster(cancellationToken);
@@ -286,7 +287,7 @@ namespace Hazelcast.Remote
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task<global::Hazelcast.Remote.Cluster> recv_createCluster(CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.Cluster> recv_createCluster(CancellationToken cancellationToken = default)
       {
         
         var tmp43 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
@@ -311,7 +312,7 @@ namespace Hazelcast.Remote
         throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "createCluster failed: unknown result");
       }
 
-      public async global::System.Threading.Tasks.Task<global::Hazelcast.Remote.Cluster> createClusterKeepClusterName(string hzVersion, string xmlconfig, CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.Cluster> createClusterKeepClusterName(string hzVersion, string xmlconfig, CancellationToken cancellationToken = default)
       {
         await send_createClusterKeepClusterName(hzVersion, xmlconfig, cancellationToken);
         return await recv_createClusterKeepClusterName(cancellationToken);
@@ -331,7 +332,7 @@ namespace Hazelcast.Remote
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task<global::Hazelcast.Remote.Cluster> recv_createClusterKeepClusterName(CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.Cluster> recv_createClusterKeepClusterName(CancellationToken cancellationToken = default)
       {
         
         var tmp47 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
@@ -356,7 +357,7 @@ namespace Hazelcast.Remote
         throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "createClusterKeepClusterName failed: unknown result");
       }
 
-      public async global::System.Threading.Tasks.Task<global::Hazelcast.Remote.Member> startMember(string clusterId, CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.Member> startMember(string clusterId, CancellationToken cancellationToken = default)
       {
         await send_startMember(clusterId, cancellationToken);
         return await recv_startMember(cancellationToken);
@@ -375,7 +376,7 @@ namespace Hazelcast.Remote
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task<global::Hazelcast.Remote.Member> recv_startMember(CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.Member> recv_startMember(CancellationToken cancellationToken = default)
       {
         
         var tmp51 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
@@ -644,7 +645,7 @@ namespace Hazelcast.Remote
         throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "terminateCluster failed: unknown result");
       }
 
-      public async global::System.Threading.Tasks.Task<global::Hazelcast.Remote.Cluster> splitMemberFromCluster(string memberId, CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.Cluster> splitMemberFromCluster(string memberId, CancellationToken cancellationToken = default)
       {
         await send_splitMemberFromCluster(memberId, cancellationToken);
         return await recv_splitMemberFromCluster(cancellationToken);
@@ -663,7 +664,7 @@ namespace Hazelcast.Remote
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task<global::Hazelcast.Remote.Cluster> recv_splitMemberFromCluster(CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.Cluster> recv_splitMemberFromCluster(CancellationToken cancellationToken = default)
       {
         
         var tmp79 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
@@ -684,7 +685,7 @@ namespace Hazelcast.Remote
         throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "splitMemberFromCluster failed: unknown result");
       }
 
-      public async global::System.Threading.Tasks.Task<global::Hazelcast.Remote.Cluster> mergeMemberToCluster(string clusterId, string memberId, CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.Cluster> mergeMemberToCluster(string clusterId, string memberId, CancellationToken cancellationToken = default)
       {
         await send_mergeMemberToCluster(clusterId, memberId, cancellationToken);
         return await recv_mergeMemberToCluster(cancellationToken);
@@ -704,7 +705,7 @@ namespace Hazelcast.Remote
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task<global::Hazelcast.Remote.Cluster> recv_mergeMemberToCluster(CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.Cluster> recv_mergeMemberToCluster(CancellationToken cancellationToken = default)
       {
         
         var tmp83 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
@@ -804,7 +805,7 @@ namespace Hazelcast.Remote
         }
       }
 
-      public async global::System.Threading.Tasks.Task<global::Hazelcast.Remote.CloudCluster> createCloudCluster(string hazelcastVersion, bool isTlsEnabled, CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.CloudCluster> createCloudCluster(string hazelcastVersion, bool isTlsEnabled, CancellationToken cancellationToken = default)
       {
         await send_createCloudCluster(hazelcastVersion, isTlsEnabled, cancellationToken);
         return await recv_createCloudCluster(cancellationToken);
@@ -824,7 +825,7 @@ namespace Hazelcast.Remote
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task<global::Hazelcast.Remote.CloudCluster> recv_createCloudCluster(CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.CloudCluster> recv_createCloudCluster(CancellationToken cancellationToken = default)
       {
         
         var tmp95 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
@@ -849,7 +850,7 @@ namespace Hazelcast.Remote
         throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "createCloudCluster failed: unknown result");
       }
 
-      public async global::System.Threading.Tasks.Task<global::Hazelcast.Remote.CloudCluster> getCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.CloudCluster> getCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default)
       {
         await send_getCloudCluster(cloudClusterId, cancellationToken);
         return await recv_getCloudCluster(cancellationToken);
@@ -868,7 +869,7 @@ namespace Hazelcast.Remote
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task<global::Hazelcast.Remote.CloudCluster> recv_getCloudCluster(CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.CloudCluster> recv_getCloudCluster(CancellationToken cancellationToken = default)
       {
         
         var tmp99 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
@@ -893,7 +894,7 @@ namespace Hazelcast.Remote
         throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "getCloudCluster failed: unknown result");
       }
 
-      public async global::System.Threading.Tasks.Task<global::Hazelcast.Remote.CloudCluster> stopCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.CloudCluster> stopCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default)
       {
         await send_stopCloudCluster(cloudClusterId, cancellationToken);
         return await recv_stopCloudCluster(cancellationToken);
@@ -912,7 +913,7 @@ namespace Hazelcast.Remote
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task<global::Hazelcast.Remote.CloudCluster> recv_stopCloudCluster(CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.CloudCluster> recv_stopCloudCluster(CancellationToken cancellationToken = default)
       {
         
         var tmp103 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
@@ -937,7 +938,7 @@ namespace Hazelcast.Remote
         throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "stopCloudCluster failed: unknown result");
       }
 
-      public async global::System.Threading.Tasks.Task<global::Hazelcast.Remote.CloudCluster> resumeCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.CloudCluster> resumeCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default)
       {
         await send_resumeCloudCluster(cloudClusterId, cancellationToken);
         return await recv_resumeCloudCluster(cancellationToken);
@@ -956,7 +957,7 @@ namespace Hazelcast.Remote
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task<global::Hazelcast.Remote.CloudCluster> recv_resumeCloudCluster(CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.CloudCluster> recv_resumeCloudCluster(CancellationToken cancellationToken = default)
       {
         
         var tmp107 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
@@ -1020,13 +1021,13 @@ namespace Hazelcast.Remote
         }
       }
 
-      public async global::System.Threading.Tasks.Task<global::Hazelcast.Remote.Response> executeOnController(string clusterId, string script, global::Hazelcast.Remote.Lang lang, CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.Response> executeOnController(string clusterId, string script, global::Hazelcast.Testing.Remote.Lang lang, CancellationToken cancellationToken = default)
       {
         await send_executeOnController(clusterId, script, lang, cancellationToken);
         return await recv_executeOnController(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task send_executeOnController(string clusterId, string script, global::Hazelcast.Remote.Lang lang, CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task send_executeOnController(string clusterId, string script, global::Hazelcast.Testing.Remote.Lang lang, CancellationToken cancellationToken = default)
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("executeOnController", TMessageType.Call, SeqId), cancellationToken);
         
@@ -1041,7 +1042,7 @@ namespace Hazelcast.Remote
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task<global::Hazelcast.Remote.Response> recv_executeOnController(CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task<global::Hazelcast.Testing.Remote.Response> recv_executeOnController(CancellationToken cancellationToken = default)
       {
         
         var tmp115 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
@@ -1241,7 +1242,7 @@ namespace Hazelcast.Remote
           {
             tmp134.Success = await _iAsync.createCluster(tmp133.HzVersion, tmp133.Xmlconfig, cancellationToken);
           }
-          catch (global::Hazelcast.Remote.ServerException tmp135)
+          catch (global::Hazelcast.Testing.Remote.ServerException tmp135)
           {
             tmp134.ServerException = tmp135;
           }
@@ -1279,7 +1280,7 @@ namespace Hazelcast.Remote
           {
             tmp140.Success = await _iAsync.createClusterKeepClusterName(tmp139.HzVersion, tmp139.Xmlconfig, cancellationToken);
           }
-          catch (global::Hazelcast.Remote.ServerException tmp141)
+          catch (global::Hazelcast.Testing.Remote.ServerException tmp141)
           {
             tmp140.ServerException = tmp141;
           }
@@ -1317,7 +1318,7 @@ namespace Hazelcast.Remote
           {
             tmp146.Success = await _iAsync.startMember(tmp145.ClusterId, cancellationToken);
           }
-          catch (global::Hazelcast.Remote.ServerException tmp147)
+          catch (global::Hazelcast.Testing.Remote.ServerException tmp147)
           {
             tmp146.ServerException = tmp147;
           }
@@ -1603,7 +1604,7 @@ namespace Hazelcast.Remote
           {
             await _iAsync.loginToCloudUsingEnvironment(cancellationToken);
           }
-          catch (global::Hazelcast.Remote.CloudException tmp193)
+          catch (global::Hazelcast.Testing.Remote.CloudException tmp193)
           {
             tmp192.CloudException = tmp193;
           }
@@ -1641,7 +1642,7 @@ namespace Hazelcast.Remote
           {
             await _iAsync.loginToCloud(tmp197.BaseUrl, tmp197.ApiKey, tmp197.ApiSecret, cancellationToken);
           }
-          catch (global::Hazelcast.Remote.CloudException tmp199)
+          catch (global::Hazelcast.Testing.Remote.CloudException tmp199)
           {
             tmp198.CloudException = tmp199;
           }
@@ -1679,7 +1680,7 @@ namespace Hazelcast.Remote
           {
             tmp204.Success = await _iAsync.createCloudCluster(tmp203.HazelcastVersion, tmp203.IsTlsEnabled, cancellationToken);
           }
-          catch (global::Hazelcast.Remote.CloudException tmp205)
+          catch (global::Hazelcast.Testing.Remote.CloudException tmp205)
           {
             tmp204.CloudException = tmp205;
           }
@@ -1717,7 +1718,7 @@ namespace Hazelcast.Remote
           {
             tmp210.Success = await _iAsync.getCloudCluster(tmp209.CloudClusterId, cancellationToken);
           }
-          catch (global::Hazelcast.Remote.CloudException tmp211)
+          catch (global::Hazelcast.Testing.Remote.CloudException tmp211)
           {
             tmp210.CloudException = tmp211;
           }
@@ -1755,7 +1756,7 @@ namespace Hazelcast.Remote
           {
             tmp216.Success = await _iAsync.stopCloudCluster(tmp215.CloudClusterId, cancellationToken);
           }
-          catch (global::Hazelcast.Remote.CloudException tmp217)
+          catch (global::Hazelcast.Testing.Remote.CloudException tmp217)
           {
             tmp216.CloudException = tmp217;
           }
@@ -1793,7 +1794,7 @@ namespace Hazelcast.Remote
           {
             tmp222.Success = await _iAsync.resumeCloudCluster(tmp221.CloudClusterId, cancellationToken);
           }
-          catch (global::Hazelcast.Remote.CloudException tmp223)
+          catch (global::Hazelcast.Testing.Remote.CloudException tmp223)
           {
             tmp222.CloudException = tmp223;
           }
@@ -1831,7 +1832,7 @@ namespace Hazelcast.Remote
           {
             await _iAsync.deleteCloudCluster(tmp227.CloudClusterId, cancellationToken);
           }
-          catch (global::Hazelcast.Remote.CloudException tmp229)
+          catch (global::Hazelcast.Testing.Remote.CloudException tmp229)
           {
             tmp228.CloudException = tmp229;
           }
@@ -2771,10 +2772,10 @@ namespace Hazelcast.Remote
 
       public partial class createCluster_result : TBase
       {
-        private global::Hazelcast.Remote.Cluster _success;
-        private global::Hazelcast.Remote.ServerException _serverException;
+        private global::Hazelcast.Testing.Remote.Cluster _success;
+        private global::Hazelcast.Testing.Remote.ServerException _serverException;
 
-        public global::Hazelcast.Remote.Cluster Success
+        public global::Hazelcast.Testing.Remote.Cluster Success
         {
           get
           {
@@ -2787,7 +2788,7 @@ namespace Hazelcast.Remote
           }
         }
 
-        public global::Hazelcast.Remote.ServerException ServerException
+        public global::Hazelcast.Testing.Remote.ServerException ServerException
         {
           get
           {
@@ -2817,12 +2818,12 @@ namespace Hazelcast.Remote
           var tmp270 = new createCluster_result();
           if((Success != null) && __isset.success)
           {
-            tmp270.Success = (global::Hazelcast.Remote.Cluster)this.Success.DeepCopy();
+            tmp270.Success = (global::Hazelcast.Testing.Remote.Cluster)this.Success.DeepCopy();
           }
           tmp270.__isset.success = this.__isset.success;
           if((ServerException != null) && __isset.serverException)
           {
-            tmp270.ServerException = (global::Hazelcast.Remote.ServerException)this.ServerException.DeepCopy();
+            tmp270.ServerException = (global::Hazelcast.Testing.Remote.ServerException)this.ServerException.DeepCopy();
           }
           tmp270.__isset.serverException = this.__isset.serverException;
           return tmp270;
@@ -2848,7 +2849,7 @@ namespace Hazelcast.Remote
                 case 0:
                   if (field.Type == TType.Struct)
                   {
-                    Success = new global::Hazelcast.Remote.Cluster();
+                    Success = new global::Hazelcast.Testing.Remote.Cluster();
                     await Success.ReadAsync(iprot, cancellationToken);
                   }
                   else
@@ -2859,7 +2860,7 @@ namespace Hazelcast.Remote
                 case 1:
                   if (field.Type == TType.Struct)
                   {
-                    ServerException = new global::Hazelcast.Remote.ServerException();
+                    ServerException = new global::Hazelcast.Testing.Remote.ServerException();
                     await ServerException.ReadAsync(iprot, cancellationToken);
                   }
                   else
@@ -3164,10 +3165,10 @@ namespace Hazelcast.Remote
 
       public partial class createClusterKeepClusterName_result : TBase
       {
-        private global::Hazelcast.Remote.Cluster _success;
-        private global::Hazelcast.Remote.ServerException _serverException;
+        private global::Hazelcast.Testing.Remote.Cluster _success;
+        private global::Hazelcast.Testing.Remote.ServerException _serverException;
 
-        public global::Hazelcast.Remote.Cluster Success
+        public global::Hazelcast.Testing.Remote.Cluster Success
         {
           get
           {
@@ -3180,7 +3181,7 @@ namespace Hazelcast.Remote
           }
         }
 
-        public global::Hazelcast.Remote.ServerException ServerException
+        public global::Hazelcast.Testing.Remote.ServerException ServerException
         {
           get
           {
@@ -3210,12 +3211,12 @@ namespace Hazelcast.Remote
           var tmp280 = new createClusterKeepClusterName_result();
           if((Success != null) && __isset.success)
           {
-            tmp280.Success = (global::Hazelcast.Remote.Cluster)this.Success.DeepCopy();
+            tmp280.Success = (global::Hazelcast.Testing.Remote.Cluster)this.Success.DeepCopy();
           }
           tmp280.__isset.success = this.__isset.success;
           if((ServerException != null) && __isset.serverException)
           {
-            tmp280.ServerException = (global::Hazelcast.Remote.ServerException)this.ServerException.DeepCopy();
+            tmp280.ServerException = (global::Hazelcast.Testing.Remote.ServerException)this.ServerException.DeepCopy();
           }
           tmp280.__isset.serverException = this.__isset.serverException;
           return tmp280;
@@ -3241,7 +3242,7 @@ namespace Hazelcast.Remote
                 case 0:
                   if (field.Type == TType.Struct)
                   {
-                    Success = new global::Hazelcast.Remote.Cluster();
+                    Success = new global::Hazelcast.Testing.Remote.Cluster();
                     await Success.ReadAsync(iprot, cancellationToken);
                   }
                   else
@@ -3252,7 +3253,7 @@ namespace Hazelcast.Remote
                 case 1:
                   if (field.Type == TType.Struct)
                   {
-                    ServerException = new global::Hazelcast.Remote.ServerException();
+                    ServerException = new global::Hazelcast.Testing.Remote.ServerException();
                     await ServerException.ReadAsync(iprot, cancellationToken);
                   }
                   else
@@ -3507,10 +3508,10 @@ namespace Hazelcast.Remote
 
       public partial class startMember_result : TBase
       {
-        private global::Hazelcast.Remote.Member _success;
-        private global::Hazelcast.Remote.ServerException _serverException;
+        private global::Hazelcast.Testing.Remote.Member _success;
+        private global::Hazelcast.Testing.Remote.ServerException _serverException;
 
-        public global::Hazelcast.Remote.Member Success
+        public global::Hazelcast.Testing.Remote.Member Success
         {
           get
           {
@@ -3523,7 +3524,7 @@ namespace Hazelcast.Remote
           }
         }
 
-        public global::Hazelcast.Remote.ServerException ServerException
+        public global::Hazelcast.Testing.Remote.ServerException ServerException
         {
           get
           {
@@ -3553,12 +3554,12 @@ namespace Hazelcast.Remote
           var tmp290 = new startMember_result();
           if((Success != null) && __isset.success)
           {
-            tmp290.Success = (global::Hazelcast.Remote.Member)this.Success.DeepCopy();
+            tmp290.Success = (global::Hazelcast.Testing.Remote.Member)this.Success.DeepCopy();
           }
           tmp290.__isset.success = this.__isset.success;
           if((ServerException != null) && __isset.serverException)
           {
-            tmp290.ServerException = (global::Hazelcast.Remote.ServerException)this.ServerException.DeepCopy();
+            tmp290.ServerException = (global::Hazelcast.Testing.Remote.ServerException)this.ServerException.DeepCopy();
           }
           tmp290.__isset.serverException = this.__isset.serverException;
           return tmp290;
@@ -3584,7 +3585,7 @@ namespace Hazelcast.Remote
                 case 0:
                   if (field.Type == TType.Struct)
                   {
-                    Success = new global::Hazelcast.Remote.Member();
+                    Success = new global::Hazelcast.Testing.Remote.Member();
                     await Success.ReadAsync(iprot, cancellationToken);
                   }
                   else
@@ -3595,7 +3596,7 @@ namespace Hazelcast.Remote
                 case 1:
                   if (field.Type == TType.Struct)
                   {
-                    ServerException = new global::Hazelcast.Remote.ServerException();
+                    ServerException = new global::Hazelcast.Testing.Remote.ServerException();
                     await ServerException.ReadAsync(iprot, cancellationToken);
                   }
                   else
@@ -5760,9 +5761,9 @@ namespace Hazelcast.Remote
 
       public partial class splitMemberFromCluster_result : TBase
       {
-        private global::Hazelcast.Remote.Cluster _success;
+        private global::Hazelcast.Testing.Remote.Cluster _success;
 
-        public global::Hazelcast.Remote.Cluster Success
+        public global::Hazelcast.Testing.Remote.Cluster Success
         {
           get
           {
@@ -5791,7 +5792,7 @@ namespace Hazelcast.Remote
           var tmp360 = new splitMemberFromCluster_result();
           if((Success != null) && __isset.success)
           {
-            tmp360.Success = (global::Hazelcast.Remote.Cluster)this.Success.DeepCopy();
+            tmp360.Success = (global::Hazelcast.Testing.Remote.Cluster)this.Success.DeepCopy();
           }
           tmp360.__isset.success = this.__isset.success;
           return tmp360;
@@ -5817,7 +5818,7 @@ namespace Hazelcast.Remote
                 case 0:
                   if (field.Type == TType.Struct)
                   {
-                    Success = new global::Hazelcast.Remote.Cluster();
+                    Success = new global::Hazelcast.Testing.Remote.Cluster();
                     await Success.ReadAsync(iprot, cancellationToken);
                   }
                   else
@@ -6099,9 +6100,9 @@ namespace Hazelcast.Remote
 
       public partial class mergeMemberToCluster_result : TBase
       {
-        private global::Hazelcast.Remote.Cluster _success;
+        private global::Hazelcast.Testing.Remote.Cluster _success;
 
-        public global::Hazelcast.Remote.Cluster Success
+        public global::Hazelcast.Testing.Remote.Cluster Success
         {
           get
           {
@@ -6130,7 +6131,7 @@ namespace Hazelcast.Remote
           var tmp370 = new mergeMemberToCluster_result();
           if((Success != null) && __isset.success)
           {
-            tmp370.Success = (global::Hazelcast.Remote.Cluster)this.Success.DeepCopy();
+            tmp370.Success = (global::Hazelcast.Testing.Remote.Cluster)this.Success.DeepCopy();
           }
           tmp370.__isset.success = this.__isset.success;
           return tmp370;
@@ -6156,7 +6157,7 @@ namespace Hazelcast.Remote
                 case 0:
                   if (field.Type == TType.Struct)
                   {
-                    Success = new global::Hazelcast.Remote.Cluster();
+                    Success = new global::Hazelcast.Testing.Remote.Cluster();
                     await Success.ReadAsync(iprot, cancellationToken);
                   }
                   else
@@ -6331,9 +6332,9 @@ namespace Hazelcast.Remote
 
       public partial class loginToCloudUsingEnvironment_result : TBase
       {
-        private global::Hazelcast.Remote.CloudException _cloudException;
+        private global::Hazelcast.Testing.Remote.CloudException _cloudException;
 
-        public global::Hazelcast.Remote.CloudException CloudException
+        public global::Hazelcast.Testing.Remote.CloudException CloudException
         {
           get
           {
@@ -6362,7 +6363,7 @@ namespace Hazelcast.Remote
           var tmp379 = new loginToCloudUsingEnvironment_result();
           if((CloudException != null) && __isset.cloudException)
           {
-            tmp379.CloudException = (global::Hazelcast.Remote.CloudException)this.CloudException.DeepCopy();
+            tmp379.CloudException = (global::Hazelcast.Testing.Remote.CloudException)this.CloudException.DeepCopy();
           }
           tmp379.__isset.cloudException = this.__isset.cloudException;
           return tmp379;
@@ -6388,7 +6389,7 @@ namespace Hazelcast.Remote
                 case 1:
                   if (field.Type == TType.Struct)
                   {
-                    CloudException = new global::Hazelcast.Remote.CloudException();
+                    CloudException = new global::Hazelcast.Testing.Remote.CloudException();
                     await CloudException.ReadAsync(iprot, cancellationToken);
                   }
                   else
@@ -6720,9 +6721,9 @@ namespace Hazelcast.Remote
 
       public partial class loginToCloud_result : TBase
       {
-        private global::Hazelcast.Remote.CloudException _cloudException;
+        private global::Hazelcast.Testing.Remote.CloudException _cloudException;
 
-        public global::Hazelcast.Remote.CloudException CloudException
+        public global::Hazelcast.Testing.Remote.CloudException CloudException
         {
           get
           {
@@ -6751,7 +6752,7 @@ namespace Hazelcast.Remote
           var tmp389 = new loginToCloud_result();
           if((CloudException != null) && __isset.cloudException)
           {
-            tmp389.CloudException = (global::Hazelcast.Remote.CloudException)this.CloudException.DeepCopy();
+            tmp389.CloudException = (global::Hazelcast.Testing.Remote.CloudException)this.CloudException.DeepCopy();
           }
           tmp389.__isset.cloudException = this.__isset.cloudException;
           return tmp389;
@@ -6777,7 +6778,7 @@ namespace Hazelcast.Remote
                 case 1:
                   if (field.Type == TType.Struct)
                   {
-                    CloudException = new global::Hazelcast.Remote.CloudException();
+                    CloudException = new global::Hazelcast.Testing.Remote.CloudException();
                     await CloudException.ReadAsync(iprot, cancellationToken);
                   }
                   else
@@ -7059,10 +7060,10 @@ namespace Hazelcast.Remote
 
       public partial class createCloudCluster_result : TBase
       {
-        private global::Hazelcast.Remote.CloudCluster _success;
-        private global::Hazelcast.Remote.CloudException _cloudException;
+        private global::Hazelcast.Testing.Remote.CloudCluster _success;
+        private global::Hazelcast.Testing.Remote.CloudException _cloudException;
 
-        public global::Hazelcast.Remote.CloudCluster Success
+        public global::Hazelcast.Testing.Remote.CloudCluster Success
         {
           get
           {
@@ -7075,7 +7076,7 @@ namespace Hazelcast.Remote
           }
         }
 
-        public global::Hazelcast.Remote.CloudException CloudException
+        public global::Hazelcast.Testing.Remote.CloudException CloudException
         {
           get
           {
@@ -7105,12 +7106,12 @@ namespace Hazelcast.Remote
           var tmp399 = new createCloudCluster_result();
           if((Success != null) && __isset.success)
           {
-            tmp399.Success = (global::Hazelcast.Remote.CloudCluster)this.Success.DeepCopy();
+            tmp399.Success = (global::Hazelcast.Testing.Remote.CloudCluster)this.Success.DeepCopy();
           }
           tmp399.__isset.success = this.__isset.success;
           if((CloudException != null) && __isset.cloudException)
           {
-            tmp399.CloudException = (global::Hazelcast.Remote.CloudException)this.CloudException.DeepCopy();
+            tmp399.CloudException = (global::Hazelcast.Testing.Remote.CloudException)this.CloudException.DeepCopy();
           }
           tmp399.__isset.cloudException = this.__isset.cloudException;
           return tmp399;
@@ -7136,7 +7137,7 @@ namespace Hazelcast.Remote
                 case 0:
                   if (field.Type == TType.Struct)
                   {
-                    Success = new global::Hazelcast.Remote.CloudCluster();
+                    Success = new global::Hazelcast.Testing.Remote.CloudCluster();
                     await Success.ReadAsync(iprot, cancellationToken);
                   }
                   else
@@ -7147,7 +7148,7 @@ namespace Hazelcast.Remote
                 case 1:
                   if (field.Type == TType.Struct)
                   {
-                    CloudException = new global::Hazelcast.Remote.CloudException();
+                    CloudException = new global::Hazelcast.Testing.Remote.CloudException();
                     await CloudException.ReadAsync(iprot, cancellationToken);
                   }
                   else
@@ -7402,10 +7403,10 @@ namespace Hazelcast.Remote
 
       public partial class getCloudCluster_result : TBase
       {
-        private global::Hazelcast.Remote.CloudCluster _success;
-        private global::Hazelcast.Remote.CloudException _cloudException;
+        private global::Hazelcast.Testing.Remote.CloudCluster _success;
+        private global::Hazelcast.Testing.Remote.CloudException _cloudException;
 
-        public global::Hazelcast.Remote.CloudCluster Success
+        public global::Hazelcast.Testing.Remote.CloudCluster Success
         {
           get
           {
@@ -7418,7 +7419,7 @@ namespace Hazelcast.Remote
           }
         }
 
-        public global::Hazelcast.Remote.CloudException CloudException
+        public global::Hazelcast.Testing.Remote.CloudException CloudException
         {
           get
           {
@@ -7448,12 +7449,12 @@ namespace Hazelcast.Remote
           var tmp409 = new getCloudCluster_result();
           if((Success != null) && __isset.success)
           {
-            tmp409.Success = (global::Hazelcast.Remote.CloudCluster)this.Success.DeepCopy();
+            tmp409.Success = (global::Hazelcast.Testing.Remote.CloudCluster)this.Success.DeepCopy();
           }
           tmp409.__isset.success = this.__isset.success;
           if((CloudException != null) && __isset.cloudException)
           {
-            tmp409.CloudException = (global::Hazelcast.Remote.CloudException)this.CloudException.DeepCopy();
+            tmp409.CloudException = (global::Hazelcast.Testing.Remote.CloudException)this.CloudException.DeepCopy();
           }
           tmp409.__isset.cloudException = this.__isset.cloudException;
           return tmp409;
@@ -7479,7 +7480,7 @@ namespace Hazelcast.Remote
                 case 0:
                   if (field.Type == TType.Struct)
                   {
-                    Success = new global::Hazelcast.Remote.CloudCluster();
+                    Success = new global::Hazelcast.Testing.Remote.CloudCluster();
                     await Success.ReadAsync(iprot, cancellationToken);
                   }
                   else
@@ -7490,7 +7491,7 @@ namespace Hazelcast.Remote
                 case 1:
                   if (field.Type == TType.Struct)
                   {
-                    CloudException = new global::Hazelcast.Remote.CloudException();
+                    CloudException = new global::Hazelcast.Testing.Remote.CloudException();
                     await CloudException.ReadAsync(iprot, cancellationToken);
                   }
                   else
@@ -7745,10 +7746,10 @@ namespace Hazelcast.Remote
 
       public partial class stopCloudCluster_result : TBase
       {
-        private global::Hazelcast.Remote.CloudCluster _success;
-        private global::Hazelcast.Remote.CloudException _cloudException;
+        private global::Hazelcast.Testing.Remote.CloudCluster _success;
+        private global::Hazelcast.Testing.Remote.CloudException _cloudException;
 
-        public global::Hazelcast.Remote.CloudCluster Success
+        public global::Hazelcast.Testing.Remote.CloudCluster Success
         {
           get
           {
@@ -7761,7 +7762,7 @@ namespace Hazelcast.Remote
           }
         }
 
-        public global::Hazelcast.Remote.CloudException CloudException
+        public global::Hazelcast.Testing.Remote.CloudException CloudException
         {
           get
           {
@@ -7791,12 +7792,12 @@ namespace Hazelcast.Remote
           var tmp419 = new stopCloudCluster_result();
           if((Success != null) && __isset.success)
           {
-            tmp419.Success = (global::Hazelcast.Remote.CloudCluster)this.Success.DeepCopy();
+            tmp419.Success = (global::Hazelcast.Testing.Remote.CloudCluster)this.Success.DeepCopy();
           }
           tmp419.__isset.success = this.__isset.success;
           if((CloudException != null) && __isset.cloudException)
           {
-            tmp419.CloudException = (global::Hazelcast.Remote.CloudException)this.CloudException.DeepCopy();
+            tmp419.CloudException = (global::Hazelcast.Testing.Remote.CloudException)this.CloudException.DeepCopy();
           }
           tmp419.__isset.cloudException = this.__isset.cloudException;
           return tmp419;
@@ -7822,7 +7823,7 @@ namespace Hazelcast.Remote
                 case 0:
                   if (field.Type == TType.Struct)
                   {
-                    Success = new global::Hazelcast.Remote.CloudCluster();
+                    Success = new global::Hazelcast.Testing.Remote.CloudCluster();
                     await Success.ReadAsync(iprot, cancellationToken);
                   }
                   else
@@ -7833,7 +7834,7 @@ namespace Hazelcast.Remote
                 case 1:
                   if (field.Type == TType.Struct)
                   {
-                    CloudException = new global::Hazelcast.Remote.CloudException();
+                    CloudException = new global::Hazelcast.Testing.Remote.CloudException();
                     await CloudException.ReadAsync(iprot, cancellationToken);
                   }
                   else
@@ -8088,10 +8089,10 @@ namespace Hazelcast.Remote
 
       public partial class resumeCloudCluster_result : TBase
       {
-        private global::Hazelcast.Remote.CloudCluster _success;
-        private global::Hazelcast.Remote.CloudException _cloudException;
+        private global::Hazelcast.Testing.Remote.CloudCluster _success;
+        private global::Hazelcast.Testing.Remote.CloudException _cloudException;
 
-        public global::Hazelcast.Remote.CloudCluster Success
+        public global::Hazelcast.Testing.Remote.CloudCluster Success
         {
           get
           {
@@ -8104,7 +8105,7 @@ namespace Hazelcast.Remote
           }
         }
 
-        public global::Hazelcast.Remote.CloudException CloudException
+        public global::Hazelcast.Testing.Remote.CloudException CloudException
         {
           get
           {
@@ -8134,12 +8135,12 @@ namespace Hazelcast.Remote
           var tmp429 = new resumeCloudCluster_result();
           if((Success != null) && __isset.success)
           {
-            tmp429.Success = (global::Hazelcast.Remote.CloudCluster)this.Success.DeepCopy();
+            tmp429.Success = (global::Hazelcast.Testing.Remote.CloudCluster)this.Success.DeepCopy();
           }
           tmp429.__isset.success = this.__isset.success;
           if((CloudException != null) && __isset.cloudException)
           {
-            tmp429.CloudException = (global::Hazelcast.Remote.CloudException)this.CloudException.DeepCopy();
+            tmp429.CloudException = (global::Hazelcast.Testing.Remote.CloudException)this.CloudException.DeepCopy();
           }
           tmp429.__isset.cloudException = this.__isset.cloudException;
           return tmp429;
@@ -8165,7 +8166,7 @@ namespace Hazelcast.Remote
                 case 0:
                   if (field.Type == TType.Struct)
                   {
-                    Success = new global::Hazelcast.Remote.CloudCluster();
+                    Success = new global::Hazelcast.Testing.Remote.CloudCluster();
                     await Success.ReadAsync(iprot, cancellationToken);
                   }
                   else
@@ -8176,7 +8177,7 @@ namespace Hazelcast.Remote
                 case 1:
                   if (field.Type == TType.Struct)
                   {
-                    CloudException = new global::Hazelcast.Remote.CloudException();
+                    CloudException = new global::Hazelcast.Testing.Remote.CloudException();
                     await CloudException.ReadAsync(iprot, cancellationToken);
                   }
                   else
@@ -8431,9 +8432,9 @@ namespace Hazelcast.Remote
 
       public partial class deleteCloudCluster_result : TBase
       {
-        private global::Hazelcast.Remote.CloudException _cloudException;
+        private global::Hazelcast.Testing.Remote.CloudException _cloudException;
 
-        public global::Hazelcast.Remote.CloudException CloudException
+        public global::Hazelcast.Testing.Remote.CloudException CloudException
         {
           get
           {
@@ -8462,7 +8463,7 @@ namespace Hazelcast.Remote
           var tmp439 = new deleteCloudCluster_result();
           if((CloudException != null) && __isset.cloudException)
           {
-            tmp439.CloudException = (global::Hazelcast.Remote.CloudException)this.CloudException.DeepCopy();
+            tmp439.CloudException = (global::Hazelcast.Testing.Remote.CloudException)this.CloudException.DeepCopy();
           }
           tmp439.__isset.cloudException = this.__isset.cloudException;
           return tmp439;
@@ -8488,7 +8489,7 @@ namespace Hazelcast.Remote
                 case 1:
                   if (field.Type == TType.Struct)
                   {
-                    CloudException = new global::Hazelcast.Remote.CloudException();
+                    CloudException = new global::Hazelcast.Testing.Remote.CloudException();
                     await CloudException.ReadAsync(iprot, cancellationToken);
                   }
                   else
@@ -8580,7 +8581,7 @@ namespace Hazelcast.Remote
       {
         private string _clusterId;
         private string _script;
-        private global::Hazelcast.Remote.Lang _lang;
+        private global::Hazelcast.Testing.Remote.Lang _lang;
 
         public string ClusterId
         {
@@ -8610,9 +8611,9 @@ namespace Hazelcast.Remote
 
         /// <summary>
         /// 
-        /// <seealso cref="global::Hazelcast.Remote.Lang"/>
+        /// <seealso cref="global::Hazelcast.Testing.Remote.Lang"/>
         /// </summary>
-        public global::Hazelcast.Remote.Lang Lang
+        public global::Hazelcast.Testing.Remote.Lang Lang
         {
           get
           {
@@ -8699,7 +8700,7 @@ namespace Hazelcast.Remote
                 case 3:
                   if (field.Type == TType.I32)
                   {
-                    Lang = (global::Hazelcast.Remote.Lang)await iprot.ReadI32Async(cancellationToken);
+                    Lang = (global::Hazelcast.Testing.Remote.Lang)await iprot.ReadI32Async(cancellationToken);
                   }
                   else
                   {
@@ -8824,9 +8825,9 @@ namespace Hazelcast.Remote
 
       public partial class executeOnController_result : TBase
       {
-        private global::Hazelcast.Remote.Response _success;
+        private global::Hazelcast.Testing.Remote.Response _success;
 
-        public global::Hazelcast.Remote.Response Success
+        public global::Hazelcast.Testing.Remote.Response Success
         {
           get
           {
@@ -8855,7 +8856,7 @@ namespace Hazelcast.Remote
           var tmp449 = new executeOnController_result();
           if((Success != null) && __isset.success)
           {
-            tmp449.Success = (global::Hazelcast.Remote.Response)this.Success.DeepCopy();
+            tmp449.Success = (global::Hazelcast.Testing.Remote.Response)this.Success.DeepCopy();
           }
           tmp449.__isset.success = this.__isset.success;
           return tmp449;
@@ -8881,7 +8882,7 @@ namespace Hazelcast.Remote
                 case 0:
                   if (field.Type == TType.Struct)
                   {
-                    Success = new global::Hazelcast.Remote.Response();
+                    Success = new global::Hazelcast.Testing.Remote.Response();
                     await Success.ReadAsync(iprot, cancellationToken);
                   }
                   else
