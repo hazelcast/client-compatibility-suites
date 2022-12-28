@@ -41,14 +41,6 @@ jobs:
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v2
-      - name: Checkout to test artifacts
-        if: ${{ matrix.kind == 'enterprise' }}
-        uses: actions/checkout@v2
-        with:
-          repository: hazelcast/private-test-artifacts
-          path: certs
-          ref: data
-          token: ${{ secrets.GH_PAT }}
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
@@ -87,11 +79,7 @@ jobs:
         working-directory: client
         env:
           HAZELCAST_SERVER_VERSION: ${{ matrix.version }}
-      - name: Copy certificates JAR to destination with the appropriate name
-        if: ${{ matrix.kind == 'enterprise' }}
-        run: |
-          mkdir -p $GITHUB_WORKSPACE/client/temp/lib
-          cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/client/temp/lib/hazelcast-enterprise-${{ matrix.version }}-tests.jar
+          GITHUB_TOKEN_DEVOPS: ${{ secrets.GH_PAT }}
       - name: Run all tests
         shell: pwsh
         if: ${{ matrix.kind == 'enterprise' }}
@@ -99,5 +87,5 @@ jobs:
         working-directory: client
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
-          HAZELCAST_SERVER_VERSION: ${{ matrix.version }}      
-        
+          HAZELCAST_SERVER_VERSION: ${{ matrix.version }}
+          GITHUB_TOKEN_DEVOPS: ${{ secrets.GH_PAT }}
