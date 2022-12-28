@@ -12,7 +12,7 @@ RUN wget --quiet https://boostorg.jfrog.io/artifactory/main/release/1.76.0/sourc
 
 ADD . .
 
-RUN cd clientSourceCode && mkdir build && cd build && cmake .. && cmake --build . --parallel && cmake --build . --target install
+RUN cd clientSourceCode && mkdir build && cd build && cmake .. && cmake --build . && cmake --build . --target install
 
 RUN mkdir build && cd build && cmake .. && cmake --build .
 
