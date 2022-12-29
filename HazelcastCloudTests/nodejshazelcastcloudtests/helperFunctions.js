@@ -64,7 +64,7 @@ async function mapPutGetAndVerify(map) {
     expect(await map.size()).to.be.equal(20, "Map size should be 20");
 }
 
-async function stopResumeScaleUpDownCluster(clusterId, map)
+async function stopResumeCluster(clusterId, map)
 {
     await mapPutGetAndVerify(map);
     console.log("Stopping cloud cluster");
@@ -91,4 +91,4 @@ async function stopResumeScaleUpDownCluster(clusterId, map)
 exports.createClientConfigWithSsl = createClientConfigWithSsl;
 exports.createClientConfigWithoutSsl =createClientConfigWithoutSsl;
 exports.mapPutGetAndVerify = mapPutGetAndVerify;
-exports.stopResumeScaleUpDownCluster = stopResumeScaleUpDownCluster;
+exports.stopResumeCluster = stopResumeCluster;
