@@ -75,7 +75,7 @@ jobs:
         working-directory: client      
       - name: Run non-enterprise tests
         shell: pwsh
-        if: ${{ matrix.kind == 'oss' }}
+        if: ${{ matrix.kind == 'os' }}
         run: ./hz.ps1 -server ${{ matrix.version }} test
         working-directory: client
         env:
