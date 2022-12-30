@@ -74,7 +74,7 @@ jobs:
         working-directory: client      
       - name: Run non-enterprise tests
         shell: pwsh
-        if: ${{ matrix.kind == 'os' }}
+        if: ${{ matrix.kind == 'oss' }}
         run: ./hz.ps1 -server ${{ matrix.version }} test
         working-directory: client
         env:
@@ -82,7 +82,7 @@ jobs:
       - name: Run all tests
         shell: pwsh
         if: ${{ matrix.kind == 'enterprise' }}
-        run: ./hz.ps1 -enterprise -server ${{ matrix.version }} test ${{ secrets.GH_PAT }}
+        run: ./hz.ps1 -enterprise -server ${{ matrix.version }} -tf "test =~ Networking.ClientSslTests.ValidateChain" -verbose-tests test ${{ secrets.GH_PAT }}
         working-directory: client
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
