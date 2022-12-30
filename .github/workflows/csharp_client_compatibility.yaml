@@ -82,7 +82,7 @@ jobs:
       - name: Run all tests        
         shell: pwsh
         if: ${{ matrix.kind == 'enterprise' }}
-        run: ./hz.ps1 -enterprise -server ${{ matrix.version }} -tf "test =~ Networking.ClientSslTests.ValidateChain" -verbose-tests test ${{ secrets.GH_PAT }}
+        run: ./hz.ps1 -enterprise -noRestore -localRestore -server ${{ matrix.version }} -tf "test =~ Networking.ClientSslTests.ValidateChain" -verbose-tests test ${{ secrets.GH_PAT }}
         working-directory: client        
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
