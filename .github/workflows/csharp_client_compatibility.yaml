@@ -79,11 +79,7 @@ jobs:
         working-directory: client
         env:
           HAZELCAST_SERVER_VERSION: ${{ matrix.version }}
-      - name: Run all tests
-        uses: actions/upload-artifact@v3
-        with:
-          name: temp-dir
-          path: temp
+      - name: Run all tests        
         shell: pwsh
         if: ${{ matrix.kind == 'enterprise' }}
         run: ./hz.ps1 -enterprise -server ${{ matrix.version }} -tf "test =~ Networking.ClientSslTests.ValidateChain" -verbose-tests test ${{ secrets.GH_PAT }}
@@ -91,4 +87,10 @@ jobs:
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
           HAZELCAST_SERVER_VERSION: ${{ matrix.version }}
+      - name: Upload tmp dir
+        uses: actions/upload-artifact@v3
+        with:
+          name: temp-dir
+          path: temp
+
           
