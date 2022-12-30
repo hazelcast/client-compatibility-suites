@@ -87,7 +87,7 @@ jobs:
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
           HAZELCAST_SERVER_VERSION: ${{ matrix.version }}
-        - uses: actions/upload-artifact@v3
-            with:
-            name: rc-logs
-            path: temp/rc
+          - uses: actions/upload-artifact@v3
+              with:
+              name: temp-dir
+              path: temp
