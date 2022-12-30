@@ -38,11 +38,7 @@ jobs:
         kind: [os, enterprise]
         os: [ ubuntu-latest, windows-latest ]
     name: Test CSharp ${{ github.event.inputs.branch_name }} branch against ${{ matrix.kind }} ${{ matrix.version }} server on ${{ matrix.os }}
-    steps:
-      - uses: actions/upload-artifact@v3
-          with:
-            name: temp-dir
-            path: temp
+    steps:      
       - name: Checkout to scripts
         uses: actions/checkout@v2
       - name: Setup Python
@@ -84,6 +80,10 @@ jobs:
         env:
           HAZELCAST_SERVER_VERSION: ${{ matrix.version }}
       - name: Run all tests
+        uses: actions/upload-artifact@v3
+          with:
+            name: temp-dir
+            path: temp
         shell: pwsh
         if: ${{ matrix.kind == 'enterprise' }}
         run: ./hz.ps1 -enterprise -server ${{ matrix.version }} -tf "test =~ Networking.ClientSslTests.ValidateChain" -verbose-tests test ${{ secrets.GH_PAT }}
