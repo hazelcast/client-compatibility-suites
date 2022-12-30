@@ -81,9 +81,9 @@ jobs:
           HAZELCAST_SERVER_VERSION: ${{ matrix.version }}
       - name: Run all tests
         uses: actions/upload-artifact@v3
-          with:
-            name: temp-dir
-            path: temp
+        with:
+          name: temp-dir
+          path: temp
         shell: pwsh
         if: ${{ matrix.kind == 'enterprise' }}
         run: ./hz.ps1 -enterprise -server ${{ matrix.version }} -tf "test =~ Networking.ClientSslTests.ValidateChain" -verbose-tests test ${{ secrets.GH_PAT }}
