@@ -41,8 +41,8 @@ jobs:
     steps:
       - uses: actions/upload-artifact@v3
           with:
-          name: temp-dir
-          path: temp
+            name: temp-dir
+            path: temp
       - name: Checkout to scripts
         uses: actions/checkout@v2
       - name: Setup Python
