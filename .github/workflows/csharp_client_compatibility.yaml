@@ -38,7 +38,7 @@ jobs:
         kind: [os, enterprise]
         os: [ ubuntu-latest, windows-latest ]
     name: Test CSharp ${{ github.event.inputs.branch_name }} branch against ${{ matrix.kind }} ${{ matrix.version }} server on ${{ matrix.os }}
-    steps:
+    steps:      
       - name: Checkout to scripts
         uses: actions/checkout@v2
       - name: Setup Python
@@ -46,7 +46,7 @@ jobs:
         with:
           python-version: 3.9
       - name: Install .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: |
             2.1.x
@@ -55,9 +55,10 @@ jobs:
             6.0.x
             7.0.x
       - name: Setup Java
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
-          java-version: 8
+          distribution: 'adopt'
+          java-version: '11'
       - name: Checkout to ${{ github.event.inputs.branch_name }}
         uses: actions/checkout@v2
         with:
@@ -79,11 +80,13 @@ jobs:
         working-directory: client
         env:
           HAZELCAST_SERVER_VERSION: ${{ matrix.version }}
-      - name: Run all tests
+      - name: Run all tests        
         shell: pwsh
         if: ${{ matrix.kind == 'enterprise' }}
-        run: ./hz.ps1 -enterprise -server ${{ matrix.version }} test ${{ secrets.GH_PAT }}
-        working-directory: client
+        run: ./hz.ps1 -enterprise -noRestore -localRestore -server ${{ matrix.version }} test ${{ secrets.GH_PAT }}
+        working-directory: client        
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
           HAZELCAST_SERVER_VERSION: ${{ matrix.version }}
+
+          
