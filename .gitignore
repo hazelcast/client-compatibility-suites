@@ -143,3 +143,4 @@ cython_debug/
 .DS_Store
 .directory
 *.pyc
+KubernetesInternalClients/csharp/KubernetesTest/.vs;KubernetesInternalClients/csharp/KubernetesTest/obj;KubernetesInternalClients/csharp/KubernetesTest/Debug;KubernetesInternalClients/csharp/KubernetesTest/Release
