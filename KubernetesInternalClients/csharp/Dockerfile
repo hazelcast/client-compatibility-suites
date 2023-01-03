@@ -1,7 +1,7 @@
-FROM mcr.microsoft.com/dotnet/aspnet:3.1
+FROM mcr.microsoft.com/dotnet/aspnet:7.0
 
-COPY clientSourceCode/src/KubernetesTest/bin/Release/netcoreapp3.1 netcoreapp3.1/
+COPY clientSourceCode/src/KubernetesTest/bin/Release/net7.0 net7.0/
 
-WORKDIR /netcoreapp3.1
+WORKDIR /net7.0
 
 CMD ["dotnet", "KubernetesTest.dll"]
