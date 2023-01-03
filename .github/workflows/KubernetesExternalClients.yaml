@@ -77,9 +77,9 @@ jobs:
         kubectl create service loadbalancer hz-hazelcast --tcp=5701 -o yaml --dry-run=client | kubectl set selector --local -f - "role=hazelcast" -o yaml | kubectl create -f -
     - name: Wait for deployment to finish
       run: |-
-        kubectl wait --for=condition=ready pod/hz-hazelcast-0 --timeout=120s
-        kubectl wait --for=condition=ready pod/hz-hazelcast-1 --timeout=120s
-        kubectl wait --for=condition=ready pod/hz-hazelcast-2 --timeout=120s
+        kubectl wait --for=condition=ready pod/hz-hazelcast-0 --timeout=180s
+        kubectl wait --for=condition=ready pod/hz-hazelcast-1 --timeout=180s
+        kubectl wait --for=condition=ready pod/hz-hazelcast-2 --timeout=180s
     - name: Wait for external IP to get assigned
       run: |-
         EXTERNAL_IP=$(kubectl get svc hz-hazelcast --output="jsonpath={.status.loadBalancer.ingress[0].ip}")

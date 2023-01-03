@@ -209,9 +209,9 @@ jobs:
           
       - name: Wait for Hazelcast cluster
         run: |-
-          kubectl wait --for=condition=ready pod/hz-hazelcast-0 --timeout=150s
-          kubectl wait --for=condition=ready pod/hz-hazelcast-1 --timeout=150s
-          kubectl wait --for=condition=ready pod/hz-hazelcast-2 --timeout=150s
+          kubectl wait --for=condition=ready pod/hz-hazelcast-0 --timeout=180s
+          kubectl wait --for=condition=ready pod/hz-hazelcast-1 --timeout=180s
+          kubectl wait --for=condition=ready pod/hz-hazelcast-2 --timeout=180s
           
       - name: Download image
         uses: ishworkh/docker-image-artifact-download@v1
@@ -222,7 +222,7 @@ jobs:
         run: |-
           kind load docker-image hazelcast-${{ matrix.client-language }}-client:test
           kubectl run hazelcast-${{ matrix.client-language }}-client --image=hazelcast-${{ matrix.client-language }}-client:test
-          kubectl wait --for=condition=ready pod/hazelcast-${{ matrix.client-language }}-client --timeout=150s         
+          kubectl wait --for=condition=ready pod/hazelcast-${{ matrix.client-language }}-client --timeout=180s         
       
       - name: Verify client application
         run: |-
