@@ -21,7 +21,7 @@ namespace Client
             // this must be consistent with what's in the GitHub action: if the action waits for 120s before testing
             // the log, then we must set an invocation retry timeout greater than 120s, else the invocations will
             // start and exceptions *will* be reported
-            options.Messaging.RetryTimeoutSeconds = 180;
+            options.Messaging.RetryTimeoutSeconds = 240;
             
             await using var client = await HazelcastClientFactory.StartNewClientAsync(options);
             await using var map = await client.GetMapAsync<string, string>("map");
