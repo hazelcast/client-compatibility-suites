@@ -12,6 +12,7 @@ namespace Client
             Console.WriteLine("Started");
             var options = new HazelcastOptionsBuilder().Build();
             options.Networking.Addresses.Add("<EXTERNAL-IP>");
+            options.Networking.UsePublicAddresses = true;
             await using var client = await HazelcastClientFactory.StartNewClientAsync(options);
             await using var map = await client.GetMapAsync<string, string>("mapForCsharp");
             await map.PutAsync("key", "value");
