@@ -95,6 +95,7 @@ jobs:
             discoveryServiceType: LoadBalancer
             memberAccess: LoadBalancer
         EOF
+        sleep 30
 
     - name: Wait for deployment to finish
       run: |-
