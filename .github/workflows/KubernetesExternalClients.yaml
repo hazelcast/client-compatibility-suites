@@ -95,11 +95,10 @@ jobs:
             discoveryServiceType: LoadBalancer
             memberAccess: LoadBalancer
         EOF
-        sleep 30
+        sleep 60
 
     - name: Wait for deployment to finish
-      run: |-        
-        while [[ $(kubectl get pods -o 'jsonpath={..status.conditions[?(@.name=="hz-hazelcast-0")].status}') != "True" ]]; do echo "waiting for pod" && sleep 2; done       
+      run: |-                    
         kubectl wait --for=condition=ready pod/hz-hazelcast-0 --timeout=180s
         kubectl wait --for=condition=ready pod/hz-hazelcast-1 --timeout=180s
         kubectl wait --for=condition=ready pod/hz-hazelcast-2 --timeout=180s
