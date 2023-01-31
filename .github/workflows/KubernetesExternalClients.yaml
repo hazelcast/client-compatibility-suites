@@ -90,6 +90,7 @@ jobs:
         metadata:
           name: hz-hazelcast
         spec:
+          clusterSize: 3
           exposeExternally:
             type: Smart
             discoveryServiceType: LoadBalancer
