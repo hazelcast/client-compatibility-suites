@@ -101,8 +101,8 @@ jobs:
       run: |-                    
         echo "Waiting for the pods..."
         nodeName=$(kubectl get pods --output='jsonpath={.items[?(@.metadata.name=="hz-hazelcast-0")].metadata.name}')
-        while [nodeName=="k8s-client-test-0"]; done
-          sleep 1
+        while ["$nodeName"=="k8s-client-test-0"]; do
+          sleep 2
           nodeName=$(kubectl get pods -o 'jsonpath={.items[?(@.metadata.name=="k8s-client-test-0")].metadata.name}')
         done
         echo "Pods are created."
