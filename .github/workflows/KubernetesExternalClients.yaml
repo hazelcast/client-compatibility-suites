@@ -100,11 +100,7 @@ jobs:
     - name: Wait for deployment to finish
       run: |-                    
         echo "Waiting for the pods..."
-        nodeName=$(kubectl get pods --output='jsonpath={.items[?(@.metadata.name=="hz-hazelcast-0")].metadata.name}')
-        while ["$nodeName"=="k8s-client-test-0"]; do
-          sleep 2
-          nodeName=$(kubectl get pods -o 'jsonpath={.items[?(@.metadata.name=="k8s-client-test-0")].metadata.name}')
-        done
+        while ! kubectl get pods hz-hazelcast-0; do sleep 2; done
         echo "Pods are created."
         kubectl wait --for=condition=ready pod/hz-hazelcast-0 --timeout=180s
         kubectl wait --for=condition=ready pod/hz-hazelcast-1 --timeout=180s
