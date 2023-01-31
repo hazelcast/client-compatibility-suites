@@ -77,7 +77,6 @@ jobs:
         --machine-type=n1-standard-2 \
         --num-nodes=2 \
         --network=${{env.GCP_NETWORK}} 
-        sleep 30
 
     - name: Deploy Hazelcast cluster
       run: |-
@@ -101,11 +100,18 @@ jobs:
     - name: Wait for deployment to finish
       run: |-                    
         echo "Waiting for the pods..."
-        while ! kubectl get pods hz-hazelcast-0; do sleep 2; done
-        echo "Pods are created."
-        kubectl wait --for=condition=ready pod/hz-hazelcast-0 --timeout=180s
-        kubectl wait --for=condition=ready pod/hz-hazelcast-1 --timeout=180s
-        kubectl wait --for=condition=ready pod/hz-hazelcast-2 --timeout=180s
+        $status = kubectl get hazelcast
+        while ! $status; do
+          sleep 2
+          $status = kubectl get hazelcast
+          echo "Hazelcast Operator not available. Waiting..."
+        done
+        $status = kubectl get hazelcast -o 'jsonpath={.items.*.status.phase}'
+        while ! $status == "Running"; do 
+          sleep 2
+          echo "Checking Hazelcast Operator to be running..."
+          $status = kubectl get hazelcast -o 'jsonpath={.items.*.status.phase}'
+        done
     - name: Wait for external IP to get assigned
       run: |-
         EXTERNAL_IP=$(kubectl get svc hz-hazelcast --output="jsonpath={.status.loadBalancer.ingress[0].ip}")
