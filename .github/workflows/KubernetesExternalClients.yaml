@@ -109,7 +109,7 @@ jobs:
         $status = kubectl get hazelcast -o 'jsonpath={.items.*.status.phase}'
         while ! $status == "Running"; do 
           sleep 2
-          echo "Checking Hazelcast Operator to be running..."
+          echo "Checking Hazelcast members to be running..."
           $status = kubectl get hazelcast -o 'jsonpath={.items.*.status.phase}'
         done
     - name: Wait for external IP to get assigned
