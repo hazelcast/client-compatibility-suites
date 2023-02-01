@@ -101,7 +101,7 @@ jobs:
       run: |-                    
         while [ "$(kubectl get hazelcast -o jsonpath='{.items[*].status.phase}')" != "Running" ]; do
           sleep 2
-          echo "Current Status of Operator: $(kubectl get hazelcast -o jsonpath='{.items[*].status.phase}')"
+          echo "Current Status of the cluster: $(kubectl get hazelcast -o jsonpath='{.items[*].status.phase}')"
         done
 
     - name: Wait for external IP to get assigned
