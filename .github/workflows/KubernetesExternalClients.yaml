@@ -96,16 +96,14 @@ jobs:
             discoveryServiceType: LoadBalancer
             memberAccess: LoadBalancer
         EOF
-        sleep 60
 
-    - name: Wait for deployment to finish
+    - name: Wait for deployment to be running
       run: |-                    
-        echo "Waiting for the pods..."
-        while ! kubectl get pods hz-hazelcast-0; do sleep 2; done
-        echo "Pods are created."
-        kubectl wait --for=condition=ready pod/hz-hazelcast-0 --timeout=180s
-        kubectl wait --for=condition=ready pod/hz-hazelcast-1 --timeout=180s
-        kubectl wait --for=condition=ready pod/hz-hazelcast-2 --timeout=180s
+        while [ "$(kubectl get hazelcast -o jsonpath='{.items[*].status.phase}')" != "Running" ]; do
+          sleep 2
+          echo "Current Status of Operator: $(kubectl get hazelcast -o jsonpath='{.items[*].status.phase}')"
+        done
+
     - name: Wait for external IP to get assigned
       run: |-
         EXTERNAL_IP=$(kubectl get svc hz-hazelcast --output="jsonpath={.status.loadBalancer.ingress[0].ip}")
