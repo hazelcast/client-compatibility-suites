@@ -52,7 +52,7 @@ func TestForSslEnabledCluster(t *testing.T) {
 		isSmartClient bool
 	}{
 		{"SmartClientWithSslCluster", true},
-		{"UniscoketClientWithSslCluster", false},
+		{"UnisocketClientWithSslCluster", false},
 	}
 
 	for _, tc := range table {
@@ -60,7 +60,7 @@ func TestForSslEnabledCluster(t *testing.T) {
 			ctx := context.Background()
 			client, _ := hazelcast.StartNewClientWithConfig(ctx, CreateClientConfigWithSsl(sslEnabledCluster.ReleaseName, sslEnabledCluster.Token, sslEnabledCluster.CertificatePath, sslEnabledCluster.TlsPassword, tc.isSmartClient))
 			defer client.Shutdown(ctx)
-			givenMap, _ := client.GetMap(ctx, "MapFor"+tc.name)
+			givenMap, _ := client.GetMap(ctx, "MapFor" + tc.name)
 			MapPutGetAndVerify(t, givenMap)
 			fmt.Println("Stopping cluster")
 			_, err = it.StopCloudCluster(context.Background(), sslEnabledCluster.ID)
@@ -123,10 +123,12 @@ func TestForSslEnabledClusterWithoutCertificates(t *testing.T) {
 			config := hazelcast.NewConfig()
 			config = CreateClientConfigWithoutSsl(sslEnabledCluster.ReleaseName, sslEnabledCluster.Token, tc.isSmartClient)
 			config.Cluster.ConnectionStrategy.Timeout = types.Duration(10 * time.Second)
-			_, err := hazelcast.StartNewClientWithConfig(ctx, config)
+			client, err := hazelcast.StartNewClientWithConfig(ctx, config)
 			value := true
 			if err != nil {
 				value = true
+			} else {
+				client.Shutdown(ctx)
 			}
 			assert.True(t, value, "Client shouldn't be able to connect ssl enabled cluster without certificates")
 		})
