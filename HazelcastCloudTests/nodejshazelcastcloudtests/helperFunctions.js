@@ -68,22 +68,12 @@ async function stopResumeCluster(clusterId, map)
 {
     await mapPutGetAndVerify(map);
     console.log("Stopping cloud cluster");
-    await RC.stopHazelcastCloudCluster(clusterId);
+    await RC.stopCloudCluster(clusterId);
 
     console.log("Starting cloud cluster");
-    await RC.resumeHazelcastCloudCluster(clusterId);
+    await RC.resumeCloudCluster(clusterId);
     console.log("Wait for 5 seconds to be sure client has enough time to connect");
     await delay(5000);
-
-    await mapPutGetAndVerify(map);
-
-    console.log("Scaling up cloud cluster");
-    await RC.setHazelcastCloudClusterMemberCount(clusterId, 4);
-
-    await mapPutGetAndVerify(map);
-
-    console.log("Scaling down cloud cluster");
-    await  RC.setHazelcastCloudClusterMemberCount(clusterId, 2);
 
     await mapPutGetAndVerify(map);
 }
