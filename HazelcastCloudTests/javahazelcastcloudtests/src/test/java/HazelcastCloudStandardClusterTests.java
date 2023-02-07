@@ -9,7 +9,6 @@ import com.hazelcast.remotecontroller.CloudException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,7 +18,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 public class HazelcastCloudStandardClusterTests {
     static CloudCluster sslDisabledCluster;
     static CloudCluster sslEnabledCluster;
-    static CloudCluster tempCluster;
+    static CloudCluster cluster;
     static CloudManager cloudManager;
     private static final Logger TestCasesLogger = LogManager.getLogger(HazelcastCloudStandardClusterTests.class);
 
@@ -46,26 +45,23 @@ public class HazelcastCloudStandardClusterTests {
     })
     public void StandardClusterTests(Boolean isSmartClient, Boolean isTlsEnabled) throws CloudException {
         ClientConfig config;
-        if(isTlsEnabled) {
+        if (isTlsEnabled) {
             config = HelperMethods.getConfigForSslEnabledCluster(sslEnabledCluster.getReleaseName(), sslEnabledCluster.getToken(), isSmartClient, sslEnabledCluster.getCertificatePath(), sslEnabledCluster.getTlsPassword());
-            tempCluster = sslEnabledCluster;
-            config.getConnectionStrategyConfig().getConnectionRetryConfig().setClusterConnectTimeoutMillis(10000);
+            cluster = sslEnabledCluster;
         } else {
             config = HelperMethods.getConfigForSslDisabledCluster(sslDisabledCluster.getReleaseName(), sslDisabledCluster.getToken(), isSmartClient);
-            tempCluster = sslDisabledCluster;
-            config.getConnectionStrategyConfig().getConnectionRetryConfig().setClusterConnectTimeoutMillis(10000);
+            cluster = sslDisabledCluster;
         }
 
         TestCasesLogger.info("Create client");
         HazelcastInstance client = HazelcastClient.newHazelcastClient(config);
         IMap<String, String> map = client.getMap("mapForTest");
-        HelperMethods.mapPutgetAndVerify(map);
 
         HelperMethods.mapPutgetAndVerify(map);
         TestCasesLogger.info("Stop cluster");
-        cloudManager.stopCloudCluster(tempCluster.getId());
+        cloudManager.stopCloudCluster(cluster.getId());
         TestCasesLogger.info("Resume cluster");
-        cloudManager.resumeCloudCluster(tempCluster.getId());
+        cloudManager.resumeCloudCluster(cluster.getId());
         HelperMethods.mapPutgetAndVerify(map);
         client.shutdown();
     }
