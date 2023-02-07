@@ -27,20 +27,23 @@ public class HelperMethods {
         ClientConfig config = new ClientConfig();
         config.getNetworkConfig().getCloudConfig().setDiscoveryToken(token).setEnabled(true);
         config.setProperty("hazelcast.client.cloud.url", System.getenv("BASE_URL"));
+        config.setProperty("hazelcast.client.heartbeat.timeout", "10000");
         config.setClusterName(nameForConnect);
         config.getNetworkConfig().setSmartRouting(isSmart);
         return config;
     }
 
-    public static void mapPutgetAndVerify(IMap<String, String> map) {
+    public static void mapPutgetAndVerify(IMap<String, String> map){
         HelperLogger.info("Map put get and verify");
         Random random = new Random();
         map.clear();
-        for(int i = 0; i < 20; i++) {
+        for(int i = 0; i < 20; i++)
+        {
             int randomKey = random.nextInt(100_000);
             map.put("key-" + randomKey, "value-" + randomKey);
             Assertions.assertEquals(map.get("key-" + randomKey), "value-" + randomKey );
         }
         Assertions.assertEquals(map.size(), 20);
     }
+
 }
