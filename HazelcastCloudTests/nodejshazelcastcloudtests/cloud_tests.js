@@ -6,7 +6,6 @@ const {Client} = require("./lib")
 const { expect } = require('chai');
 
 describe('SslEnabledStandardClusterTests', function () {
-
     let client;
     let sslEnabledCluster;
 
@@ -60,13 +59,14 @@ describe('SslEnabledStandardClusterTests', function () {
     });
 
     after(async function (){
-        await RC.deleteCloudCluster(sslEnabledCluster.id)
+        await RC.deleteCloudCluster(sslEnabledCluster.id);
     });
 });
 
 describe('SslDisabledStandardClusterTests', function () {
-    let client
-    let sslDisabledCluster
+    let client;
+    let sslDisabledCluster;
+
     before(async function (){
         await RC.loginToCloudUsingEnvironment()
         sslDisabledCluster = await RC.createCloudCluster(process.env.HZ_VERSION, false)
@@ -93,6 +93,6 @@ describe('SslDisabledStandardClusterTests', function () {
     });
 
     after(async function (){
-        await RC.deleteCloudCluster(sslDisabledCluster.id)
+        await RC.deleteCloudCluster(sslDisabledCluster.id);
     });
 });

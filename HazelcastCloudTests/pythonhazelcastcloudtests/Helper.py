@@ -1,7 +1,6 @@
 import os
 import random
 import logging
-import unittest
 from os.path import abspath
 
 
