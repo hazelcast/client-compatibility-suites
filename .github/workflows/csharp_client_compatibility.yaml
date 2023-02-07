@@ -38,33 +38,27 @@ jobs:
         kind: [os, enterprise]
         os: [ ubuntu-latest, windows-latest ]
     name: Test CSharp ${{ github.event.inputs.branch_name }} branch against ${{ matrix.kind }} ${{ matrix.version }} server on ${{ matrix.os }}
-    steps:
+    steps:      
       - name: Checkout to scripts
         uses: actions/checkout@v2
-      - name: Checkout to test artifacts
-        if: ${{ matrix.kind == 'enterprise' }}
-        uses: actions/checkout@v2
-        with:
-          repository: hazelcast/private-test-artifacts
-          path: certs
-          ref: data
-          token: ${{ secrets.GH_PAT }}
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
       - name: Install .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: |
             2.1.x
             3.1.x
             5.0.x
             6.0.x
+            7.0.x
       - name: Setup Java
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
-          java-version: 8
+          distribution: 'adopt'
+          java-version: '11'
       - name: Checkout to ${{ github.event.inputs.branch_name }}
         uses: actions/checkout@v2
         with:
@@ -86,17 +80,13 @@ jobs:
         working-directory: client
         env:
           HAZELCAST_SERVER_VERSION: ${{ matrix.version }}
-      - name: Copy certificates JAR to destination with the appropriate name
-        if: ${{ matrix.kind == 'enterprise' }}
-        run: |
-          mkdir -p $GITHUB_WORKSPACE/client/temp/lib
-          cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/client/temp/lib/hazelcast-enterprise-${{ matrix.version }}-tests.jar
-      - name: Run all tests
+      - name: Run all tests        
         shell: pwsh
         if: ${{ matrix.kind == 'enterprise' }}
-        run: ./hz.ps1 -enterprise -server ${{ matrix.version }} test
-        working-directory: client
+        run: ./hz.ps1 -enterprise -noRestore -localRestore -server ${{ matrix.version }} test ${{ secrets.GH_PAT }}
+        working-directory: client        
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
-          HAZELCAST_SERVER_VERSION: ${{ matrix.version }}      
-        
+          HAZELCAST_SERVER_VERSION: ${{ matrix.version }}
+
+          

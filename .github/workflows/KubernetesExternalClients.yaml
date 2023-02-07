@@ -43,43 +43,67 @@ jobs:
       cluster_name: ${{steps.cluster_name.outputs.cluster_name}}
       GKE_ZONE: ${{steps.gke_zone.outputs.gke_zone}}
     runs-on: ubuntu-latest
+    env:
+      GCP_NETWORK: operator-test-network
     
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-
-    - name: Setup gcloud CLI
-      uses: GoogleCloudPlatform/github-actions/setup-gcloud@v0.2.1
+    
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v1'
       with:
-        service_account_key: ${{ secrets.GKE_SA_KEY }}
-        project_id: ${{ env.PROJECT_ID }}
-        export_default_credentials: true 
+        credentials_json: '${{ secrets.GKE_SA_KEY }}'
+
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v1'
 
     - name: Install Kubectl
       run: |-
         gcloud components install kubectl
+
+    - name: Install Helm
+      uses: azure/setup-helm@v3
+      id: install
+      
     - name: Create GKE cluster
       run: |-
         repoName='kubernetes-clients-compatibility'
         clusterName="$repoName-$GITHUB_RUN_NUMBER"
         echo "clusterName=$clusterName" >> $GITHUB_ENV
-        gcloud container clusters create "$clusterName" --zone="$GKE_ZONE" --project="$PROJECT_ID" --machine-type=n1-standard-2 --num-nodes=2 --no-enable-ip-alias
+        gcloud container clusters create "$clusterName" \
+        --zone="$GKE_ZONE" \
+        --project=${{ secrets.PROJECT_ID }} \
+        --machine-type=n1-standard-2 \
+        --num-nodes=2 \
+        --network=${{env.GCP_NETWORK}} 
         sleep 30
+
     - name: Deploy Hazelcast cluster
       run: |-
-        kubectl apply -f https://raw.githubusercontent.com/hazelcast/hazelcast-kubernetes/master/rbac.yaml
-        kubectl create service loadbalancer hz-hazelcast-0 --tcp=5701
-        kubectl run hz-hazelcast-0 --image=hazelcast/hazelcast:$HAZELCAST_VERSION --port=5701 -l "app=hz-hazelcast-0,role=hazelcast"
-        kubectl create service loadbalancer hz-hazelcast-1 --tcp=5701
-        kubectl run hz-hazelcast-1 --image=hazelcast/hazelcast:$HAZELCAST_VERSION --port=5701 -l "app=hz-hazelcast-1,role=hazelcast"
-        kubectl create service loadbalancer hz-hazelcast-2 --tcp=5701
-        kubectl run hz-hazelcast-2 --image=hazelcast/hazelcast:$HAZELCAST_VERSION --port=5701 -l "app=hz-hazelcast-2,role=hazelcast"
-        kubectl create service loadbalancer hz-hazelcast --tcp=5701 -o yaml --dry-run=client | kubectl set selector --local -f - "role=hazelcast" -o yaml | kubectl create -f -
-    - name: Wait for deployment to finish
-      run: |-
-        kubectl wait --for=condition=ready pod/hz-hazelcast-0 --timeout=120s
-        kubectl wait --for=condition=ready pod/hz-hazelcast-1 --timeout=120s
-        kubectl wait --for=condition=ready pod/hz-hazelcast-2 --timeout=120s
+        helm repo add hazelcast https://hazelcast-charts.s3.amazonaws.com/
+        helm repo update
+        helm install operator hazelcast/hazelcast-platform-operator --set installCRDs=true       
+        cat <<EOF | kubectl apply -f -
+        apiVersion: hazelcast.com/v1alpha1
+        kind: Hazelcast
+        metadata:
+          name: hz-hazelcast
+        spec:
+          clusterSize: 3
+          exposeExternally:
+            type: Smart
+            discoveryServiceType: LoadBalancer
+            memberAccess: LoadBalancer
+        EOF
+
+    - name: Wait for deployment to be running
+      run: |-                    
+        while [ "$(kubectl get hazelcast -o jsonpath='{.items[*].status.phase}')" != "Running" ]; do
+          sleep 2
+          echo "Current Status of the cluster: $(kubectl get hazelcast -o jsonpath='{.items[*].status.phase}')"
+        done
+
     - name: Wait for external IP to get assigned
       run: |-
         EXTERNAL_IP=$(kubectl get svc hz-hazelcast --output="jsonpath={.status.loadBalancer.ingress[0].ip}")
@@ -202,10 +226,11 @@ jobs:
         
     steps: 
     
-    - name: Setup .NET Core 3.1.x
+    - name: Setup .NET Core 7.0
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.x
+        dotnet-version: |
+            7.0.x
     - name: Checkout to scripts
       uses: actions/checkout@v2
         
@@ -222,7 +247,7 @@ jobs:
         cd KubernetesExternalClients/csharp/clientSourceCode/src/KubernetesTest       
         sed -i "s/<EXTERNAL-IP>/${{needs.create-gke-cluster.outputs.external-ip}}/g" Program.cs
         dotnet build -c Release
-        cd bin/Release/netcoreapp3.1
+        cd bin/Release/net7.0
         dotnet KubernetesTest.dll &> output.txt && tail -n 20 output.txt &> last20lines.txt
         cat last20lines.txt
         if [ $(grep -o 'Current map size:' last20lines.txt | wc -l) != $"20" ]; then exit 1; fi
@@ -273,11 +298,13 @@ jobs:
     if: always()
     steps:
     
-    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@v0.2.1
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v1'
       with:
-        service_account_key: ${{ secrets.GKE_SA_KEY }}
-        project_id: ${{ env.PROJECT_ID }}
-        export_default_credentials: true
+        credentials_json: '${{ secrets.GKE_SA_KEY }}'
+
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v1'
         
     - name: Delete cluster
       run: |-

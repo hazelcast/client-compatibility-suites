@@ -147,4 +147,4 @@ cython_debug/
 # Csharp objects
 HazelcastCloudTests/csharphazelcastcloudtests/CloudTests/obj/
 KubernetesExternalClients/csharp/KubernetesTest/obj/
-KubernetesInternalClients/csharp/KubernetesTest/obj/
+KubernetesInternalClients/csharp/KubernetesTest/.vs;KubernetesInternalClients/csharp/KubernetesTest/obj;KubernetesInternalClients/csharp/KubernetesTest/Debug;KubernetesInternalClients/csharp/KubernetesTest/Release
