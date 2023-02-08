@@ -17,7 +17,7 @@ var sslDisabledCluster *it.CloudCluster
 
 func TestMain(m *testing.M) {
 	it.Rc = it.CreateDefaultRemoteController()
-	err := it.LoginToHazelcastCloudUsingEnvironment(context.Background())
+	err := it.LoginToCloudUsingEnvironment(context.Background())
 	if err != nil {
 		return
 	}
@@ -60,10 +60,10 @@ func TestForSslEnabledCluster(t *testing.T) {
 			ctx := context.Background()
 			client, _ := hazelcast.StartNewClientWithConfig(ctx, CreateClientConfigWithSsl(sslEnabledCluster.ReleaseName, sslEnabledCluster.Token, sslEnabledCluster.CertificatePath, sslEnabledCluster.TlsPassword, tc.isSmartClient))
 			defer client.Shutdown(ctx)
-			givenMap, _ := client.GetMap(ctx, "MapFor" + tc.name)
+			givenMap, _ := client.GetMap(ctx, "MapFor"+tc.name)
 			MapPutGetAndVerify(t, givenMap)
 			fmt.Println("Stopping cluster")
-			_, err = it.StopCloudCluster(context.Background(), sslEnabledCluster.ID)
+			_, err := it.StopCloudCluster(context.Background(), sslEnabledCluster.ID)
 			if err != nil {
 				panic(err.Error())
 			}
@@ -94,7 +94,7 @@ func TestForSslDisabledCluster(t *testing.T) {
 			givenMap, _ := client.GetMap(ctx, "MapFor"+tc.name)
 			MapPutGetAndVerify(t, givenMap)
 			fmt.Println("Stopping cluster")
-			_, err = it.StopCloudCluster(context.Background(), sslDisabledCluster.ID)
+			_, err := it.StopCloudCluster(context.Background(), sslDisabledCluster.ID)
 			if err != nil {
 				panic(err.Error())
 			}

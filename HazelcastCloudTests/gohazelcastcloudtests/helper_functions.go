@@ -75,7 +75,6 @@ func CreateClientConfigWithoutSsl(clusterName string, token string, smartRouting
 	config.Cluster.Name = clusterName
 	config.Cluster.Cloud.Enabled = true
 	config.Cluster.Cloud.Token = token
-	config.Cluster.HeartBeatTimeout = types.Duration(60 * time.Second)
 	config.Stats.Enabled = true
 	config.Stats.Period = types.Duration(time.Second)
 	return config
