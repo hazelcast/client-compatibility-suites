@@ -3,7 +3,6 @@ import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.map.IMap;
 
-import com.hazelcast.remotecontroller.CloudManager;
 import com.hazelcast.remotecontroller.CloudCluster;
 import com.hazelcast.remotecontroller.CloudException;
 import org.apache.logging.log4j.LogManager;
