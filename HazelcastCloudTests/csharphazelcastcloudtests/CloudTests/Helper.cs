@@ -36,6 +36,7 @@ namespace CloudTests
             options.Networking.Ssl.Protocol = SslProtocols.Tls12;
             options.Networking.Ssl.CertificatePath = Path.GetFullPath(certificatesPath + "client.pfx");
             options.Networking.Ssl.CertificatePassword = tlsPassword;
+            options.Heartbeat.TimeoutMilliseconds = 10_000;
             return options;
         }
 
