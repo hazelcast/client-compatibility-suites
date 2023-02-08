@@ -44,6 +44,7 @@ public class HazelcastCloudStandardClusterTests {
             "false,false"
     })
     public void StandardClusterTests(Boolean isSmartClient, Boolean isTlsEnabled) throws CloudException {
+        TestCasesLogger.info(String.format("StandardClusterTests started: isSmartClient: %s, isTlsEnabled: %s", isSmartClient, isTlsEnabled));
         ClientConfig config;
         if (isTlsEnabled) {
             config = HelperMethods.getConfigForSslEnabledCluster(sslEnabledCluster.getReleaseName(), sslEnabledCluster.getToken(), isSmartClient, sslEnabledCluster.getCertificatePath(), sslEnabledCluster.getTlsPassword());
@@ -53,16 +54,20 @@ public class HazelcastCloudStandardClusterTests {
             cluster = sslDisabledCluster;
         }
 
-        TestCasesLogger.info("Create client");
+        TestCasesLogger.info("Creating client");
         HazelcastInstance client = HazelcastClient.newHazelcastClient(config);
         IMap<String, String> map = client.getMap("mapForTest");
 
         HelperMethods.mapPutgetAndVerify(map);
-        TestCasesLogger.info("Stop cluster");
+        TestCasesLogger.info("Stopping cluster");
         cloudManager.stopCloudCluster(cluster.getId());
-        TestCasesLogger.info("Resume cluster");
+        TestCasesLogger.info("Stopped cluster");
+        TestCasesLogger.info("Resuming cluster");
         cloudManager.resumeCloudCluster(cluster.getId());
+        TestCasesLogger.info("Resumed cluster");
+        TestCasesLogger.info("Map put get and verify starting");
         HelperMethods.mapPutgetAndVerify(map);
+        TestCasesLogger.info("Map put get and verify done");
         client.shutdown();
     }
 
@@ -70,6 +75,7 @@ public class HazelcastCloudStandardClusterTests {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     public void TryConnectSslClusterWithoutCertificates(Boolean isSmartClient) {
+        TestCasesLogger.info(String.format("TryConnectSslClusterWithoutCertificates started: isSmartClient: %s", isSmartClient));
         ClientConfig config = HelperMethods.getConfigForSslDisabledCluster(sslEnabledCluster.getReleaseName(), sslEnabledCluster.getToken(), isSmartClient);
         config.getConnectionStrategyConfig().getConnectionRetryConfig().setClusterConnectTimeoutMillis(10000);
         boolean value = false;
