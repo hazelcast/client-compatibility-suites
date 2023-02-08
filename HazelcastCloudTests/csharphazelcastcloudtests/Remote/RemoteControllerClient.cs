@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2008-2021, Hazelcast, Inc. All Rights Reserved.
+﻿// Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ namespace Hazelcast.Testing.Remote
         /// <returns>A new remote controller client.</returns>
         public static Task<IRemoteControllerClient> CreateAsync(string rcHostAddress = "127.0.0.1", int port = 9701)
             => CreateAsync(IPAddress.Parse(rcHostAddress), port);
-
+        
         /// <summary>
         /// Creates and connects a new remote controller client.
         /// </summary>
@@ -72,7 +72,7 @@ namespace Hazelcast.Testing.Remote
             var protocol = new TBinaryProtocol(transport);
             return Create(protocol);
         }
-
+        
         /// <summary>
         /// Creates a new remote controller client.
         /// </summary>
@@ -105,12 +105,6 @@ namespace Hazelcast.Testing.Remote
                 _lock.Release();
             }
         }
-
-        private async Task WithLock(Func<CancellationToken, Task> action, CancellationToken cancellationToken)
-        {
-            await WithLock<object>(async token => { await action(token); return default; }, cancellationToken);
-        }
-
 
         /// <inheritdoc />
         public Task<bool> PingAsync(CancellationToken cancellationToken = default)
@@ -171,30 +165,5 @@ namespace Hazelcast.Testing.Remote
         /// <inheritdoc />
         public Task<Response> ExecuteOnControllerAsync(string clusterId, string script, Lang lang, CancellationToken cancellationToken = default)
             => WithLock(token => executeOnController(clusterId, script, lang, token), cancellationToken);
-
-        public Task LoginToCloud(string uri, string apiKey, string apiSecret, CancellationToken cancellationToken)
-            => WithLock(token => loginToCloud(uri, apiKey, apiSecret, token), cancellationToken);
-
-        public Task<CloudCluster> CreateCloudCluster(string hzVersion, bool isTlsEnabled, CancellationToken cancellationToken = default)
-            => WithLock(token => createCloudCluster(hzVersion, isTlsEnabled, token), cancellationToken);
-
-        /// <inheritdoc />
-        public Task LoginToCloudUsingEnvironment(CancellationToken token = default) => loginToCloudUsingEnvironment(token);
-
-        /// <inheritdoc />
-        public Task<CloudCluster> GetCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default)
-        => WithLock<CloudCluster>(token => getCloudCluster(cloudClusterId, token), cancellationToken);
-
-        /// <inheritdoc />
-        public Task<CloudCluster> StopCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default)
-        => WithLock<CloudCluster>(token => stopCloudCluster(cloudClusterId, token), cancellationToken);
-
-        /// <inheritdoc />
-        public Task<CloudCluster> ResumeCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default)
-        => WithLock<CloudCluster>(token => resumeCloudCluster(cloudClusterId, token), cancellationToken);
-
-        /// <inheritdoc />
-        public Task DeleteCloudCluster(string cloudClusterId, CancellationToken cancellationToken = default)
-        => WithLock(token => deleteCloudCluster(cloudClusterId, token), cancellationToken);
     }
 }
