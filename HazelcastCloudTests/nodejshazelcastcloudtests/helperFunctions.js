@@ -27,7 +27,6 @@ function createClientConfigWithSsl(clusterName, token, __dirname, passphrase, ur
             'hazelcast.client.cloud.url': url,
             'hazelcast.client.statistics.enabled': true,
             'hazelcast.client.statistics.period.seconds': 1,
-            'hazelcast.client.heartbeat.timeout': 10000
         }
     }
 }
