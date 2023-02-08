@@ -12,7 +12,8 @@ class HelperMethods:
             "cluster_name": name_for_connect,
             "cloud_discovery_token": token,
             "statistics_enabled": True,
-            "smart_routing": is_smart_client
+            "smart_routing": is_smart_client,
+            "heartbeat_timeout": 10.0
         }
         return config
 

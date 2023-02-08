@@ -26,7 +26,6 @@ class StandardClusterTests(unittest.TestCase):
         cls.ssl_enabled_cluster = cls.rc.createCloudCluster(os.getenv('HZ_VERSION'), True)
         cls.ssl_disabled_cluster = cls.rc.createCloudCluster(os.getenv('HZ_VERSION'), False)
 
-    # There is an issue to connect ssl cluster, it is disabled for now
     @parameterized.expand([(True, True), (False, True), (True, False), (False, False)])
     def test_cloud(self, is_smart, is_ssl_enabled):
         if is_ssl_enabled:
