@@ -49,9 +49,6 @@ class StandardClusterTests(unittest.TestCase):
         self.logger.info("Stopping cluster")
         self.rc.stopCloudCluster(cluster.id)
 
-        self.logger.info("Wait 30 seconds before resuming cluster")
-        time.sleep(30)
-
         self.logger.info("Resuming cluster")
         self.rc.resumeCloudCluster(cluster.id)
 
