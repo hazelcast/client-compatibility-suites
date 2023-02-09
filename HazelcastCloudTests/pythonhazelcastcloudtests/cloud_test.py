@@ -28,6 +28,18 @@ class StandardClusterTests(unittest.TestCase):
         cls.ssl_enabled_cluster = cls.rc.createCloudCluster(os.getenv('HZ_VERSION'), True)
         cls.ssl_disabled_cluster = cls.rc.createCloudCluster(os.getenv('HZ_VERSION'), False)
 
+    def logCloudCluster(self, cluster: CloudCluster):
+        self.logger.error("Cluster id: " + cluster.id)
+        self.logger.error("Cluster name: " + cluster.name)
+        self.logger.error("Cluster release name: " + cluster.releaseName)
+        self.logger.error("Cluster cloud token: " + cluster.token)
+        self.logger.error("Cluster cloud certificate path: " + cluster.certificatePath)
+        self.logger.error("Cluster cloud tls password: " + cluster.tlsPassword)
+        self.logger.error("Cluster cloud status: " + cluster.state)
+        self.logger.error("Cluster cloud version: " + cluster.hazelcastVersion)
+        self.logger.error("Cluster cloud tls enabled: " + str(cluster.isTlsEnabled))
+
+    
     @parameterized.expand([(True, True), (False, True), (True, False), (False, False)])
     def test_cloud(self, is_smart, is_ssl_enabled):
         if is_ssl_enabled:
@@ -48,10 +60,12 @@ class StandardClusterTests(unittest.TestCase):
         HelperMethods.map_put_get_and_verify(self, client.get_map("map_for_test_cloud").blocking())
 
         self.logger.error("Stopping cluster")
-        self.rc.stopCloudCluster(cluster.id)
+        tmp = self.rc.stopCloudCluster(cluster.id)
+        self.logCloudCluster(tmp)
 
         self.logger.error("Resuming cluster")
-        self.rc.resumeCloudCluster(cluster.id)
+        tmp = self.rc.resumeCloudCluster(cluster.id)
+        self.logCloudCluster(tmp)
 
         self.logger.error("Wait 5 seconds to be sure client is connected")
         time.sleep(5)
