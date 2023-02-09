@@ -25,8 +25,17 @@ class StandardClusterTests(unittest.TestCase):
         logger.setLevel(logging.ERROR)
         cls.rc = HzRemoteController("127.0.0.1", 9701)
         cls.rc.loginToCloudUsingEnvironment()
-        cls.ssl_enabled_cluster = cls.rc.createCloudCluster(os.getenv('HZ_VERSION'), True)
-        cls.ssl_disabled_cluster = cls.rc.createCloudCluster(os.getenv('HZ_VERSION'), False)
+
+
+    def setUp(self) -> None:
+        self.ssl_enabled_cluster = self.rc.createCloudCluster(os.getenv('HZ_VERSION'), True)
+        self.ssl_disabled_cluster = self.rc.createCloudCluster(os.getenv('HZ_VERSION'), False)
+
+
+    def tearDown(self) -> None:
+        self.rc.deleteCloudCluster(self.ssl_enabled_cluster.id)
+        self.rc.deleteCloudCluster(self.ssl_disabled_cluster.id)
+
 
     def logCloudCluster(self, cluster: CloudCluster):
         self.logger.error("Cluster id: " + cluster.id)
@@ -84,6 +93,4 @@ class StandardClusterTests(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        cls.rc.deleteCloudCluster(cls.ssl_enabled_cluster.id)
-        cls.rc.deleteCloudCluster(cls.ssl_disabled_cluster.id)
         cls.rc.exit()
