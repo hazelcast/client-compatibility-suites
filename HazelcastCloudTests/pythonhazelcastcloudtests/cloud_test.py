@@ -31,14 +31,14 @@ class StandardClusterTests(unittest.TestCase):
 
 
     def logCloudCluster(self, cluster: CloudCluster):
-        self.logger.error("Cluster id: " + cluster.id)
-        self.logger.error("Cluster name: " + cluster.name)
-        self.logger.error("Cluster release name: " + cluster.releaseName)
-        self.logger.error("Cluster cloud token: " + cluster.token)
-        self.logger.error("Cluster cloud certificate path: " + cluster.certificatePath)
-        self.logger.error("Cluster cloud tls password: " + cluster.tlsPassword)
-        self.logger.error("Cluster cloud status: " + cluster.state)
-        self.logger.error("Cluster cloud version: " + cluster.hazelcastVersion)
+        self.logger.error("Cluster id: " + str(cluster.id))
+        self.logger.error("Cluster name: " + str(cluster.name))
+        self.logger.error("Cluster release name: " + str(cluster.releaseName))
+        self.logger.error("Cluster cloud token: " + str(cluster.token))
+        self.logger.error("Cluster cloud certificate path: " + str(cluster.certificatePath))
+        self.logger.error("Cluster cloud tls password: " + str(cluster.tlsPassword))
+        self.logger.error("Cluster cloud status: " + str(cluster.state))
+        self.logger.error("Cluster cloud version: " + str(cluster.hazelcastVersion))
         self.logger.error("Cluster cloud tls enabled: " + str(cluster.isTlsEnabled))
 
     
@@ -78,9 +78,10 @@ class StandardClusterTests(unittest.TestCase):
 
     @parameterized.expand([(True,), (False,)])
     def test_try_connect_ssl_cluster_without_certificates(self, is_smart):
+        self.cluster = self.rc.createCloudCluster(os.getenv('HZ_VERSION'), True)
         with self.assertRaises(IllegalStateError):
-            config = HelperMethods.create_client_config(self.ssl_enabled_cluster.releaseName,
-                                                        self.ssl_enabled_cluster.token, is_smart)
+            config = HelperMethods.create_client_config(self.cluster.releaseName,
+                                                        self.cluster.token, is_smart)
             config["ssl_enabled"] = True
             config["cluster_connect_timeout"] = 10
             hazelcast.HazelcastClient(**config)
