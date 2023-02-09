@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
+// Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,11 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Text;
+using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
+using Thrift;
+using Thrift.Collections;
+
 using Thrift.Protocol;
 using Thrift.Protocol.Entities;
 using Thrift.Protocol.Utilities;
+using Thrift.Transport;
+using Thrift.Transport.Client;
+using Thrift.Transport.Server;
+using Thrift.Processor;
 
 #pragma warning disable IDE0079  // remove unnecessary pragmas
 #pragma warning disable IDE1006  // parts of the code use IDL spelling
@@ -83,28 +95,7 @@ namespace Hazelcast.Testing.Remote
     {
     }
 
-    public Member DeepCopy()
-    {
-      var tmp5 = new Member();
-      if((Uuid != null) && __isset.uuid)
-      {
-        tmp5.Uuid = this.Uuid;
-      }
-      tmp5.__isset.uuid = this.__isset.uuid;
-      if((Host != null) && __isset.host)
-      {
-        tmp5.Host = this.Host;
-      }
-      tmp5.__isset.host = this.__isset.host;
-      if(__isset.port)
-      {
-        tmp5.Port = this.Port;
-      }
-      tmp5.__isset.port = this.__isset.port;
-      return tmp5;
-    }
-
-    public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
+    public async Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
     {
       iprot.IncrementRecursionDepth();
       try
@@ -151,7 +142,7 @@ namespace Hazelcast.Testing.Remote
                 await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
               }
               break;
-            default:
+            default: 
               await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
               break;
           }
@@ -167,38 +158,38 @@ namespace Hazelcast.Testing.Remote
       }
     }
 
-    public async global::System.Threading.Tasks.Task WriteAsync(TProtocol oprot, CancellationToken cancellationToken)
+    public async Task WriteAsync(TProtocol oprot, CancellationToken cancellationToken)
     {
       oprot.IncrementRecursionDepth();
       try
       {
-        var tmp6 = new TStruct("Member");
-        await oprot.WriteStructBeginAsync(tmp6, cancellationToken);
-        var tmp7 = new TField();
-        if((Uuid != null) && __isset.uuid)
+        var struc = new TStruct("Member");
+        await oprot.WriteStructBeginAsync(struc, cancellationToken);
+        var field = new TField();
+        if (Uuid != null && __isset.uuid)
         {
-          tmp7.Name = "uuid";
-          tmp7.Type = TType.String;
-          tmp7.ID = 1;
-          await oprot.WriteFieldBeginAsync(tmp7, cancellationToken);
+          field.Name = "uuid";
+          field.Type = TType.String;
+          field.ID = 1;
+          await oprot.WriteFieldBeginAsync(field, cancellationToken);
           await oprot.WriteStringAsync(Uuid, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
-        if((Host != null) && __isset.host)
+        if (Host != null && __isset.host)
         {
-          tmp7.Name = "host";
-          tmp7.Type = TType.String;
-          tmp7.ID = 2;
-          await oprot.WriteFieldBeginAsync(tmp7, cancellationToken);
+          field.Name = "host";
+          field.Type = TType.String;
+          field.ID = 2;
+          await oprot.WriteFieldBeginAsync(field, cancellationToken);
           await oprot.WriteStringAsync(Host, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
-        if(__isset.port)
+        if (__isset.port)
         {
-          tmp7.Name = "port";
-          tmp7.Type = TType.I32;
-          tmp7.ID = 3;
-          await oprot.WriteFieldBeginAsync(tmp7, cancellationToken);
+          field.Name = "port";
+          field.Type = TType.I32;
+          field.ID = 3;
+          await oprot.WriteFieldBeginAsync(field, cancellationToken);
           await oprot.WriteI32Async(Port, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
@@ -213,7 +204,8 @@ namespace Hazelcast.Testing.Remote
 
     public override bool Equals(object that)
     {
-      if (!(that is Member other)) return false;
+      var other = that as Member;
+      if (other == null) return false;
       if (ReferenceEquals(this, other)) return true;
       return ((__isset.uuid == other.__isset.uuid) && ((!__isset.uuid) || (System.Object.Equals(Uuid, other.Uuid))))
         && ((__isset.host == other.__isset.host) && ((!__isset.host) || (System.Object.Equals(Host, other.Host))))
@@ -223,46 +215,43 @@ namespace Hazelcast.Testing.Remote
     public override int GetHashCode() {
       int hashcode = 157;
       unchecked {
-        if((Uuid != null) && __isset.uuid)
-        {
+        if(__isset.uuid)
           hashcode = (hashcode * 397) + Uuid.GetHashCode();
-        }
-        if((Host != null) && __isset.host)
-        {
+        if(__isset.host)
           hashcode = (hashcode * 397) + Host.GetHashCode();
-        }
         if(__isset.port)
-        {
           hashcode = (hashcode * 397) + Port.GetHashCode();
-        }
       }
       return hashcode;
     }
 
     public override string ToString()
     {
-      var tmp8 = new StringBuilder("Member(");
-      int tmp9 = 0;
-      if((Uuid != null) && __isset.uuid)
+      var sb = new StringBuilder("Member(");
+      bool __first = true;
+      if (Uuid != null && __isset.uuid)
       {
-        if(0 < tmp9++) { tmp8.Append(", "); }
-        tmp8.Append("Uuid: ");
-        Uuid.ToString(tmp8);
+        if(!__first) { sb.Append(", "); }
+        __first = false;
+        sb.Append("Uuid: ");
+        sb.Append(Uuid);
       }
-      if((Host != null) && __isset.host)
+      if (Host != null && __isset.host)
       {
-        if(0 < tmp9++) { tmp8.Append(", "); }
-        tmp8.Append("Host: ");
-        Host.ToString(tmp8);
+        if(!__first) { sb.Append(", "); }
+        __first = false;
+        sb.Append("Host: ");
+        sb.Append(Host);
       }
-      if(__isset.port)
+      if (__isset.port)
       {
-        if(0 < tmp9++) { tmp8.Append(", "); }
-        tmp8.Append("Port: ");
-        Port.ToString(tmp8);
+        if(!__first) { sb.Append(", "); }
+        __first = false;
+        sb.Append("Port: ");
+        sb.Append(Port);
       }
-      tmp8.Append(')');
-      return tmp8.ToString();
+      sb.Append(")");
+      return sb.ToString();
     }
   }
 

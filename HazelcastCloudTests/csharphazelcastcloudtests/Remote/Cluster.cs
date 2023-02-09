@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
+// Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,11 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Text;
+using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
+using Thrift;
+using Thrift.Collections;
+
 using Thrift.Protocol;
 using Thrift.Protocol.Entities;
 using Thrift.Protocol.Utilities;
+using Thrift.Transport;
+using Thrift.Transport.Client;
+using Thrift.Transport.Server;
+using Thrift.Processor;
 
 #pragma warning disable IDE0079  // remove unnecessary pragmas
 #pragma warning disable IDE1006  // parts of the code use IDL spelling
@@ -53,18 +65,7 @@ namespace Hazelcast.Testing.Remote
     {
     }
 
-    public Cluster DeepCopy()
-    {
-      var tmp0 = new Cluster();
-      if((Id != null) && __isset.id)
-      {
-        tmp0.Id = this.Id;
-      }
-      tmp0.__isset.id = this.__isset.id;
-      return tmp0;
-    }
-
-    public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
+    public async Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
     {
       iprot.IncrementRecursionDepth();
       try
@@ -91,7 +92,7 @@ namespace Hazelcast.Testing.Remote
                 await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
               }
               break;
-            default:
+            default: 
               await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
               break;
           }
@@ -107,20 +108,20 @@ namespace Hazelcast.Testing.Remote
       }
     }
 
-    public async global::System.Threading.Tasks.Task WriteAsync(TProtocol oprot, CancellationToken cancellationToken)
+    public async Task WriteAsync(TProtocol oprot, CancellationToken cancellationToken)
     {
       oprot.IncrementRecursionDepth();
       try
       {
-        var tmp1 = new TStruct("Cluster");
-        await oprot.WriteStructBeginAsync(tmp1, cancellationToken);
-        var tmp2 = new TField();
-        if((Id != null) && __isset.id)
+        var struc = new TStruct("Cluster");
+        await oprot.WriteStructBeginAsync(struc, cancellationToken);
+        var field = new TField();
+        if (Id != null && __isset.id)
         {
-          tmp2.Name = "id";
-          tmp2.Type = TType.String;
-          tmp2.ID = 1;
-          await oprot.WriteFieldBeginAsync(tmp2, cancellationToken);
+          field.Name = "id";
+          field.Type = TType.String;
+          field.ID = 1;
+          await oprot.WriteFieldBeginAsync(field, cancellationToken);
           await oprot.WriteStringAsync(Id, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
@@ -135,7 +136,8 @@ namespace Hazelcast.Testing.Remote
 
     public override bool Equals(object that)
     {
-      if (!(that is Cluster other)) return false;
+      var other = that as Cluster;
+      if (other == null) return false;
       if (ReferenceEquals(this, other)) return true;
       return ((__isset.id == other.__isset.id) && ((!__isset.id) || (System.Object.Equals(Id, other.Id))));
     }
@@ -143,26 +145,25 @@ namespace Hazelcast.Testing.Remote
     public override int GetHashCode() {
       int hashcode = 157;
       unchecked {
-        if((Id != null) && __isset.id)
-        {
+        if(__isset.id)
           hashcode = (hashcode * 397) + Id.GetHashCode();
-        }
       }
       return hashcode;
     }
 
     public override string ToString()
     {
-      var tmp3 = new StringBuilder("Cluster(");
-      int tmp4 = 0;
-      if((Id != null) && __isset.id)
+      var sb = new StringBuilder("Cluster(");
+      bool __first = true;
+      if (Id != null && __isset.id)
       {
-        if(0 < tmp4++) { tmp3.Append(", "); }
-        tmp3.Append("Id: ");
-        Id.ToString(tmp3);
+        if(!__first) { sb.Append(", "); }
+        __first = false;
+        sb.Append("Id: ");
+        sb.Append(Id);
       }
-      tmp3.Append(')');
-      return tmp3.ToString();
+      sb.Append(")");
+      return sb.ToString();
     }
   }
 

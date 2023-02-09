@@ -23,7 +23,7 @@ using Thrift.Transport.Server;
 using Thrift.Processor;
 
 
-namespace Hazelcast.Remote
+namespace Hazelcast.Testing.Remote
 {
 
   public partial class CloudException : TException, TBase

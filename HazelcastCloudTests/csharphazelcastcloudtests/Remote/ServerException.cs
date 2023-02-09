@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
+// Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,12 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Text;
+using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using Thrift;
+using Thrift.Collections;
+
 using Thrift.Protocol;
 using Thrift.Protocol.Entities;
 using Thrift.Protocol.Utilities;
+using Thrift.Transport;
+using Thrift.Transport.Client;
+using Thrift.Transport.Server;
+using Thrift.Processor;
 
 #pragma warning disable IDE0079  // remove unnecessary pragmas
 #pragma warning disable IDE1006  // parts of the code use IDL spelling
@@ -55,18 +66,7 @@ namespace Hazelcast.Testing.Remote
     {
     }
 
-    public ServerException DeepCopy()
-    {
-      var tmp15 = new ServerException();
-      if((Message != null) && __isset.message)
-      {
-        tmp15.Message = this.Message;
-      }
-      tmp15.__isset.message = this.__isset.message;
-      return tmp15;
-    }
-
-    public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
+    public async Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
     {
       iprot.IncrementRecursionDepth();
       try
@@ -93,7 +93,7 @@ namespace Hazelcast.Testing.Remote
                 await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
               }
               break;
-            default:
+            default: 
               await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
               break;
           }
@@ -109,20 +109,20 @@ namespace Hazelcast.Testing.Remote
       }
     }
 
-    public async global::System.Threading.Tasks.Task WriteAsync(TProtocol oprot, CancellationToken cancellationToken)
+    public async Task WriteAsync(TProtocol oprot, CancellationToken cancellationToken)
     {
       oprot.IncrementRecursionDepth();
       try
       {
-        var tmp16 = new TStruct("ServerException");
-        await oprot.WriteStructBeginAsync(tmp16, cancellationToken);
-        var tmp17 = new TField();
-        if((Message != null) && __isset.message)
+        var struc = new TStruct("ServerException");
+        await oprot.WriteStructBeginAsync(struc, cancellationToken);
+        var field = new TField();
+        if (Message != null && __isset.message)
         {
-          tmp17.Name = "message";
-          tmp17.Type = TType.String;
-          tmp17.ID = 1;
-          await oprot.WriteFieldBeginAsync(tmp17, cancellationToken);
+          field.Name = "message";
+          field.Type = TType.String;
+          field.ID = 1;
+          await oprot.WriteFieldBeginAsync(field, cancellationToken);
           await oprot.WriteStringAsync(Message, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
@@ -137,7 +137,8 @@ namespace Hazelcast.Testing.Remote
 
     public override bool Equals(object that)
     {
-      if (!(that is ServerException other)) return false;
+      var other = that as ServerException;
+      if (other == null) return false;
       if (ReferenceEquals(this, other)) return true;
       return ((__isset.message == other.__isset.message) && ((!__isset.message) || (System.Object.Equals(Message, other.Message))));
     }
@@ -145,26 +146,25 @@ namespace Hazelcast.Testing.Remote
     public override int GetHashCode() {
       int hashcode = 157;
       unchecked {
-        if((Message != null) && __isset.message)
-        {
+        if(__isset.message)
           hashcode = (hashcode * 397) + Message.GetHashCode();
-        }
       }
       return hashcode;
     }
 
     public override string ToString()
     {
-      var tmp18 = new StringBuilder("ServerException(");
-      int tmp19 = 0;
-      if((Message != null) && __isset.message)
+      var sb = new StringBuilder("ServerException(");
+      bool __first = true;
+      if (Message != null && __isset.message)
       {
-        if(0 < tmp19++) { tmp18.Append(", "); }
-        tmp18.Append("Message: ");
-        Message.ToString(tmp18);
+        if(!__first) { sb.Append(", "); }
+        __first = false;
+        sb.Append("Message: ");
+        sb.Append(Message);
       }
-      tmp18.Append(')');
-      return tmp18.ToString();
+      sb.Append(")");
+      return sb.ToString();
     }
   }
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
+// Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,13 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Linq;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Text;
+using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
+using Thrift;
 using Thrift.Collections;
+
 using Thrift.Protocol;
 using Thrift.Protocol.Entities;
 using Thrift.Protocol.Utilities;
+using Thrift.Transport;
+using Thrift.Transport.Client;
+using Thrift.Transport.Server;
+using Thrift.Processor;
 
 #pragma warning disable IDE0079  // remove unnecessary pragmas
 #pragma warning disable IDE1006  // parts of the code use IDL spelling
@@ -85,28 +95,7 @@ namespace Hazelcast.Testing.Remote
     {
     }
 
-    public Response DeepCopy()
-    {
-      var tmp10 = new Response();
-      if(__isset.success)
-      {
-        tmp10.Success = this.Success;
-      }
-      tmp10.__isset.success = this.__isset.success;
-      if((Message != null) && __isset.message)
-      {
-        tmp10.Message = this.Message;
-      }
-      tmp10.__isset.message = this.__isset.message;
-      if((Result != null) && __isset.result)
-      {
-        tmp10.Result = this.Result.ToArray();
-      }
-      tmp10.__isset.result = this.__isset.result;
-      return tmp10;
-    }
-
-    public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
+    public async Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
     {
       iprot.IncrementRecursionDepth();
       try
@@ -153,7 +142,7 @@ namespace Hazelcast.Testing.Remote
                 await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
               }
               break;
-            default:
+            default: 
               await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
               break;
           }
@@ -169,38 +158,38 @@ namespace Hazelcast.Testing.Remote
       }
     }
 
-    public async global::System.Threading.Tasks.Task WriteAsync(TProtocol oprot, CancellationToken cancellationToken)
+    public async Task WriteAsync(TProtocol oprot, CancellationToken cancellationToken)
     {
       oprot.IncrementRecursionDepth();
       try
       {
-        var tmp11 = new TStruct("Response");
-        await oprot.WriteStructBeginAsync(tmp11, cancellationToken);
-        var tmp12 = new TField();
-        if(__isset.success)
+        var struc = new TStruct("Response");
+        await oprot.WriteStructBeginAsync(struc, cancellationToken);
+        var field = new TField();
+        if (__isset.success)
         {
-          tmp12.Name = "success";
-          tmp12.Type = TType.Bool;
-          tmp12.ID = 1;
-          await oprot.WriteFieldBeginAsync(tmp12, cancellationToken);
+          field.Name = "success";
+          field.Type = TType.Bool;
+          field.ID = 1;
+          await oprot.WriteFieldBeginAsync(field, cancellationToken);
           await oprot.WriteBoolAsync(Success, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
-        if((Message != null) && __isset.message)
+        if (Message != null && __isset.message)
         {
-          tmp12.Name = "message";
-          tmp12.Type = TType.String;
-          tmp12.ID = 2;
-          await oprot.WriteFieldBeginAsync(tmp12, cancellationToken);
+          field.Name = "message";
+          field.Type = TType.String;
+          field.ID = 2;
+          await oprot.WriteFieldBeginAsync(field, cancellationToken);
           await oprot.WriteStringAsync(Message, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
-        if((Result != null) && __isset.result)
+        if (Result != null && __isset.result)
         {
-          tmp12.Name = "result";
-          tmp12.Type = TType.String;
-          tmp12.ID = 3;
-          await oprot.WriteFieldBeginAsync(tmp12, cancellationToken);
+          field.Name = "result";
+          field.Type = TType.String;
+          field.ID = 3;
+          await oprot.WriteFieldBeginAsync(field, cancellationToken);
           await oprot.WriteBinaryAsync(Result, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
@@ -215,7 +204,8 @@ namespace Hazelcast.Testing.Remote
 
     public override bool Equals(object that)
     {
-      if (!(that is Response other)) return false;
+      var other = that as Response;
+      if (other == null) return false;
       if (ReferenceEquals(this, other)) return true;
       return ((__isset.success == other.__isset.success) && ((!__isset.success) || (System.Object.Equals(Success, other.Success))))
         && ((__isset.message == other.__isset.message) && ((!__isset.message) || (System.Object.Equals(Message, other.Message))))
@@ -226,45 +216,42 @@ namespace Hazelcast.Testing.Remote
       int hashcode = 157;
       unchecked {
         if(__isset.success)
-        {
           hashcode = (hashcode * 397) + Success.GetHashCode();
-        }
-        if((Message != null) && __isset.message)
-        {
+        if(__isset.message)
           hashcode = (hashcode * 397) + Message.GetHashCode();
-        }
-        if((Result != null) && __isset.result)
-        {
+        if(__isset.result)
           hashcode = (hashcode * 397) + Result.GetHashCode();
-        }
       }
       return hashcode;
     }
 
     public override string ToString()
     {
-      var tmp13 = new StringBuilder("Response(");
-      int tmp14 = 0;
-      if(__isset.success)
+      var sb = new StringBuilder("Response(");
+      bool __first = true;
+      if (__isset.success)
       {
-        if(0 < tmp14++) { tmp13.Append(", "); }
-        tmp13.Append("Success: ");
-        Success.ToString(tmp13);
+        if(!__first) { sb.Append(", "); }
+        __first = false;
+        sb.Append("Success: ");
+        sb.Append(Success);
       }
-      if((Message != null) && __isset.message)
+      if (Message != null && __isset.message)
       {
-        if(0 < tmp14++) { tmp13.Append(", "); }
-        tmp13.Append("Message: ");
-        Message.ToString(tmp13);
+        if(!__first) { sb.Append(", "); }
+        __first = false;
+        sb.Append("Message: ");
+        sb.Append(Message);
       }
-      if((Result != null) && __isset.result)
+      if (Result != null && __isset.result)
       {
-        if(0 < tmp14++) { tmp13.Append(", "); }
-        tmp13.Append("Result: ");
-        Result.ToString(tmp13);
+        if(!__first) { sb.Append(", "); }
+        __first = false;
+        sb.Append("Result: ");
+        sb.Append(Result);
       }
-      tmp13.Append(')');
-      return tmp13.ToString();
+      sb.Append(")");
+      return sb.ToString();
     }
   }
 
