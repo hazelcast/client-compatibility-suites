@@ -7919,11 +7919,7 @@ namespace Hazelcast.Testing.Remote
             hashcode = (hashcode * 397) + ClusterId.GetHashCode();
           if(__isset.script)
             hashcode = (hashcode * 397) + Script.GetHashCode();
-            if(__isset.lang)
-            if(__isset.lang)
-            {
           if(__isset.lang)
-            {
             hashcode = (hashcode * 397) + Lang.GetHashCode();
         }
         return hashcode;
