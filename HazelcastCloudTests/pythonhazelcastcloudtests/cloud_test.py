@@ -13,8 +13,7 @@ from hzrc.ttypes import CloudCluster
 
 
 class StandardClusterTests(unittest.TestCase):
-    ssl_enabled_cluster: CloudCluster = None
-    ssl_disabled_cluster: CloudCluster = None
+    cluster: CloudCluster = None
     rc: HzRemoteController = None
     HazelcastCloudDiscovery._CLOUD_URL_BASE = os.getenv('BASE_URL').replace("https://", "")
     logger = logging.getLogger("test")
@@ -27,14 +26,8 @@ class StandardClusterTests(unittest.TestCase):
         cls.rc.loginToCloudUsingEnvironment()
 
 
-    def setUp(self) -> None:
-        self.ssl_enabled_cluster = self.rc.createCloudCluster(os.getenv('HZ_VERSION'), True)
-        self.ssl_disabled_cluster = self.rc.createCloudCluster(os.getenv('HZ_VERSION'), False)
-
-
     def tearDown(self) -> None:
-        self.rc.deleteCloudCluster(self.ssl_enabled_cluster.id)
-        self.rc.deleteCloudCluster(self.ssl_disabled_cluster.id)
+        self.rc.deleteCloudCluster(self.cluster.id)
 
 
     def logCloudCluster(self, cluster: CloudCluster):
@@ -53,28 +46,29 @@ class StandardClusterTests(unittest.TestCase):
     def test_cloud(self, is_smart, is_ssl_enabled):
         if is_ssl_enabled:
             self.logger.error("Create ssl enabled client config for smart routing " + str(is_smart))
+            self.cluster = self.rc.createCloudCluster(os.getenv('HZ_VERSION'), True)
             client = hazelcast.HazelcastClient(
-                **HelperMethods.create_client_config_with_ssl(self.ssl_enabled_cluster.releaseName,
-                                                              self.ssl_enabled_cluster.token, is_smart,
-                                                              self.ssl_enabled_cluster.certificatePath,
-                                                              self.ssl_enabled_cluster.tlsPassword))
-            cluster = self.ssl_enabled_cluster
+                **HelperMethods.create_client_config_with_ssl(self.cluster.releaseName,
+                                                              self.cluster.token, is_smart,
+                                                              self.cluster.certificatePath,
+                                                              self.cluster.tlsPassword))
+            
         else:
             self.logger.error("Create ssl disabled client config for smart routing " + str(is_smart))
+            self.cluster = self.rc.createCloudCluster(os.getenv('HZ_VERSION'), False)
             client = hazelcast.HazelcastClient(
-                **HelperMethods.create_client_config(self.ssl_disabled_cluster.releaseName,
-                                                     self.ssl_disabled_cluster.token, is_smart))
-            cluster = self.ssl_disabled_cluster
+                **HelperMethods.create_client_config(self.cluster.releaseName,
+                                                     self.cluster.token, is_smart))
 
         HelperMethods.map_put_get_and_verify(self, client.get_map("map_for_test_cloud").blocking())
 
         self.logger.error("Stopping cluster")
-        tmp = self.rc.stopCloudCluster(cluster.id)
-        self.logCloudCluster(tmp)
+        cluster = self.rc.stopCloudCluster(self.cluster.id)
+        self.logCloudCluster(cluster)
 
         self.logger.error("Resuming cluster")
-        tmp = self.rc.resumeCloudCluster(cluster.id)
-        self.logCloudCluster(tmp)
+        cluster = self.rc.resumeCloudCluster(self.cluster.id)
+        self.logCloudCluster(cluster)
 
         self.logger.error("Wait 5 seconds to be sure client is connected")
         time.sleep(5)
