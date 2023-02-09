@@ -29,7 +29,7 @@ class StandardClusterTests(unittest.TestCase):
     @parameterized.expand([(True, True), (False, True), (True, False), (False, False)])
     def test_cloud(self, is_smart, is_ssl_enabled):
         if is_ssl_enabled:
-            self.logger.info("Create ssl enabled client config for smart routing " + str(is_smart))
+            self.logger.error("Create ssl enabled client config for smart routing " + str(is_smart))
             client = hazelcast.HazelcastClient(
                 **HelperMethods.create_client_config_with_ssl(self.ssl_enabled_cluster.releaseName,
                                                               self.ssl_enabled_cluster.token, is_smart,
@@ -37,7 +37,7 @@ class StandardClusterTests(unittest.TestCase):
                                                               self.ssl_enabled_cluster.tlsPassword))
             cluster = self.ssl_enabled_cluster
         else:
-            self.logger.info("Create ssl disabled client config for smart routing " + str(is_smart))
+            self.logger.error("Create ssl disabled client config for smart routing " + str(is_smart))
             client = hazelcast.HazelcastClient(
                 **HelperMethods.create_client_config(self.ssl_disabled_cluster.releaseName,
                                                      self.ssl_disabled_cluster.token, is_smart))
@@ -45,13 +45,13 @@ class StandardClusterTests(unittest.TestCase):
 
         HelperMethods.map_put_get_and_verify(self, client.get_map("map_for_test_cloud").blocking())
 
-        self.logger.info("Stopping cluster")
+        self.logger.error("Stopping cluster")
         self.rc.stopCloudCluster(cluster.id)
 
-        self.logger.info("Resuming cluster")
+        self.logger.error("Resuming cluster")
         self.rc.resumeCloudCluster(cluster.id)
 
-        self.logger.info("Wait 5 seconds to be sure client is connected")
+        self.logger.error("Wait 5 seconds to be sure client is connected")
         time.sleep(5)
         HelperMethods.map_put_get_and_verify(self, client.get_map("map_for_test_cloud").blocking())
 
