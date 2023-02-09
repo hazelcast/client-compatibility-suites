@@ -21,6 +21,8 @@ class StandardClusterTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
+        logger = logging.getLogger("hazelcast")
+        logger.setLevel(logging.ERROR)
         cls.rc = HzRemoteController("127.0.0.1", 9701)
         cls.rc.loginToCloudUsingEnvironment()
         cls.ssl_enabled_cluster = cls.rc.createCloudCluster(os.getenv('HZ_VERSION'), True)
