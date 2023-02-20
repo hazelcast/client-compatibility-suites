@@ -17,6 +17,7 @@ class StandardClusterTests(unittest.TestCase):
     rc: HzRemoteController = None
     HazelcastCloudDiscovery._CLOUD_URL_BASE = os.getenv('BASE_URL').replace("https://", "")
     logger = logging.getLogger("test")
+    logger.setLevel(logging.DEBUG)
 
     @classmethod
     def setUpClass(cls) -> None:
