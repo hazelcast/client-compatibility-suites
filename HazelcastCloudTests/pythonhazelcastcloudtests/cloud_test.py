@@ -21,7 +21,7 @@ class StandardClusterTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         logger = logging.getLogger("hazelcast")
-        logger.setLevel(logging.ERROR)
+        logger.setLevel(logging.DEBUG)
         cls.rc = HzRemoteController("127.0.0.1", 9701)
         cls.rc.loginToCloudUsingEnvironment()
 
