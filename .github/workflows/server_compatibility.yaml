@@ -126,7 +126,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Set client matrix
         id: set-matrix
-        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client py --option tag )"
+        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client py --option tag --use-latest-patch-versions )"
   test_python_clients:
     needs: [ upload_jars, setup_python_client_matrix ]
     runs-on: ubuntu-latest
@@ -224,7 +224,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Set client matrix
         id: set-matrix
-        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client node --option tag )"
+        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client node --option tag --use-latest-patch-versions )"
   test_nodejs_clients:
     needs: [ upload_jars, setup_nodejs_client_matrix ]
     runs-on: ubuntu-latest
