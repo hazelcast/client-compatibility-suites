@@ -54,23 +54,14 @@ jobs:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-csharp-client
           path: client
           ref: ${{ github.event.inputs.branch_name }}    
-         
-      - name: Start RC for Viridian
-        env:
-          baseUrl: ${{ github.event.inputs.base_url }}
-          apiKey: ${{ secrets.APIKEY_VIRIDIAN }}
-          apiSecret: ${{ secrets.APISECRET_VIRIDIAN }}
-          hzVersion: ${{ github.event.inputs.hzVersion }}
-        run: |
-          python start_remote_controller.py &> rc.log &
-          sleep 30
-
+  
       - name: Update submodules
         run: |
             git submodule update --init
         working-directory: client
         
       - name: Build
+        id: build
         shell: pwsh
         run: ./hz.ps1 -localRestore build
         working-directory: client      
@@ -80,10 +71,16 @@ jobs:
         run: ./hz.ps1 test -tf "test == /Hazelcast.Tests.Cloud.ServerlessCloudTests.TestCloud/" ${{ secrets.GH_PAT }}
         working-directory: client
         env:
-          HAZELCAST_SERVER_VERSION: ${{ matrix.version }}   
+          HAZELCAST_SERVER_VERSION: ${{ matrix.version }}  
+          baseUrl: ${{ github.event.inputs.base_url }}
+          apiKey: ${{ secrets.APIKEY_VIRIDIAN }}
+          apiSecret: ${{ secrets.APISECRET_VIRIDIAN }}
+          hzVersion: ${{ github.event.inputs.hzVersion }} 
 
-      - uses: actions/upload-artifact@v2
-        if: always()
+      # upload test results artifact
+      - name: Upload test results artifact
+        if: (success() || failure()) && steps.build.conclusion == 'success'
+        uses: actions/upload-artifact@v3
         with:
-          name: rc
-          path: rc.log
+          name: Test-Results ${{ inputs.os }}-${{ matrix.fwk }}
+          path: './client/temp/tests/results/*.trx'
