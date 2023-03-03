@@ -38,48 +38,50 @@ jobs:
           java-version: 8
           distribution: 'temurin'
           
-      - name: Setup .NET
+      - name: Install .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: |
+            2.1.x
+            3.1.x
+            5.0.x
+            6.0.x
+            7.0.x
           
       - name: Checkout to ${{ github.event.inputs.branch_name }}
         uses: actions/checkout@v3
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-csharp-client
           path: client
-          ref: ${{ github.event.inputs.branch_name }}
-        
-      - name: Copy required files to under test folders
-        run: |
-          rm -rf $GITHUB_WORKSPACE/client/src/Hazelcast.Net.Testing/Remote
-          cp -R $GITHUB_WORKSPACE/HazelcastCloudTests/csharphazelcastcloudtests/Remote $GITHUB_WORKSPACE/client/src/Hazelcast.Net.Testing/Remote/
-          cp -R $GITHUB_WORKSPACE/HazelcastCloudTests/csharphazelcastcloudtests/CloudTests $GITHUB_WORKSPACE/client/src/CloudTests/
-          ls $GITHUB_WORKSPACE/client/src/CloudTests
+          ref: ${{ github.event.inputs.branch_name }}    
          
       - name: Start RC for Viridian
         env:
           baseUrl: ${{ github.event.inputs.base_url }}
           apiKey: ${{ secrets.APIKEY_VIRIDIAN }}
           apiSecret: ${{ secrets.APISECRET_VIRIDIAN }}
+          hzVersion: ${{ github.event.inputs.hzVersion }}
         run: |
           python start_remote_controller.py &> rc.log &
           sleep 30
 
-      - name: Build project
+      - name: Update submodules
         run: |
-          dotnet build -c Release -f net6.0
-        working-directory: client/src/CloudTests
-                   
+            git submodule update --init
+        working-directory: client
+        
+      - name: Build
+        shell: pwsh
+        run: ./hz.ps1 -localRestore build
+        working-directory: client      
+
       - name: Run cloud tests
-        env: 
-          baseUrl: ${{ github.event.inputs.base_url }}
-          hzVersion: ${{ github.event.inputs.hzVersion }}
-          HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hzVersion }}
-        run: |
-          dotnet test bin/Release/net6.0/CloudTests.dll --verbosity n
-        working-directory: client/src/CloudTests
-          
+        shell: pwsh
+        run: ./hz.ps1 test -tf "test == /Hazelcast.Tests.Cloud.ServerlessCloudTests.TestCloud/" ${{ secrets.GH_PAT }}
+        working-directory: client
+        env:
+          HAZELCAST_SERVER_VERSION: ${{ matrix.version }}   
+
       - uses: actions/upload-artifact@v2
         if: always()
         with:
