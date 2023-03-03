@@ -82,5 +82,5 @@ jobs:
         if: (success() || failure()) && steps.build.conclusion == 'success'
         uses: actions/upload-artifact@v3
         with:
-          name: Test-Results ${{ inputs.os }}-${{ matrix.fwk }}
+          name: Test-Results
           path: './client/temp/tests/results/*.trx'
