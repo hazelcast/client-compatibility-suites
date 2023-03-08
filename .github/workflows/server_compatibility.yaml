@@ -349,80 +349,102 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
+
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: Setup .NET Core 6.0.x
-        uses: actions/setup-dotnet@v1
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 6.0.x
-      - name: Setup .NET Core 5.0.x
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 5.0.x
-      - name: Setup .NET Core 3.1.x
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 3.1.x
-      - name: Setup .NET Core 2.1.x
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 2.1.x
+          dotnet-version: |
+            2.1.x
+            3.1.x
+            5.0.x
+            6.0.x
+            7.0.x
+
       - name: Checkout to tag
         uses: actions/checkout@v2
         with:
           repository: hazelcast/hazelcast-csharp-client
           path: tag
           ref: ${{ matrix.client_tag }}
+
       - name: Download Hazelcast tests JAR
         uses: actions/download-artifact@v2
         with:
           name: hazelcast-tests
           path: tag/temp/lib
+
       - name: Download Hazelcast SQL JAR (if exists)
         continue-on-error: true
         uses: actions/download-artifact@v2
         with:
           name: hazelcast-sql
           path: tag/temp/lib
+
       - name: Download Hazelcast JAR
         if: ${{ matrix.server_kind == 'os' }}
         uses: actions/download-artifact@v2
         with:
           name: hazelcast
           path: tag/temp/lib
+
       - name: Download Hazelcast Enterprise JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
         uses: actions/download-artifact@v2
         with:
           name: hazelcast-enterprise
           path: tag/temp/lib
+
       - name: Download Hazelcast Enterprise tests JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
         uses: actions/download-artifact@v2
         with:
           name: hazelcast-enterprise-tests
           path: tag/temp/lib
+
       - name: Update submodules
         run: |
           git submodule update --init
         working-directory: tag
+
+      - uses: madhead/semver-utils@latest
+        id: version
+        with:
+          version: ${{matrix.client_tag}}
+          compare-to: 5.1.*
+          satisfies: 1.x
+
+      - name: Backport SSL Tests for client <=5.1.0
+        if: ${{ matrix.server_kind == 'enterprise' && steps.version.outputs.comparison-result == '<' }}
+        shell: pwsh
+        working-directory: tag
+        run: |
+          cp $GITHUB_WORKSPACE/utils/net/hz-latest.ps1 $GITHUB_WORKSPACE/tag/hz-latest.ps1
+          cp $GITHUB_WORKSPACE/utils/net/utils.ps1 $GITHUB_WORKSPACE/tag/build/utils.ps1
+          ./hz-latest.ps1 copy-source -source  $GITHUB_WORKSPACE/utils/net/ssl 
+
       - name: Run non-enterprise tests
         if: ${{ matrix.server_kind == 'os' }}
-        shell: bash
-        run: ./hz.sh clean,build,test -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
+        shell: pwsh
+        run: ./hz-latest.ps1 clean,build,test -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
         working-directory: tag      
         env:
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}
+
       - name: Run all tests
         if: ${{ matrix.server_kind == 'enterprise' }}
-        shell: bash
-        run: ./hz.sh -enterprise clean,build,test -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
+        shell: pwsh
+        run: |
+          run: ./hz.ps1 -enterprise -noRestore -localRestore -tf "test =~ /Hazelcast.Tests.Networking.ClientSslTests/" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
         working-directory: tag
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}
+
   setup_cpp_client_matrix:
     name: Setup the Cpp client test matrix
     if: ${{ github.event.inputs.run_cpp == 'run' }}
