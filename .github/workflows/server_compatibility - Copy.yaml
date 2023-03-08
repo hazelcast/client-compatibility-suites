@@ -1,0 +1,89 @@
+name: MyWF
+
+on:
+  workflow_dispatch:
+    inputs:
+      organization_name:
+        description: Name of the organization to build JARs from. If you want to run the tests with the JARs from your fork, set this to your username.
+        required: true
+        default: hazelcast
+      branch_name:
+        description: Name of the branch to build JARs from
+        required: true
+        default: master
+      hz_version:
+        description: Version of the JARs that will be built, without the SNAPSHOT suffix.
+        required: true
+        default: "5.0"
+      run_python:
+        description: Whether or not to run Python client tests. Set to something else to not run the tests.
+        required: true
+        default: run
+      run_nodejs:
+        description: Whether or not to run Node.js client tests. Set to something else to not run the tests.
+        required: true
+        default: run
+      run_cpp:
+        description: Whether or not to run CPP client tests. Set to something else to not run the tests.
+        required: true
+        default: run
+      run_csharp:
+        description: Whether or not to run Csharp client tests. Set to something else to not run the tests.
+        required: true
+        default: run
+      run_go:
+        description: Whether or not to run Go client tests. Set to something else to not run the tests.
+        required: true
+        default: run
+jobs:
+  
+  setup_csharp_client_matrix:
+    name: Setup the Csharp client test matrix
+    if: ${{ github.event.inputs.run_csharp == 'run' }}
+    runs-on: windows-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Checkout to scripts
+        uses: actions/checkout@v2
+      - name: Set client matrix
+        id: set-matrix
+        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client cs --option tag --use-latest-patch-versions )"
+  test_csharp_clients:
+    needs: [ setup_csharp_client_matrix ]
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        client_tag: ${{ fromJson(needs.setup_csharp_client_matrix.outputs.matrix) }}
+        server_kind: [ os, enterprise ]
+    name: Test Csharp client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+
+      - uses: madhead/semver-utils@latest
+        id: version
+        with:
+          version: ${{matrix.client_tag}}
+          compare-to: 5.1.*
+          satisfies: 1.x
+
+      - name: Backport SSL Tests for client <=5.1.0
+        if: ${{steps.version.outputs.comparison-result == '<' }}
+        shell: pwsh
+        working-directory: tag
+        run: Write-Out "${{ steps.version.outputs.comparison-result }}  ${{steps.version.outputs.major}}"
