@@ -424,9 +424,9 @@ jobs:
         shell: pwsh
         working-directory: tag
         run: |
-          cp $GITHUB_WORKSPACE/utils/net/hz-latest.ps1 $GITHUB_WORKSPACE/tag/hz-latest.ps1
-          cp $GITHUB_WORKSPACE/utils/net/utils.ps1 $GITHUB_WORKSPACE/tag/build/utils.ps1
-          ./hz-latest.ps1 copy-source -source  $GITHUB_WORKSPACE/utils/net/ssl 
+          cp ${{github.workspace}}/utils/net/hz-latest.ps1 ${{github.workspace}}/tag/hz-latest.ps1
+          cp ${{github.workspace}}/utils/net/utils.ps1 ${{github.workspace}}/tag/build/utils.ps1
+          ./hz-latest.ps1 copy-source -source  ${{github.workspace}}/utils/net/ssl 
 
       - name: Run non-enterprise tests
         if: ${{ matrix.server_kind == 'os' }}
