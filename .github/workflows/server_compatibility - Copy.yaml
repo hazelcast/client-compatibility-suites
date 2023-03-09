@@ -17,7 +17,7 @@ jobs:
           uses: madhead/semver-utils@latest        
           id: version
           with:
-            version: v5.1.0
+            version: v5.2.0
             compare-to: 5.2.x
             satisfies: 1.x
 
