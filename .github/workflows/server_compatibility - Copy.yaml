@@ -8,6 +8,13 @@ jobs:
     steps:
         - uses: actions/checkout@v2
 
+        - name: Checkout to tag
+          uses: actions/checkout@v2
+          with:
+            repository: hazelcast/hazelcast-csharp-client
+            path: tag
+            ref: v5.1.0
+
         - name: Setup Python
           uses: actions/setup-python@v2
           with:
@@ -26,6 +33,9 @@ jobs:
           run: |
             Write-Output "${{ steps.version.outputs.comparison-result }}  ${{steps.version.outputs.major}}"
             Write-Output "Condtition: ${{ (steps.version.outputs.major == '5' && steps.version.outputs.minor < '2') || (steps.version.outputs.major == '4') }}"
+            ls $GITHUB_WORKSPACE
+            ls $GITHUB_WORKSPACE/utils
+            ls $GITHUB_WORKSPACE/tag
 
         - name: Detect Version 2
           uses: madhead/semver-utils@latest        
