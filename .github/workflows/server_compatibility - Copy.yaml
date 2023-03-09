@@ -28,4 +28,4 @@ jobs:
         - name: Backport SSL Tests for client <=5.1.0
           shell: pwsh
           working-directory: tag
-          run: Write-Out "${{ steps.version.outputs.comparison-result }}  ${{steps.version.outputs.major}}"
+          run: Write-Output "${{ steps.version.outputs.comparison-result }}  ${{steps.version.outputs.major}}"
