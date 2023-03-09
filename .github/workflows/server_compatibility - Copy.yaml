@@ -29,7 +29,7 @@ jobs:
 
         - name: Detect Version 2
           uses: madhead/semver-utils@latest        
-          id: version
+          id: version2
           with:
             version: v4.1.0
             compare-to: 5.2.x
@@ -38,5 +38,5 @@ jobs:
         - name: Backport SSL Tests for client < 5.2.0
           shell: pwsh
           run: |
-            Write-Output "${{ steps.version.outputs.comparison-result }}  ${{steps.version.outputs.major}}"
-            Write-Output "Condtition: ${{ (steps.version.outputs.major == '5' && steps.version.outputs.minor < '2') || (steps.version.outputs.major == '4') }}"            
+            Write-Output "${{ steps.version2.outputs.comparison-result }}  ${{steps.version2.outputs.major}}"
+            Write-Output "Condtition: ${{ (steps.version2.outputs.major == '5' && steps.version2.outputs.minor < '2') || (steps.version2.outputs.major == '4') }}"            
