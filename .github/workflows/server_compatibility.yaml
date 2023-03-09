@@ -428,11 +428,16 @@ jobs:
           cp ${{github.workspace}}/utils/net/utils.ps1 ${{github.workspace}}/tag/build/utils.ps1
           ./hz-latest.ps1 copy-source -source  ${{github.workspace}}/utils/net/ssl 
 
+      - name: Build
+        shell: pwsh
+        run: |
+          ./hz.ps1 clean,build
+
       - name: Run non-enterprise tests
         if: ${{ matrix.server_kind == 'os' }}
         shell: pwsh
         run: |
-          ./hz.ps1 clean,build,test -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
+          ./hz.ps1 test -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
         working-directory: tag      
         env:
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}
@@ -441,7 +446,7 @@ jobs:
         if: ${{ matrix.server_kind == 'enterprise' && (( steps.version.outputs.major == '5' && steps.version.outputs.minor > '1' ))  }}
         shell: pwsh
         run: |
-           ./hz.ps1 -enterprise -noRestore -localRestore -tf "test =~ /Hazelcast.Tests.Networking.ClientSslTests/" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
+           ./hz.ps1 -enterprise -tf "test =~ /Hazelcast.Tests.Networking.ClientSslTests/" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
         working-directory: tag
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
@@ -451,7 +456,7 @@ jobs:
         if: ${{steps.backport-tests.outcome == 'success'}}
         shell: pwsh
         run: |
-           ./hz-latest.ps1 -enterprise -noRestore -localRestore -tf "test =~ /Hazelcast.Tests.Networking.ClientSslTests/" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
+           ./hz-latest.ps1 -enterprise -tf "test =~ /Hazelcast.Tests.Networking.ClientSslTests/" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
         working-directory: tag
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
