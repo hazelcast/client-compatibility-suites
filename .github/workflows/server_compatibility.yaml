@@ -415,11 +415,12 @@ jobs:
         id: version
         with:
           version: ${{matrix.client_tag}}
-          compare-to: 5.1.*
+          compare-to: 5.1.x
           satisfies: 1.x
 
-      - name: Backport SSL Tests for client <=5.1.0
-        if: ${{ matrix.server_kind == 'enterprise' && steps.version.outputs.comparison-result == '<' }}
+      - name: Backport SSL Tests for client < 5.2.0
+        id: backport-tests
+        if: ${{ matrix.server_kind == 'enterprise' && ((steps.version2.outputs.major == '5' && steps.version.outputs.minor < '2') || (steps.version.outputs.major == '4')) }}
         shell: pwsh
         working-directory: tag
         run: |
@@ -437,7 +438,7 @@ jobs:
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}
 
       - name: Run all tests
-        if: ${{ matrix.server_kind == 'enterprise' && steps.version.outputs.comparison-result != '<'  }}
+        if: ${{ matrix.server_kind == 'enterprise' && (( steps.version.outputs.major == '5' && steps.version.outputs.minor > '1' ))  }}
         shell: pwsh
         run: |
            ./hz.ps1 -enterprise -noRestore -localRestore -tf "test =~ /Hazelcast.Tests.Networking.ClientSslTests/" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
@@ -447,7 +448,7 @@ jobs:
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}
 
       - name: Run all tests with compatibility
-        if: ${{ matrix.server_kind == 'enterprise' && steps.version.outputs.comparison-result == '<'  }}
+        if: ${{steps.backport-tests.outcome == 'success'}}
         shell: pwsh
         run: |
           run: ./hz-latest.ps1 -enterprise -noRestore -localRestore -tf "test =~ /Hazelcast.Tests.Networking.ClientSslTests/" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
