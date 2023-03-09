@@ -430,6 +430,7 @@ jobs:
 
       - name: Build
         shell: pwsh
+        working-directory: tag 
         run: |
           ./hz.ps1 clean,build
 
