@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
         - uses: actions/checkout@v2
-        
+
         - name: Setup Python
           uses: actions/setup-python@v2
           with:
@@ -18,10 +18,12 @@ jobs:
           id: version
           with:
             version: v5.2.0
-            compare-to: 5.1.*
+            compare-to: 5.2.x
             satisfies: 1.x
 
-        - name: Backport SSL Tests for client <=5.1.0
+        - name: Backport SSL Tests for client < 5.2.0
           shell: pwsh
           run: |
             Write-Output "${{ steps.version.outputs.comparison-result }}  ${{steps.version.outputs.major}}"
+            Write-Output "Major < 5: ${{steps.version.outputs.major < '5'}}"
+            Write-Output "Minor < 2: ${{steps.version.outputs.minor < '2'}}"
