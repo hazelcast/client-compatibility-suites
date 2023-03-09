@@ -34,8 +34,10 @@ jobs:
             Write-Output "${{ steps.version.outputs.comparison-result }}  ${{steps.version.outputs.major}}"
             Write-Output "Condtition: ${{ (steps.version.outputs.major == '5' && steps.version.outputs.minor < '2') || (steps.version.outputs.major == '4') }}"
             ls $GITHUB_WORKSPACE
-            ls $GITHUB_WORKSPACE\utils
-            ls $GITHUB_WORKSPACE\tag
+            ls ${{$GITHUB_WORKSPACE}}\utils
+            ls ${{$GITHUB_WORKSPACE}}\tag
+            ls ${{$GITHUB_WORKSPACE}}/utils
+            ls ${{$GITHUB_WORKSPACE}}/tag
 
         - name: Detect Version 2
           uses: madhead/semver-utils@latest        
