@@ -2,60 +2,30 @@ name: MyWF
 
 on:
   workflow_dispatch:
-    inputs:
-      organization_name:
-        description: Name of the organization to build JARs from. If you want to run the tests with the JARs from your fork, set this to your username.
-        required: true
-        default: hazelcast
-      branch_name:
-        description: Name of the branch to build JARs from
-        required: true
-        default: master
-      hz_version:
-        description: Version of the JARs that will be built, without the SNAPSHOT suffix.
-        required: true
-        default: "5.0"
-      run_python:
-        description: Whether or not to run Python client tests. Set to something else to not run the tests.
-        required: true
-        default: run
-      run_nodejs:
-        description: Whether or not to run Node.js client tests. Set to something else to not run the tests.
-        required: true
-        default: run
-      run_cpp:
-        description: Whether or not to run CPP client tests. Set to something else to not run the tests.
-        required: true
-        default: run
-      run_csharp:
-        description: Whether or not to run Csharp client tests. Set to something else to not run the tests.
-        required: true
-        default: run
-      run_go:
-        description: Whether or not to run Go client tests. Set to something else to not run the tests.
-        required: true
-        default: run
+jobs:
+  my-job: 
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Setup Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
+        - uses: actions/checkout@v2
+        - name: Setup Python
+          uses: actions/setup-python@v2
+          with:
+            python-version: 3.9
 
-      - name: Setup Java
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
+        - name: Setup Java
+          uses: actions/setup-java@v1
+          with:
+            java-version: 11
 
 
-      - uses: madhead/semver-utils@latest
-        id: version
-        with:
-          version: v5.2.0
-          compare-to: 5.1.*
-          satisfies: 1.x
+        - uses: madhead/semver-utils@latest
+          id: version
+          with:
+            version: v5.2.0
+            compare-to: 5.1.*
+            satisfies: 1.x
 
-      - name: Backport SSL Tests for client <=5.1.0
-        shell: pwsh
-        working-directory: tag
-        run: Write-Out "${{ steps.version.outputs.comparison-result }}  ${{steps.version.outputs.major}}"
+        - name: Backport SSL Tests for client <=5.1.0
+          shell: pwsh
+          working-directory: tag
+          run: Write-Out "${{ steps.version.outputs.comparison-result }}  ${{steps.version.outputs.major}}"
