@@ -38,6 +38,7 @@ on:
 jobs:
   upload_jars:
     name: Create and upload JARs
+    if: false
     runs-on: ubuntu-latest
     steps:
       - name: Setup Java
@@ -335,7 +336,7 @@ jobs:
         id: set-matrix
         run: echo "::set-output name=matrix::$( python get_client_matrix.py --client cs --option tag --use-latest-patch-versions )"
   test_csharp_clients:
-    needs: [ upload_jars, setup_csharp_client_matrix ]
+    needs: [  setup_csharp_client_matrix ]
     runs-on: windows-latest
     strategy:
       fail-fast: false
@@ -372,39 +373,39 @@ jobs:
           path: tag
           ref: ${{ matrix.client_tag }}
 
-      - name: Download Hazelcast tests JAR
-        uses: actions/download-artifact@v2
-        with:
-          name: hazelcast-tests
-          path: tag/temp/lib
+      # - name: Download Hazelcast tests JAR
+      #   uses: actions/download-artifact@v2
+      #   with:
+      #     name: hazelcast-tests
+      #     path: tag/temp/lib
 
-      - name: Download Hazelcast SQL JAR (if exists)
-        continue-on-error: true
-        uses: actions/download-artifact@v2
-        with:
-          name: hazelcast-sql
-          path: tag/temp/lib
+      # - name: Download Hazelcast SQL JAR (if exists)
+      #   continue-on-error: true
+      #   uses: actions/download-artifact@v2
+      #   with:
+      #     name: hazelcast-sql
+      #     path: tag/temp/lib
 
-      - name: Download Hazelcast JAR
-        if: ${{ matrix.server_kind == 'os' }}
-        uses: actions/download-artifact@v2
-        with:
-          name: hazelcast
-          path: tag/temp/lib
+      # - name: Download Hazelcast JAR
+      #   if: ${{ matrix.server_kind == 'os' }}
+      #   uses: actions/download-artifact@v2
+      #   with:
+      #     name: hazelcast
+      #     path: tag/temp/lib
 
-      - name: Download Hazelcast Enterprise JAR
-        if: ${{ matrix.server_kind == 'enterprise' }}
-        uses: actions/download-artifact@v2
-        with:
-          name: hazelcast-enterprise
-          path: tag/temp/lib
+      # - name: Download Hazelcast Enterprise JAR
+      #   if: ${{ matrix.server_kind == 'enterprise' }}
+      #   uses: actions/download-artifact@v2
+      #   with:
+      #     name: hazelcast-enterprise
+      #     path: tag/temp/lib
 
-      - name: Download Hazelcast Enterprise tests JAR
-        if: ${{ matrix.server_kind == 'enterprise' }}
-        uses: actions/download-artifact@v2
-        with:
-          name: hazelcast-enterprise-tests
-          path: tag/temp/lib
+      # - name: Download Hazelcast Enterprise tests JAR
+      #   if: ${{ matrix.server_kind == 'enterprise' }}
+      #   uses: actions/download-artifact@v2
+      #   with:
+      #     name: hazelcast-enterprise-tests
+      #     path: tag/temp/lib
 
       - name: Update submodules
         run: |
@@ -424,15 +425,15 @@ jobs:
         shell: pwsh
         working-directory: tag
         run: |
-          cp ${{github.workspace}}/utils/net/hz-latest.ps1 ${{github.workspace}}/tag/hz-latest.ps1
-          cp ${{github.workspace}}/utils/net/utils.ps1 ${{github.workspace}}/tag/build/utils.ps1
-          ./hz-latest.ps1 copy-source -source  ${{github.workspace}}/utils/net/ssl 
+          cp ${{github.workspace}}\utils\net\hz-latest.ps1 ${{github.workspace}}\tag\hz-latest.ps1
+          cp ${{github.workspace}}\utils\net\utils.ps1 ${{github.workspace}}\tag\build\utils.ps1
+          ./hz-latest.ps1 copy-source -source  ${{github.workspace}}\utils\net\ssl 
 
       - name: Build
         shell: pwsh
         working-directory: tag 
         run: |
-          ./hz.ps1 clean,build
+          ./hz.ps1 build
 
       - name: Run non-enterprise tests
         if: ${{ matrix.server_kind == 'os' }}
