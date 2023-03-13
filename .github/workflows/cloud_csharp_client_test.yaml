@@ -1,4 +1,4 @@
-name: Cloud test with csharp client
+name: Hazelcast cloud test with csharp client
 
 on:
   workflow_dispatch:
@@ -12,17 +12,17 @@ on:
         required: true
         default: master
       base_url:
-        description: Base url of the cloud env. I.e https://api.dev.viridian.hazelcast.cloud
+        description: Base url of the cloud env. I.e https://uat.hazelcast.cloud
         required: true
-        default: https://api.dev.viridian.hazelcast.cloud
+        default: https://uat.hazelcast.cloud
       hzVersion:
-        description: Version of hazelcast
+        description: Version of hazelcast (For cloud standard cluster, it has different versions, i.e 5.0.2-2)
         required: true
 
 jobs:
-  test_cloud_csharp:
+  test_standard_cluster:
     runs-on: ubuntu-latest
-    name: Cloud tests with csharp
+    name: Hazelcast cloud standard cluster tests with csharp
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v3
@@ -30,57 +30,68 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v3
         with:
-          python-version: "3.10"
+          python-version: 3.10
           
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           java-version: 8
-          distribution: 'temurin'
           
-      - name: Install .NET
+      - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: |
-            2.1.x
-            3.1.x
-            5.0.x
-            6.0.x
-            7.0.x
+          dotnet-version: 6.0.x
           
       - name: Checkout to ${{ github.event.inputs.branch_name }}
         uses: actions/checkout@v3
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-csharp-client
           path: client
-          ref: ${{ github.event.inputs.branch_name }}    
-  
-      - name: Update submodules
-        run: |
-            git submodule update --init
-        working-directory: client
+          ref: ${{ github.event.inputs.branch_name }}
         
-      - name: Build
-        id: build
-        shell: pwsh
-        run: ./hz.ps1 -localRestore build
-        working-directory: client      
-
-      - name: Run cloud tests
-        shell: pwsh
-        run: ./hz.ps1 test -tf "test == /Hazelcast.Tests.Cloud.ServerlessCloudTests.TestCloud/" ${{ secrets.GH_PAT }}
-        working-directory: client
+      - name: Copy reqired files to under test folders
+        run: |
+          rm -rf $GITHUB_WORKSPACE/client/src/Hazelcast.Net.Testing/Remote
+          cp -R $GITHUB_WORKSPACE/HazelcastCloudTests/csharphazelcastcloudtests/Remote $GITHUB_WORKSPACE/client/src/Hazelcast.Net.Testing/Remote/
+          cp -R $GITHUB_WORKSPACE/HazelcastCloudTests/csharphazelcastcloudtests/CloudTests $GITHUB_WORKSPACE/client/src/CloudTests/
+          ls $GITHUB_WORKSPACE/client/src/CloudTests
+         
+      - name: Start RC for UAT
+        if: ${{ github.event.inputs.base_url == 'https://uat.hazelcast.cloud' }}
         env:
-          HAZELCAST_SERVER_VERSION: ${{ matrix.version }}  
+          baseUrl: ${{ github.event.inputs.base_url }} 
+          apiKey: ${{ secrets.APIKEY_UAT }}
+          apiSecret: ${{ secrets.APISECRET_UAT }}
+        run: |
+          python start_remote_controller.py &> rc_standard_cluster.log &
+          sleep 30
+          
+      - name: Start RC for PROD
+        if: ${{ github.event.inputs.base_url == 'https://cloud.hazelcast.com' }}
+        env:
+          baseUrl: ${{ github.event.inputs.base_url }} 
+          apiKey: ${{ secrets.APIKEY_PROD }}
+          apiSecret: ${{ secrets.APISECRET_PROD }}
+        run: |
+          python start_remote_controller.py &> rc_standard_cluster.log &
+          sleep 30
+          
+      - name: Build project
+        run: |
+          dotnet build -c Release -f net6.0
+        working-directory: client/src/CloudTests
+                   
+      - name: Run cloud tests
+        env: 
           baseUrl: ${{ github.event.inputs.base_url }}
-          apiKey: ${{ secrets.APIKEY_VIRIDIAN }}
-          apiSecret: ${{ secrets.APISECRET_VIRIDIAN }}
-          hzVersion: ${{ github.event.inputs.hzVersion }} 
-
-      # upload test results artifact
-      - name: Upload test results artifact
-        if: (success() || failure()) && steps.build.conclusion == 'success'
-        uses: actions/upload-artifact@v3
+          hzVersion: ${{ github.event.inputs.hzVersion }}
+          HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hzVersion }}
+        run: |
+          dotnet test bin/Release/net6.0/CloudTests.dll --verbosity n
+        working-directory: client/src/CloudTests
+          
+      - uses: actions/upload-artifact@v2
+        if: always()
         with:
-          name: Test-Results
-          path: './client/temp/tests/results/*.trx'
+          name: rc_standard_cluster
+          path: rc_standard_cluster.log
