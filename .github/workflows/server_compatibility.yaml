@@ -420,7 +420,7 @@ jobs:
 
       - name: Backport SSL Tests for client < 5.2.0
         id: backport-tests
-        if: ${{ matrix.server_kind == 'enterprise' && ((steps.version2.outputs.major == '5' && steps.version.outputs.minor < '2') || (steps.version.outputs.major == '4')) }}
+        if: ${{  ((steps.version2.outputs.major == '5' && steps.version.outputs.minor < '2') || (steps.version.outputs.major == '4')) }}
         shell: pwsh
         working-directory: tag
         run: |
@@ -435,13 +435,22 @@ jobs:
           ./hz.ps1 build
 
       - name: Run non-enterprise tests
-        if: ${{ matrix.server_kind == 'os' }}
+        if: ${{ matrix.server_kind == 'os' && steps.backport-tests.outcome != 'success'  }}
         shell: pwsh
         run: |
-          ./hz.ps1 test -tf "method != SendReceive" -server  ${{ github.event.inputs.hz_version }}-SNAPSHOT
+          ./hz.ps1 test -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
         working-directory: tag      
         env:
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}
+
+      - name: Run non-enterprise tests with compatibility
+        if: ${{ matrix.server_kind == 'os' && steps.backport-tests.outcome == 'success'  }}
+        shell: pwsh
+        run: |
+          ./hz-latest.ps1 test -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
+        working-directory: tag      
+        env:
+          HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}          
 
       - name: Run all tests
         if: ${{ matrix.server_kind == 'enterprise' && (( steps.version.outputs.major == '5' && steps.version.outputs.minor > '1' ))  }}
@@ -454,7 +463,7 @@ jobs:
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}
 
       - name: Run all tests with compatibility
-        if: ${{steps.backport-tests.outcome == 'success'}}
+        if: ${{matrix.server_kind == 'enterprise' && steps.backport-tests.outcome == 'success'}}
         shell: pwsh
         run: |
            ./hz-latest.ps1 -enterprise -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
