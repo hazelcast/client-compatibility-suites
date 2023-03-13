@@ -438,7 +438,7 @@ jobs:
         if: ${{ matrix.server_kind == 'os' }}
         shell: pwsh
         run: |
-          ./hz.ps1 test -server -tf "method != SendReceive" ${{ github.event.inputs.hz_version }}-SNAPSHOT
+          ./hz.ps1 test -tf "method != SendReceive" -server  ${{ github.event.inputs.hz_version }}-SNAPSHOT
         working-directory: tag      
         env:
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}
