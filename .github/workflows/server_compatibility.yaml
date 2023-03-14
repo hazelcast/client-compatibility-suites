@@ -417,6 +417,10 @@ jobs:
           version: ${{matrix.client_tag}}
           compare-to: 5.1.x
           satisfies: 1.x
+      
+      - name: Client Version
+        run: |
+          echo "${{steps.version2.outputs.major '.' steps.version.outputs.minor  '.' steps.version.outputs.patch }}"
 
       - name: Backport SSL Tests for client < 5.2.0
         id: backport-tests
@@ -463,7 +467,7 @@ jobs:
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}
 
       - name: Run all tests with compatibility
-        if: ${{matrix.server_kind == 'enterprise' && steps.backport-tests.outcome != 'success'}}
+        if: ${{matrix.server_kind == 'enterprise' && steps.backport-tests.outcome == 'success'}}
         shell: pwsh
         run: |
            ./hz-latest.ps1 -enterprise -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
