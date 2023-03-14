@@ -353,6 +353,7 @@ if (-not [System.String]::IsNullOrWhiteSpace($options.version)) {
 # set versions and configure
 $serverVersion = $options.server # use specified value by default
 $isSnapshot = $options.server.Contains("SNAPSHOT") -or $options.server -eq "master"
+$isBeta = $options.server.Contains("BETA") 
 $hzRCVersion = "0.8-SNAPSHOT" # use appropriate version
 #$hzRCVersion = "0.5-SNAPSHOT" # for 3.12.x
 
@@ -555,6 +556,11 @@ function determine-server-version {
     # set the actual server version
     # this will be updated below if required
     $script:serverVersion = $version
+
+    if($isBeta){
+        Write-Output "Server: version $version is BETA, using this version"
+        return       
+    }
 
     if (-not $isSnapshot) {
         Write-Output "Server: version $version is not a -SNAPSHOT, using this version"
@@ -820,7 +826,7 @@ function ensure-server-files {
         }
 
         # special master case
-        if ($options.server.contains("BETA")) {
+        if ($isBeta) {
             $url = "https://raw.githubusercontent.com/hazelcast/hazelcast/$v/hazelcast/src/main/resources/hazelcast-default.xml"
             $dest = "$libDir/hazelcast-$serverVersion.xml"
             $response = invoke-web-request $url $dest
