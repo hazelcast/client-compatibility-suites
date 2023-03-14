@@ -420,7 +420,7 @@ jobs:
       
       - name: Client Version
         run: |
-          echo "${{steps.version2.outputs.major '.' steps.version.outputs.minor  '.' steps.version.outputs.patch }}"
+          echo "${{steps.version2.outputs.major . steps.version.outputs.minor  . steps.version.outputs.patch }}"
 
       - name: Backport SSL Tests for client < 5.2.0
         id: backport-tests
