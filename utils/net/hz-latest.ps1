@@ -821,7 +821,7 @@ function ensure-server-files {
 
         # special master case
         if ($options.server.contains("BETA")) {
-            $url = "https://raw.githubusercontent.com/hazelcast/hazelcast/$v/hazelcast/src/main/resources/hazelcast-client-default.xml"
+            $url = "https://raw.githubusercontent.com/hazelcast/hazelcast/$v/hazelcast/src/main/resources/hazelcast-default.xml"
             $dest = "$libDir/hazelcast-$serverVersion.xml"
             $response = invoke-web-request $url $dest
             if ($response.StatusCode -ne 200) {

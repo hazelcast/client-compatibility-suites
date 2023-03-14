@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Reflection;
 using System.Threading.Tasks;
 using Hazelcast.Exceptions;
 using Hazelcast.Testing;
@@ -42,7 +41,7 @@ namespace Hazelcast.Tests.Networking
             {
                 var clientCertNumber = knowsClient ? 1 : 2;
                 var clientCertPath = withCert
-                    ? TestFiles.GetFullPath(Assembly.GetAssembly(typeof(ClientSslTestBase)), ClientCertificatePath, $"{ClientCertificatePrefix}client{clientCertNumber}.pfx")
+                    ? TestFiles.GetFullPath(this, ClientCertificatePath, $"{ClientCertificatePrefix}client{clientCertNumber}.pfx")
                     : null;
 
                 await using var client = await StartClientAsync(
@@ -76,7 +75,7 @@ namespace Hazelcast.Tests.Networking
         {
             var clientCertNumber = knowsClient ? 1 : 2;
             var clientCertPath = withCert
-                ? TestFiles.GetFullPath(Assembly.GetAssembly(typeof(ClientSslTestBase)), ClientCertificatePath, $"{ClientCertificatePrefix}client{clientCertNumber}.pfx")
+                ? TestFiles.GetFullPath(this, ClientCertificatePath, $"{ClientCertificatePrefix}client{clientCertNumber}.pfx")
                 : null;
 
             await using var client = await StartClientAsync(

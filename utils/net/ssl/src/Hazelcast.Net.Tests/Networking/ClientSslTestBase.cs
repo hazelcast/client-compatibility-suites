@@ -69,7 +69,6 @@
 
 using System;
 using System.IO;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Hazelcast.Clustering;
@@ -158,7 +157,7 @@ namespace Hazelcast.Tests.Networking
             var xml = TestFiles.ReadAllText(this, "Cluster/ssl.xml");
 
             var ssl = new StringBuilder();
-            var keyStoreFullPath = TestFiles.GetFullPath(Assembly.GetAssembly(typeof(ClientSslTestBase)), keyStorePath);
+            var keyStoreFullPath = TestFiles.GetFullPath(this, keyStorePath);
             if (!File.Exists(keyStoreFullPath))
             {
                 var message = $"KeyStore file not found at \"{keyStoreFullPath}\".";
@@ -170,7 +169,7 @@ namespace Hazelcast.Tests.Networking
             AppendProperty(ssl, "keyStoreType", "PKCS12");
             if (trustStorePath != null)
             {
-                var trustStoreFullPath = TestFiles.GetFullPath(Assembly.GetAssembly(typeof(ClientSslTestBase)), trustStorePath);
+                var trustStoreFullPath = TestFiles.GetFullPath(this, trustStorePath);
                 if (!File.Exists(trustStoreFullPath))
                 {
                     var message = $"TrustStore file not found at \"{trustStoreFullPath}\".";
