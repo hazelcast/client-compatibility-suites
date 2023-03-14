@@ -439,7 +439,7 @@ jobs:
           ./hz.ps1 build
 
       - name: Run non-enterprise tests
-        if: ${{ matrix.server_kind == 'os' && steps.backport-tests.outcome != 'success'  }}
+        if: ${{ matrix.server_kind == 'os' && steps.backport-tests.outcome == 'skipped'  }}
         shell: pwsh
         run: |
           ./hz.ps1 test -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
@@ -457,7 +457,7 @@ jobs:
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}          
 
       - name: Run all tests
-        if: ${{ matrix.server_kind == 'enterprise' && (( steps.version.outputs.major == '5' && steps.version.outputs.minor > '1' ))  }}
+        if: ${{ matrix.server_kind == 'enterprise' && steps.backport-tests.outcome == 'skipped'  }}
         shell: pwsh
         run: |
            ./hz.ps1 -enterprise -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}

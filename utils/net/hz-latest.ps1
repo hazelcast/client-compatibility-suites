@@ -819,6 +819,19 @@ function ensure-server-files {
             $found = $true
         }
 
+        # special master case
+        if ($options.server.contains("BETA")) {
+            $url = "https://raw.githubusercontent.com/hazelcast/hazelcast/$v/hazelcast/src/main/resources/hazelcast-client-default.xml"
+            $dest = "$libDir/hazelcast-$serverVersion.xml"
+            $response = invoke-web-request $url $dest
+            if ($response.StatusCode -ne 200) {
+                if (test-path $dest) { rm $dest }
+                Die "Error: failed to download hazelcast-default.xml ($($response.StatusCode)) from branch master"
+            }
+            Write-Output "Found hazelcast-default.xml from branch $v"
+            $found = $true
+        }        
+
         if (-not $found) {
             # try tag eg 'v4.2.1' or 'v4.3'
             $url = "https://raw.githubusercontent.com/hazelcast/hazelcast/v$v/hazelcast/src/main/resources/hazelcast-default.xml"
