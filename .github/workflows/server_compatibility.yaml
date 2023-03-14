@@ -415,7 +415,7 @@ jobs:
         id: version
         with:
           version: ${{matrix.client_tag}}
-          compare-to: 5.1.x
+          compare-to: 5.2.x
           satisfies: 1.x
       
       - name: Client Version
