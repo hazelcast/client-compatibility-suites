@@ -416,15 +416,15 @@ jobs:
         with:
           version: ${{matrix.client_tag}}
           compare-to: 5.2.x
-          satisfies: 1.x
+          satisfies: x
       
       - name: Client Version
         run: |
-          echo "${{steps.version2.outputs.major . steps.version.outputs.minor  . steps.version.outputs.patch }}"
+          echo "${{steps.version2.outputs.major}} ${{steps.version.outputs.minor }}  ${{steps.version.outputs.patch }}"
 
       - name: Backport SSL Tests for client < 5.2.0
         id: backport-tests
-        if: ${{  ((steps.version2.outputs.major == '5' && steps.version.outputs.minor < '2') || (steps.version.outputs.major == '4')) }}
+        # if: ${{  ((steps.version2.outputs.major == '5' && steps.version.outputs.minor < '2') || (steps.version.outputs.major == '4')) }}
         shell: pwsh
         working-directory: tag
         run: |
