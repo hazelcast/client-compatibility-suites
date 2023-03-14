@@ -34,8 +34,7 @@ jobs:
             Write-Output "${{ steps.version.outputs.comparison-result }}  ${{steps.version.outputs.major}}"
             Write-Output "Condtition: ${{ (steps.version.outputs.major == '5' && steps.version.outputs.minor < '2') || (steps.version.outputs.major == '4') }}"
             ls $GITHUB_WORKSPACE
-            ls ${{github.workspace}}\utils
-            ls ${{github.workspace}}\tag
+
             ls ${{github.workspace}}/utils
             ls ${{github.workspace}}/tag
 
@@ -43,7 +42,7 @@ jobs:
           uses: madhead/semver-utils@latest        
           id: version2
           with:
-            version: v4.1.0
+            version: v5.1.0
             compare-to: 5.2.x
             satisfies: 1.x
 
