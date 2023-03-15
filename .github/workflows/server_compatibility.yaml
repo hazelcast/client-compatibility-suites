@@ -488,7 +488,7 @@ jobs:
         if: always()
         with:
           name: Rc-Server-logs-${{ matrix.client_tag }}-${{ matrix.server_kind }}
-          path: '${{github.workspace}}\temp\rc\' # entire directory          
+          path: '${{github.workspace}}\tag\temp\rc\' # entire directory          
 
   setup_cpp_client_matrix:
     name: Setup the Cpp client test matrix
