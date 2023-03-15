@@ -415,7 +415,7 @@ jobs:
         shell: pwsh
         run: |
           $client = "${{matrix.client_tag}}".replace("v","")
-          echo "CLIENT_VERSION=$client" >> $GITHUB_ENV
+          "CLIENT_VERSION=$client" >> $env:GITHUB_ENV
 
       - uses: madhead/semver-utils@latest
         id: version
