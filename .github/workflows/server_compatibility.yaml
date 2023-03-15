@@ -411,20 +411,26 @@ jobs:
           git submodule update --init
         working-directory: tag
 
+      - name: Detect Client Version
+        shell: pwsh
+        run: |
+          $client = "${{matrix.client_tag}}".replace("v","")
+          echo "CLIENT_VERSION=$client" >> $GITHUB_ENV
+
       - uses: madhead/semver-utils@latest
         id: version
         with:
-          version: ${{matrix.client_tag}}
+          version: ${{ env.CLIENT_VERSION }}
           compare-to: 5.2.x
           satisfies: x
       
       - name: Client Version
         run: |
-          echo "${{steps.version2.outputs.major}} ${{steps.version.outputs.minor }}  ${{steps.version.outputs.patch }}"
+          echo "${{steps.version.outputs.major}.${{steps.version.outputs.minor }}.${{steps.version.outputs.patch }}"
 
-      - name: Backport SSL Tests for client < 5.2.0
+      - name: Backport SSL Tests and hz script for client < 5.2.0
         id: backport-tests
-        # if: ${{  ((steps.version2.outputs.major == '5' && steps.version.outputs.minor < '2') || (steps.version.outputs.major == '4')) }}
+        if: ${{  ((steps.version.outputs.major == '5' && steps.version.outputs.minor < '2') || (steps.version.outputs.major == '4')) }}
         shell: pwsh
         working-directory: tag
         run: |
@@ -475,6 +481,14 @@ jobs:
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }} 
+      
+      # upload logs
+      - name: Upload RC and Server logs
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: Rc-Server-logs-${{ matrix.client_tag }}-${{ matrix.server_kind }}
+          path: '${{github.workspace}}\temp\rc\' # entire directory          
 
   setup_cpp_client_matrix:
     name: Setup the Cpp client test matrix

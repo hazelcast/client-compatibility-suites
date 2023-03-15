@@ -825,14 +825,14 @@ function ensure-server-files {
             $found = $true
         }
 
-        # special master case
+        # special beta case
         if ($isBeta) {
             $url = "https://raw.githubusercontent.com/hazelcast/hazelcast/$v/hazelcast/src/main/resources/hazelcast-default.xml"
             $dest = "$libDir/hazelcast-$serverVersion.xml"
             $response = invoke-web-request $url $dest
             if ($response.StatusCode -ne 200) {
                 if (test-path $dest) { rm $dest }
-                Die "Error: failed to download hazelcast-default.xml ($($response.StatusCode)) from branch master"
+                Die "Error: failed to download hazelcast-default.xml ($($response.StatusCode)) from branch $v"
             }
             Write-Output "Found hazelcast-default.xml from branch $v"
             $found = $true
@@ -2604,10 +2604,10 @@ function hz-copy-source (){
             $dest = join-path $currentPath $subPath $file.name
             Write-Output "-$($dest)"            
             copy-item $file -destination $dest
-            $count += 1
+            if($?){$count += 1}
         }
     }
-    Write-Output "$($count) items copied."
+    Write-Output "$($count) item(s) copied."
 }
 
 
