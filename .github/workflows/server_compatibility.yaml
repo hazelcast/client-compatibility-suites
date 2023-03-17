@@ -430,7 +430,7 @@ jobs:
 
       - name: Backport SSL Tests and hz script for client < 5.2.0
         id: backport-tests
-        if: ${{  ((steps.version.outputs.major == '5' && steps.version.outputs.minor < '2') || (steps.version.outputs.major == '4')) }}
+        #if: ${{  ((steps.version.outputs.major == '5' && steps.version.outputs.minor < '2') || (steps.version.outputs.major == '4')) }}
         shell: pwsh
         working-directory: tag
         run: |
@@ -439,15 +439,13 @@ jobs:
           ./hz-latest.ps1 copy-source -source  ${{github.workspace}}\utils\net\ssl 
 
       - name: Build
-        if: ${{ steps.version.outputs.major != '4' && steps.version.outputs.minor != '0'  }}
-        id: normal-build
         shell: pwsh
         working-directory: tag 
         run: |
           ./hz.ps1 clean, build
 
       - name: Build Client 4.0.2 with compatibility
-        if: ${{ steps.normal-build.outcome == 'skipped'  }}
+        if: ${{ steps.version.outputs.major == '4' && steps.version.outputs.minor == '0'  }}
         shell: pwsh
         working-directory: tag 
         run: |
