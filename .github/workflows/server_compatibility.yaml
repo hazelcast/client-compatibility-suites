@@ -439,10 +439,19 @@ jobs:
           ./hz-latest.ps1 copy-source -source  ${{github.workspace}}\utils\net\ssl 
 
       - name: Build
+        if: ${{ steps.version.outputs.major != '4' && steps.version.outputs.minor != '0'  }}
+        id: normal-build
         shell: pwsh
         working-directory: tag 
         run: |
-          ./hz.ps1 build
+          ./hz.ps1 clean, build
+
+      - name: Build Client 4.0.2 with compatibility
+        if: ${{ steps.normal-build.outcome == 'skipped'  }}
+        shell: pwsh
+        working-directory: tag 
+        run: |
+          ./hz-latest.ps1 clean, build
 
       - name: Run non-enterprise tests
         if: ${{ matrix.server_kind == 'os' && steps.backport-tests.outcome == 'skipped'  }}
