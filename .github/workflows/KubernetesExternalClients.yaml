@@ -151,7 +151,7 @@ jobs:
         sed -i "s/<EXTERNAL-IP>/${{needs.create-gke-cluster.outputs.external-ip}}/g" main.go
         cat main.go
         go run main.go 2>&1 tee output.txt
-        tail -n 20 output.txt 2>&1 tee last20lines.txt
+        tail -n 20 2>&1 tee last20lines.txt
         if [ $(grep -o 'Current map size:' last20lines.txt | wc -l) != $"20" ]; then exit 1; fi
         
 #TODO: More reliabe verification
