@@ -15,7 +15,7 @@
 ## Hazelcast.NET Build Script
 
 # constant
-$defaultServerVersion="5.2.0"
+$defaultServerVersion="5.3.0-SNAPSHOT"
 
 # PowerShell errors can *also* be a pain
 # see https://stackoverflow.com/questions/10666035
@@ -146,7 +146,8 @@ $params = @(
        desc = "confirms excution of sensitive actions"
     },
     @{
-        name="source"; type = [string];  default = $null;
+        name="copy-files-source"; type = [string];  default = $null;
+        desc = "source folder to be copied"
     }
 )
 
@@ -280,8 +281,8 @@ $actions = @(
        internal = $true; uniq = $true; outputs = $true
     },
     @{
-        name = "copy-source";
-        desc= "";        
+        name = "copy-files";
+        desc= "copies from given --copy-files-source to current solution folder by reflecting the folder structure.";        
     }
 )
 
@@ -557,6 +558,7 @@ function determine-server-version {
     # this will be updated below if required
     $script:serverVersion = $version
 
+    # BETA versions should be build and places under temp/lib.
     if($isBeta){
         Write-Output "Server: version $version is BETA, using this version"
         return       
@@ -836,8 +838,8 @@ function ensure-server-files {
             }
             Write-Output "Found hazelcast-default.xml from branch $v"
             $found = $true
-        }        
-
+        }   
+        
         if (-not $found) {
             # try tag eg 'v4.2.1' or 'v4.3'
             $url = "https://raw.githubusercontent.com/hazelcast/hazelcast/v$v/hazelcast/src/main/resources/hazelcast-default.xml"
@@ -1512,13 +1514,14 @@ function hz-build {
 
     if ($isReleaseBranch) {
         $files = ls -recurse -path $srcDir -filter PublicAPI.Unshipped.txt
-        $files | Foreach-Object {
-            $text = get-content $_ -raw
-            if ($text.Length -gt 0) {
-                $filename = $_.Fullname.Substring($slnRoot.Length)
-                Write-Output "Found non-empty file $filename."
-                Write-Output "'Unshipped' files must be merged before building release branches."
-                Die "Failed to build release branch."
+        foreach ($file in $files) {
+            foreach ($line in get-content $file) {
+                if ($line.Length -gt 0 -and -not $line.StartsWith('#')) {
+                    $filename = $file.Fullname.Substring($slnRoot.Length+1)
+                    Write-Output "Found non-empty file $filename."
+                    Write-Output "'Unshipped' files must be merged before building release branches."
+                    Die "Failed to build release branch."
+                }
             }
         }
     }
@@ -1665,7 +1668,7 @@ function hz-build-docs-on-windows {
     mkdir "$docDir/templates/hz/Plugins" >$null 2>&1
 
     # copy our plugin dll
-    $target = "netstandard2.0"
+    $target = "net48" # must match DocAsCode project framework
     $pluginDll = "$srcDir/Hazelcast.Net.DocAsCode/bin/$($options.configuration)/$target/Hazelcast.Net.DocAsCode.dll"
     if (-not (test-path $pluginDll)) {
         Die "Could not find Hazelcast.Net.DocAsCode.dll, make sure to build the solution first.`nIn: $srcDir/Hazelcast.Net.DocAsCode/bin/$($options.configuration)/$target"
@@ -2410,6 +2413,7 @@ function hz-pack-nuget {
     nuget-pack("Hazelcast.Net.Win32")
     nuget-pack("Hazelcast.Net.DependencyInjection")
     nuget-pack("Hazelcast.Net.Caching")
+    nuget-pack("Hazelcast.Net.Linq.Async")
 
     Get-ChildItem "$tmpDir/output" | Foreach-Object { Write-Output "  $_" }
 }
@@ -2587,15 +2591,15 @@ function hz-getfwks-json {
 }
 
 ## Copies files from given path to project folder with respect to source hierarhcy.
-function hz-copy-source (){
+function hz-copy-files (){
 
-    $source = $options.source
+    $source = $options.'copy-files-source'
 
     if(-not (test-path -path $source)){
         Die "$($source) is not exist."
     }
 
-    $currentPath = get-location
+    $currentPath = $slnRoot
     $count = 0
     foreach ($file in get-childItem -path $source -recurse){
 
@@ -2609,7 +2613,6 @@ function hz-copy-source (){
     }
     Write-Output "$($count) item(s) copied."
 }
-
 
 # ########
 # ########
