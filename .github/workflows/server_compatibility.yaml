@@ -335,7 +335,7 @@ jobs:
         id: set-matrix
         run: echo "::set-output name=matrix::$( python get_client_matrix.py --client cs --option tag --use-latest-patch-versions )"
   test_csharp_clients:
-    needs: [ upload_jars, setup_csharp_client_matrix ]
+    needs: [ upload_jars,  setup_csharp_client_matrix ]
     runs-on: windows-latest
     strategy:
       fail-fast: false
@@ -349,80 +349,154 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
+
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: Setup .NET Core 6.0.x
-        uses: actions/setup-dotnet@v1
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 6.0.x
-      - name: Setup .NET Core 5.0.x
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 5.0.x
-      - name: Setup .NET Core 3.1.x
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 3.1.x
-      - name: Setup .NET Core 2.1.x
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 2.1.x
+          dotnet-version: |
+            2.1.x
+            3.1.x
+            5.0.x
+            6.0.x
+            7.0.x
+
       - name: Checkout to tag
         uses: actions/checkout@v2
         with:
           repository: hazelcast/hazelcast-csharp-client
           path: tag
           ref: ${{ matrix.client_tag }}
+
       - name: Download Hazelcast tests JAR
         uses: actions/download-artifact@v2
         with:
           name: hazelcast-tests
           path: tag/temp/lib
+
       - name: Download Hazelcast SQL JAR (if exists)
         continue-on-error: true
         uses: actions/download-artifact@v2
         with:
           name: hazelcast-sql
           path: tag/temp/lib
+
       - name: Download Hazelcast JAR
         if: ${{ matrix.server_kind == 'os' }}
         uses: actions/download-artifact@v2
         with:
           name: hazelcast
           path: tag/temp/lib
+
       - name: Download Hazelcast Enterprise JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
         uses: actions/download-artifact@v2
         with:
           name: hazelcast-enterprise
           path: tag/temp/lib
+
       - name: Download Hazelcast Enterprise tests JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
         uses: actions/download-artifact@v2
         with:
           name: hazelcast-enterprise-tests
           path: tag/temp/lib
+
       - name: Update submodules
         run: |
           git submodule update --init
         working-directory: tag
+
+      - name: Detect Client Version
+        shell: pwsh
+        run: |
+          $client = "${{matrix.client_tag}}".replace("v","")
+          "CLIENT_VERSION=$client" >> $env:GITHUB_ENV
+
+      - uses: madhead/semver-utils@latest
+        id: version
+        with:
+          version: ${{ env.CLIENT_VERSION }}
+          compare-to: 5.2.x
+          satisfies: x
+      
+      - name: Client Version
+        run: |
+          echo "${{steps.version.outputs.major}}.${{steps.version.outputs.minor }}.${{steps.version.outputs.patch }}"
+
+      - name: Backport SSL Tests and hz script for client < 5.2.0
+        id: backport-tests
+        if: ${{  ((steps.version.outputs.major == '5' && steps.version.outputs.minor < '2') || (steps.version.outputs.major == '4')) }}
+        shell: pwsh
+        working-directory: tag
+        run: |
+          cp ${{github.workspace}}\utils\net\hz-latest.ps1 ${{github.workspace}}\tag\hz-latest.ps1
+          cp ${{github.workspace}}\utils\net\utils.ps1 ${{github.workspace}}\tag\build\utils.ps1
+          ./hz-latest.ps1 copy-files -copy-files-source  ${{github.workspace}}\utils\net\ssl 
+
+      - name: Build
+        shell: pwsh
+        working-directory: tag 
+        run: |
+          ./hz.ps1 clean, build
+
+      - name: Build Client 4.0.2 with compatibility
+        if: ${{ steps.version.outputs.major == '4' && steps.version.outputs.minor == '0'  }}
+        shell: pwsh
+        working-directory: tag 
+        run: |
+          ./hz-latest.ps1 clean, build
+
       - name: Run non-enterprise tests
-        if: ${{ matrix.server_kind == 'os' }}
-        shell: bash
-        run: ./hz.sh clean,build,test -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
+        if: ${{ matrix.server_kind == 'os' && steps.backport-tests.outcome == 'skipped'  }}
+        shell: pwsh
+        run: |
+          ./hz.ps1 test -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
         working-directory: tag      
         env:
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}
+
+      - name: Run non-enterprise tests with compatibility
+        if: ${{ matrix.server_kind == 'os' && steps.backport-tests.outcome == 'success'  }}
+        shell: pwsh
+        run: |
+          ./hz-latest.ps1 test -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
+        working-directory: tag      
+        env:
+          HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}          
+
       - name: Run all tests
-        if: ${{ matrix.server_kind == 'enterprise' }}
-        shell: bash
-        run: ./hz.sh -enterprise clean,build,test -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
+        if: ${{ matrix.server_kind == 'enterprise' && steps.backport-tests.outcome == 'skipped'  }}
+        shell: pwsh
+        run: |
+           ./hz.ps1 -enterprise -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
         working-directory: tag
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}
+
+      - name: Run all tests with compatibility
+        if: ${{matrix.server_kind == 'enterprise' && steps.backport-tests.outcome == 'success'}}
+        shell: pwsh
+        run: |
+           ./hz-latest.ps1 -enterprise -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
+        working-directory: tag
+        env:
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+          HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }} 
+      
+      # upload logs
+      - name: Upload RC and Server logs
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: Rc-Server-logs-${{ matrix.client_tag }}-${{ matrix.server_kind }}
+          path: '${{github.workspace}}\tag\temp\rc\' # entire directory          
+
   setup_cpp_client_matrix:
     name: Setup the Cpp client test matrix
     if: ${{ github.event.inputs.run_cpp == 'run' }}
