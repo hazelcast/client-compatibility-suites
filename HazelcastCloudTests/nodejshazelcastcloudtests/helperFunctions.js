@@ -27,7 +27,6 @@ function createClientConfigWithSsl(clusterName, token, __dirname, passphrase, ur
             'hazelcast.client.cloud.url': url,
             'hazelcast.client.statistics.enabled': true,
             'hazelcast.client.statistics.period.seconds': 1,
-            'hazelcast.client.heartbeat.timeout': 10000
         }
     }
 }
@@ -45,7 +44,6 @@ function createClientConfigWithoutSsl(clusterName, token, url, smartRouting) {
             'hazelcast.client.cloud.url': url,
             'hazelcast.client.statistics.enabled': true,
             'hazelcast.client.statistics.period.seconds': 1,
-            'hazelcast.client.heartbeat.timeout': 10000
         }
     }
 }
@@ -64,26 +62,16 @@ async function mapPutGetAndVerify(map) {
     expect(await map.size()).to.be.equal(20, "Map size should be 20");
 }
 
-async function stopResumeScaleUpDownCluster(clusterId, map)
+async function stopResumeCluster(clusterId, map)
 {
     await mapPutGetAndVerify(map);
     console.log("Stopping cloud cluster");
-    await RC.stopHazelcastCloudCluster(clusterId);
+    await RC.stopCloudCluster(clusterId);
 
     console.log("Starting cloud cluster");
-    await RC.resumeHazelcastCloudCluster(clusterId);
+    await RC.resumeCloudCluster(clusterId);
     console.log("Wait for 5 seconds to be sure client has enough time to connect");
     await delay(5000);
-
-    await mapPutGetAndVerify(map);
-
-    console.log("Scaling up cloud cluster");
-    await RC.setHazelcastCloudClusterMemberCount(clusterId, 4);
-
-    await mapPutGetAndVerify(map);
-
-    console.log("Scaling down cloud cluster");
-    await  RC.setHazelcastCloudClusterMemberCount(clusterId, 2);
 
     await mapPutGetAndVerify(map);
 }
@@ -91,4 +79,4 @@ async function stopResumeScaleUpDownCluster(clusterId, map)
 exports.createClientConfigWithSsl = createClientConfigWithSsl;
 exports.createClientConfigWithoutSsl =createClientConfigWithoutSsl;
 exports.mapPutGetAndVerify = mapPutGetAndVerify;
-exports.stopResumeScaleUpDownCluster = stopResumeScaleUpDownCluster;
+exports.stopResumeCluster = stopResumeCluster;

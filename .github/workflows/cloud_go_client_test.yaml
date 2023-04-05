@@ -1,4 +1,4 @@
-name: Hazelcast cloud test with go client
+name: Cloud test with go client
 
 on:
   workflow_dispatch:
@@ -12,17 +12,17 @@ on:
         required: true
         default: master
       base_url:
-        description: Base url of the cloud env. I.e https://uat.hazelcast.cloud
+        description: Base url of the cloud env. I.e https://api.dev.viridian.hazelcast.cloud
         required: true
-        default: https://uat.hazelcast.cloud
+        default: https://api.dev.viridian.hazelcast.cloud
       hzVersion:
-        description: Version of hazelcast (For cloud standard cluster, it has different versions, i.e 5.0.2-2)
+        description: Version of hazelcast
         required: true
 
 jobs:
-  test_standard_cluster:
+  test_cloud_go:
     runs-on: ubuntu-latest
-    name: Hazelcast cloud standard cluster tests with go
+    name: Cloud tests with go
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v2
@@ -48,24 +48,13 @@ jobs:
           sed -i "s/<InputBranchName>/${{ github.event.inputs.branch_name }}/g" go.mod
           go mod tidy
 
-      - name: Start RC for UAT
-        if: ${{ github.event.inputs.base_url == 'https://uat.hazelcast.cloud' }}
+      - name: Start RC for Viridian
         env:
           BASE_URL: ${{ github.event.inputs.base_url }}
-          API_KEY: ${{ secrets.APIKEY_UAT }}
-          API_SECRET: ${{ secrets.APISECRET_UAT }}
+          API_KEY: ${{ secrets.APIKEY_VIRIDIAN }}
+          API_SECRET: ${{ secrets.APISECRET_VIRIDIAN }}
         run: |
-          python start_remote_controller.py --use-simple-server &> rc_standard_cluster.log &
-          sleep 30
-
-      - name: Start RC for PROD
-        if: ${{ github.event.inputs.base_url == 'https://cloud.hazelcast.com' }}
-        env:
-          BASE_URL: ${{ github.event.inputs.base_url }}
-          API_KEY: ${{ secrets.APIKEY_PROD }}
-          API_SECRET: ${{ secrets.APISECRET_PROD }}
-        run: |
-          python start_remote_controller.py --use-simple-server &> rc_standard_cluster.log &
+          python start_remote_controller.py --use-simple-server &> rc.log &
           sleep 30
 
       - name: Run cloud tests
@@ -80,5 +69,5 @@ jobs:
       - uses: actions/upload-artifact@v2
         if: always()
         with:
-          name: rc_standard_cluster
-          path: rc_standard_cluster.log
+          name: rc
+          path: rc.log

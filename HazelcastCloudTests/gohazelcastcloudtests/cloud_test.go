@@ -17,7 +17,7 @@ var sslDisabledCluster *it.CloudCluster
 
 func TestMain(m *testing.M) {
 	it.Rc = it.CreateDefaultRemoteController()
-	err := it.LoginToHazelcastCloudUsingEnvironment(context.Background())
+	err := it.LoginToCloudUsingEnvironment(context.Background())
 	if err != nil {
 		return
 	}
@@ -30,17 +30,17 @@ func TestMain(m *testing.M) {
 
 func setupForStandardClusterTests() error {
 	var err error
-	sslEnabledCluster, err = it.CreateHazelcastCloudStandardCluster(context.Background(), os.Getenv("HZ_VERSION"), true)
-	sslDisabledCluster, err = it.CreateHazelcastCloudStandardCluster(context.Background(), os.Getenv("HZ_VERSION"), false)
+	sslEnabledCluster, err = it.CreateCloudCluster(context.Background(), os.Getenv("HZ_VERSION"), true)
+	sslDisabledCluster, err = it.CreateCloudCluster(context.Background(), os.Getenv("HZ_VERSION"), false)
 	return err
 }
 
 func shutdownForStandardClusterTests() {
-	err := it.DeleteHazelcastCloudCluster(context.Background(), sslEnabledCluster.ID)
+	err := it.DeleteCloudCluster(context.Background(), sslEnabledCluster.ID)
 	if err != nil {
 		panic(err.Error())
 	}
-	err = it.DeleteHazelcastCloudCluster(context.Background(), sslDisabledCluster.ID)
+	err = it.DeleteCloudCluster(context.Background(), sslDisabledCluster.ID)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -52,35 +52,23 @@ func TestForSslEnabledCluster(t *testing.T) {
 		isSmartClient bool
 	}{
 		{"SmartClientWithSslCluster", true},
-		{"UniscoketClientWithSslCluster", false},
+		{"UnisocketClientWithSslCluster", false},
 	}
 
 	for _, tc := range table {
 		t.Run(tc.name, func(t *testing.T) {
 			ctx := context.Background()
-			client, _ := hazelcast.StartNewClientWithConfig(ctx, CreateClientConfigWithSsl(sslEnabledCluster.NameForConnect, sslEnabledCluster.Token, sslEnabledCluster.CertificatePath, sslEnabledCluster.TlsPassword, tc.isSmartClient))
+			client, _ := hazelcast.StartNewClientWithConfig(ctx, CreateClientConfigWithSsl(sslEnabledCluster.ReleaseName, sslEnabledCluster.Token, sslEnabledCluster.CertificatePath, sslEnabledCluster.TlsPassword, tc.isSmartClient))
 			defer client.Shutdown(ctx)
 			givenMap, _ := client.GetMap(ctx, "MapFor"+tc.name)
 			MapPutGetAndVerify(t, givenMap)
-			fmt.Println("Scaling up cluster from 2 node to 4")
-			err := it.SetHazelcastCloudClusterMemberCount(context.Background(), sslEnabledCluster.ID, 4)
-			if err != nil {
-				panic(err.Error())
-			}
-			MapPutGetAndVerify(t, givenMap)
-			fmt.Println("Scaling down cluster from 4 node to 2")
-			err = it.SetHazelcastCloudClusterMemberCount(context.Background(), sslEnabledCluster.ID, 2)
-			if err != nil {
-				panic(err.Error())
-			}
-			MapPutGetAndVerify(t, givenMap)
 			fmt.Println("Stopping cluster")
-			_, err = it.StopHazelcastCloudCluster(context.Background(), sslEnabledCluster.ID)
+			_, err := it.StopCloudCluster(context.Background(), sslEnabledCluster.ID)
 			if err != nil {
 				panic(err.Error())
 			}
 			fmt.Println("Resuming cluster")
-			_, err = it.ResumeHazelcastCloudCluster(context.Background(), sslEnabledCluster.ID)
+			_, err = it.ResumeCloudCluster(context.Background(), sslEnabledCluster.ID)
 			if err != nil {
 				panic(err.Error())
 			}
@@ -101,29 +89,17 @@ func TestForSslDisabledCluster(t *testing.T) {
 	for _, tc := range table {
 		t.Run(tc.name, func(t *testing.T) {
 			ctx := context.Background()
-			client, _ := hazelcast.StartNewClientWithConfig(ctx, CreateClientConfigWithoutSsl(sslDisabledCluster.NameForConnect, sslDisabledCluster.Token, tc.isSmartClient))
+			client, _ := hazelcast.StartNewClientWithConfig(ctx, CreateClientConfigWithoutSsl(sslDisabledCluster.ReleaseName, sslDisabledCluster.Token, tc.isSmartClient))
 			defer client.Shutdown(ctx)
 			givenMap, _ := client.GetMap(ctx, "MapFor"+tc.name)
 			MapPutGetAndVerify(t, givenMap)
-			fmt.Println("Scaling up cluster from 2 node to 4")
-			err := it.SetHazelcastCloudClusterMemberCount(context.Background(), sslDisabledCluster.ID, 4)
-			if err != nil {
-				panic(err.Error())
-			}
-			MapPutGetAndVerify(t, givenMap)
-			fmt.Println("Scaling down cluster from 4 node to 2")
-			err = it.SetHazelcastCloudClusterMemberCount(context.Background(), sslDisabledCluster.ID, 2)
-			if err != nil {
-				panic(err.Error())
-			}
-			MapPutGetAndVerify(t, givenMap)
 			fmt.Println("Stopping cluster")
-			_, err = it.StopHazelcastCloudCluster(context.Background(), sslDisabledCluster.ID)
+			_, err := it.StopCloudCluster(context.Background(), sslDisabledCluster.ID)
 			if err != nil {
 				panic(err.Error())
 			}
 			fmt.Println("Resuming cluster")
-			_, err = it.ResumeHazelcastCloudCluster(context.Background(), sslDisabledCluster.ID)
+			_, err = it.ResumeCloudCluster(context.Background(), sslDisabledCluster.ID)
 			if err != nil {
 				panic(err.Error())
 			}
@@ -145,12 +121,14 @@ func TestForSslEnabledClusterWithoutCertificates(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			ctx := context.Background()
 			config := hazelcast.NewConfig()
-			config = CreateClientConfigWithoutSsl(sslEnabledCluster.NameForConnect, sslEnabledCluster.Token, tc.isSmartClient)
+			config = CreateClientConfigWithoutSsl(sslEnabledCluster.ReleaseName, sslEnabledCluster.Token, tc.isSmartClient)
 			config.Cluster.ConnectionStrategy.Timeout = types.Duration(10 * time.Second)
-			_, err := hazelcast.StartNewClientWithConfig(ctx, config)
+			client, err := hazelcast.StartNewClientWithConfig(ctx, config)
 			value := true
 			if err != nil {
 				value = true
+			} else {
+				client.Shutdown(ctx)
 			}
 			assert.True(t, value, "Client shouldn't be able to connect ssl enabled cluster without certificates")
 		})

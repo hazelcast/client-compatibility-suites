@@ -123,17 +123,17 @@ class Iface(object):
         """
         pass
 
-    def loginToHazelcastCloudUsingEnvironment(self):
+    def loginToCloudUsingEnvironment(self):
         """
-        Reads the environment variables and calls loginToHazelcastCloud() method with these variables.
+        Reads the environment variables and calls loginToCloud() method with these variables.
         @throws CloudException
 
         """
         pass
 
-    def loginToHazelcastCloud(self, baseUrl, apiKey, apiSecret):
+    def loginToCloud(self, baseUrl, apiKey, apiSecret):
         """
-        Logins the hazelcast cloud, sets the bearer token, uri and baseUrl to HazelcastCloudManager then it will be ready to use cloud API
+        Logins to the cloud, sets the bearerToken, baseUrl variables in CloudManager to make it ready to use cloud API
         @throws CloudException
 
         @param baseUrl -> Base url of the cloud environment. i.e. https://uat.hazelcast.cloud
@@ -148,13 +148,13 @@ class Iface(object):
         """
         pass
 
-    def createHazelcastCloudStandardCluster(self, hazelcastVersion, isTlsEnabled):
+    def createCloudCluster(self, hazelcastVersion, isTlsEnabled):
         """
-        Creates a standard cluster
+        Creates a cluster
         @return CloudCluster
         @throws CloudException
 
-        @param hazelcastVersion
+        @param hazelcastVersion -> Hazelcast version
         @param isTlsEnabled -> True if ssl enabled cluster is requested, otherwise false.
 
         Parameters:
@@ -164,28 +164,13 @@ class Iface(object):
         """
         pass
 
-    def setHazelcastCloudClusterMemberCount(self, cloudClusterId, totalMemberCount):
-        """
-        Setting member count of the cluster
-        @throws CloudException
-
-        @param cloudClusterId
-        @param totalMemberCount -> Total member count of the cluster
-
-        Parameters:
-         - cloudClusterId
-         - totalMemberCount
-
-        """
-        pass
-
-    def getHazelcastCloudCluster(self, cloudClusterId):
+    def getCloudCluster(self, cloudClusterId):
         """
         Get information of the given cluster
         @return CloudCluster
         @throws CloudException
 
-        @param cloudClusterId
+        @param cloudClusterId -> Id of the cluster
 
         Parameters:
          - cloudClusterId
@@ -193,13 +178,13 @@ class Iface(object):
         """
         pass
 
-    def stopHazelcastCloudCluster(self, cloudClusterId):
+    def stopCloudCluster(self, cloudClusterId):
         """
         Stops the given cluster
         @return CloudCluster
         @throws CloudException
 
-        @param cloudClusterId
+        @param cloudClusterId -> Id of the cluster
 
         Parameters:
          - cloudClusterId
@@ -207,7 +192,7 @@ class Iface(object):
         """
         pass
 
-    def resumeHazelcastCloudCluster(self, cloudClusterId):
+    def resumeCloudCluster(self, cloudClusterId):
         """
         Resumes the given cluster
         @return CloudCluster
@@ -221,7 +206,7 @@ class Iface(object):
         """
         pass
 
-    def deleteHazelcastCloudCluster(self, cloudClusterId):
+    def deleteCloudCluster(self, cloudClusterId):
         """
         Deletes the given cluster
         @return boolean
@@ -703,23 +688,23 @@ class Client(Iface):
             return result.success
         raise TApplicationException(TApplicationException.MISSING_RESULT, "mergeMemberToCluster failed: unknown result")
 
-    def loginToHazelcastCloudUsingEnvironment(self):
+    def loginToCloudUsingEnvironment(self):
         """
-        Reads the environment variables and calls loginToHazelcastCloud() method with these variables.
+        Reads the environment variables and calls loginToCloud() method with these variables.
         @throws CloudException
 
         """
-        self.send_loginToHazelcastCloudUsingEnvironment()
-        self.recv_loginToHazelcastCloudUsingEnvironment()
+        self.send_loginToCloudUsingEnvironment()
+        self.recv_loginToCloudUsingEnvironment()
 
-    def send_loginToHazelcastCloudUsingEnvironment(self):
-        self._oprot.writeMessageBegin('loginToHazelcastCloudUsingEnvironment', TMessageType.CALL, self._seqid)
-        args = loginToHazelcastCloudUsingEnvironment_args()
+    def send_loginToCloudUsingEnvironment(self):
+        self._oprot.writeMessageBegin('loginToCloudUsingEnvironment', TMessageType.CALL, self._seqid)
+        args = loginToCloudUsingEnvironment_args()
         args.write(self._oprot)
         self._oprot.writeMessageEnd()
         self._oprot.trans.flush()
 
-    def recv_loginToHazelcastCloudUsingEnvironment(self):
+    def recv_loginToCloudUsingEnvironment(self):
         iprot = self._iprot
         (fname, mtype, rseqid) = iprot.readMessageBegin()
         if mtype == TMessageType.EXCEPTION:
@@ -727,16 +712,16 @@ class Client(Iface):
             x.read(iprot)
             iprot.readMessageEnd()
             raise x
-        result = loginToHazelcastCloudUsingEnvironment_result()
+        result = loginToCloudUsingEnvironment_result()
         result.read(iprot)
         iprot.readMessageEnd()
         if result.cloudException is not None:
             raise result.cloudException
         return
 
-    def loginToHazelcastCloud(self, baseUrl, apiKey, apiSecret):
+    def loginToCloud(self, baseUrl, apiKey, apiSecret):
         """
-        Logins the hazelcast cloud, sets the bearer token, uri and baseUrl to HazelcastCloudManager then it will be ready to use cloud API
+        Logins to the cloud, sets the bearerToken, baseUrl variables in CloudManager to make it ready to use cloud API
         @throws CloudException
 
         @param baseUrl -> Base url of the cloud environment. i.e. https://uat.hazelcast.cloud
@@ -749,12 +734,12 @@ class Client(Iface):
          - apiSecret
 
         """
-        self.send_loginToHazelcastCloud(baseUrl, apiKey, apiSecret)
-        self.recv_loginToHazelcastCloud()
+        self.send_loginToCloud(baseUrl, apiKey, apiSecret)
+        self.recv_loginToCloud()
 
-    def send_loginToHazelcastCloud(self, baseUrl, apiKey, apiSecret):
-        self._oprot.writeMessageBegin('loginToHazelcastCloud', TMessageType.CALL, self._seqid)
-        args = loginToHazelcastCloud_args()
+    def send_loginToCloud(self, baseUrl, apiKey, apiSecret):
+        self._oprot.writeMessageBegin('loginToCloud', TMessageType.CALL, self._seqid)
+        args = loginToCloud_args()
         args.baseUrl = baseUrl
         args.apiKey = apiKey
         args.apiSecret = apiSecret
@@ -762,7 +747,7 @@ class Client(Iface):
         self._oprot.writeMessageEnd()
         self._oprot.trans.flush()
 
-    def recv_loginToHazelcastCloud(self):
+    def recv_loginToCloud(self):
         iprot = self._iprot
         (fname, mtype, rseqid) = iprot.readMessageBegin()
         if mtype == TMessageType.EXCEPTION:
@@ -770,20 +755,20 @@ class Client(Iface):
             x.read(iprot)
             iprot.readMessageEnd()
             raise x
-        result = loginToHazelcastCloud_result()
+        result = loginToCloud_result()
         result.read(iprot)
         iprot.readMessageEnd()
         if result.cloudException is not None:
             raise result.cloudException
         return
 
-    def createHazelcastCloudStandardCluster(self, hazelcastVersion, isTlsEnabled):
+    def createCloudCluster(self, hazelcastVersion, isTlsEnabled):
         """
-        Creates a standard cluster
+        Creates a cluster
         @return CloudCluster
         @throws CloudException
 
-        @param hazelcastVersion
+        @param hazelcastVersion -> Hazelcast version
         @param isTlsEnabled -> True if ssl enabled cluster is requested, otherwise false.
 
         Parameters:
@@ -791,19 +776,19 @@ class Client(Iface):
          - isTlsEnabled
 
         """
-        self.send_createHazelcastCloudStandardCluster(hazelcastVersion, isTlsEnabled)
-        return self.recv_createHazelcastCloudStandardCluster()
+        self.send_createCloudCluster(hazelcastVersion, isTlsEnabled)
+        return self.recv_createCloudCluster()
 
-    def send_createHazelcastCloudStandardCluster(self, hazelcastVersion, isTlsEnabled):
-        self._oprot.writeMessageBegin('createHazelcastCloudStandardCluster', TMessageType.CALL, self._seqid)
-        args = createHazelcastCloudStandardCluster_args()
+    def send_createCloudCluster(self, hazelcastVersion, isTlsEnabled):
+        self._oprot.writeMessageBegin('createCloudCluster', TMessageType.CALL, self._seqid)
+        args = createCloudCluster_args()
         args.hazelcastVersion = hazelcastVersion
         args.isTlsEnabled = isTlsEnabled
         args.write(self._oprot)
         self._oprot.writeMessageEnd()
         self._oprot.trans.flush()
 
-    def recv_createHazelcastCloudStandardCluster(self):
+    def recv_createCloudCluster(self):
         iprot = self._iprot
         (fname, mtype, rseqid) = iprot.readMessageBegin()
         if mtype == TMessageType.EXCEPTION:
@@ -811,79 +796,39 @@ class Client(Iface):
             x.read(iprot)
             iprot.readMessageEnd()
             raise x
-        result = createHazelcastCloudStandardCluster_result()
+        result = createCloudCluster_result()
         result.read(iprot)
         iprot.readMessageEnd()
         if result.success is not None:
             return result.success
         if result.cloudException is not None:
             raise result.cloudException
-        raise TApplicationException(TApplicationException.MISSING_RESULT, "createHazelcastCloudStandardCluster failed: unknown result")
+        raise TApplicationException(TApplicationException.MISSING_RESULT, "createCloudCluster failed: unknown result")
 
-    def setHazelcastCloudClusterMemberCount(self, cloudClusterId, totalMemberCount):
-        """
-        Setting member count of the cluster
-        @throws CloudException
-
-        @param cloudClusterId
-        @param totalMemberCount -> Total member count of the cluster
-
-        Parameters:
-         - cloudClusterId
-         - totalMemberCount
-
-        """
-        self.send_setHazelcastCloudClusterMemberCount(cloudClusterId, totalMemberCount)
-        self.recv_setHazelcastCloudClusterMemberCount()
-
-    def send_setHazelcastCloudClusterMemberCount(self, cloudClusterId, totalMemberCount):
-        self._oprot.writeMessageBegin('setHazelcastCloudClusterMemberCount', TMessageType.CALL, self._seqid)
-        args = setHazelcastCloudClusterMemberCount_args()
-        args.cloudClusterId = cloudClusterId
-        args.totalMemberCount = totalMemberCount
-        args.write(self._oprot)
-        self._oprot.writeMessageEnd()
-        self._oprot.trans.flush()
-
-    def recv_setHazelcastCloudClusterMemberCount(self):
-        iprot = self._iprot
-        (fname, mtype, rseqid) = iprot.readMessageBegin()
-        if mtype == TMessageType.EXCEPTION:
-            x = TApplicationException()
-            x.read(iprot)
-            iprot.readMessageEnd()
-            raise x
-        result = setHazelcastCloudClusterMemberCount_result()
-        result.read(iprot)
-        iprot.readMessageEnd()
-        if result.cloudException is not None:
-            raise result.cloudException
-        return
-
-    def getHazelcastCloudCluster(self, cloudClusterId):
+    def getCloudCluster(self, cloudClusterId):
         """
         Get information of the given cluster
         @return CloudCluster
         @throws CloudException
 
-        @param cloudClusterId
+        @param cloudClusterId -> Id of the cluster
 
         Parameters:
          - cloudClusterId
 
         """
-        self.send_getHazelcastCloudCluster(cloudClusterId)
-        return self.recv_getHazelcastCloudCluster()
+        self.send_getCloudCluster(cloudClusterId)
+        return self.recv_getCloudCluster()
 
-    def send_getHazelcastCloudCluster(self, cloudClusterId):
-        self._oprot.writeMessageBegin('getHazelcastCloudCluster', TMessageType.CALL, self._seqid)
-        args = getHazelcastCloudCluster_args()
+    def send_getCloudCluster(self, cloudClusterId):
+        self._oprot.writeMessageBegin('getCloudCluster', TMessageType.CALL, self._seqid)
+        args = getCloudCluster_args()
         args.cloudClusterId = cloudClusterId
         args.write(self._oprot)
         self._oprot.writeMessageEnd()
         self._oprot.trans.flush()
 
-    def recv_getHazelcastCloudCluster(self):
+    def recv_getCloudCluster(self):
         iprot = self._iprot
         (fname, mtype, rseqid) = iprot.readMessageBegin()
         if mtype == TMessageType.EXCEPTION:
@@ -891,39 +836,39 @@ class Client(Iface):
             x.read(iprot)
             iprot.readMessageEnd()
             raise x
-        result = getHazelcastCloudCluster_result()
+        result = getCloudCluster_result()
         result.read(iprot)
         iprot.readMessageEnd()
         if result.success is not None:
             return result.success
         if result.cloudException is not None:
             raise result.cloudException
-        raise TApplicationException(TApplicationException.MISSING_RESULT, "getHazelcastCloudCluster failed: unknown result")
+        raise TApplicationException(TApplicationException.MISSING_RESULT, "getCloudCluster failed: unknown result")
 
-    def stopHazelcastCloudCluster(self, cloudClusterId):
+    def stopCloudCluster(self, cloudClusterId):
         """
         Stops the given cluster
         @return CloudCluster
         @throws CloudException
 
-        @param cloudClusterId
+        @param cloudClusterId -> Id of the cluster
 
         Parameters:
          - cloudClusterId
 
         """
-        self.send_stopHazelcastCloudCluster(cloudClusterId)
-        return self.recv_stopHazelcastCloudCluster()
+        self.send_stopCloudCluster(cloudClusterId)
+        return self.recv_stopCloudCluster()
 
-    def send_stopHazelcastCloudCluster(self, cloudClusterId):
-        self._oprot.writeMessageBegin('stopHazelcastCloudCluster', TMessageType.CALL, self._seqid)
-        args = stopHazelcastCloudCluster_args()
+    def send_stopCloudCluster(self, cloudClusterId):
+        self._oprot.writeMessageBegin('stopCloudCluster', TMessageType.CALL, self._seqid)
+        args = stopCloudCluster_args()
         args.cloudClusterId = cloudClusterId
         args.write(self._oprot)
         self._oprot.writeMessageEnd()
         self._oprot.trans.flush()
 
-    def recv_stopHazelcastCloudCluster(self):
+    def recv_stopCloudCluster(self):
         iprot = self._iprot
         (fname, mtype, rseqid) = iprot.readMessageBegin()
         if mtype == TMessageType.EXCEPTION:
@@ -931,16 +876,16 @@ class Client(Iface):
             x.read(iprot)
             iprot.readMessageEnd()
             raise x
-        result = stopHazelcastCloudCluster_result()
+        result = stopCloudCluster_result()
         result.read(iprot)
         iprot.readMessageEnd()
         if result.success is not None:
             return result.success
         if result.cloudException is not None:
             raise result.cloudException
-        raise TApplicationException(TApplicationException.MISSING_RESULT, "stopHazelcastCloudCluster failed: unknown result")
+        raise TApplicationException(TApplicationException.MISSING_RESULT, "stopCloudCluster failed: unknown result")
 
-    def resumeHazelcastCloudCluster(self, cloudClusterId):
+    def resumeCloudCluster(self, cloudClusterId):
         """
         Resumes the given cluster
         @return CloudCluster
@@ -952,18 +897,18 @@ class Client(Iface):
          - cloudClusterId
 
         """
-        self.send_resumeHazelcastCloudCluster(cloudClusterId)
-        return self.recv_resumeHazelcastCloudCluster()
+        self.send_resumeCloudCluster(cloudClusterId)
+        return self.recv_resumeCloudCluster()
 
-    def send_resumeHazelcastCloudCluster(self, cloudClusterId):
-        self._oprot.writeMessageBegin('resumeHazelcastCloudCluster', TMessageType.CALL, self._seqid)
-        args = resumeHazelcastCloudCluster_args()
+    def send_resumeCloudCluster(self, cloudClusterId):
+        self._oprot.writeMessageBegin('resumeCloudCluster', TMessageType.CALL, self._seqid)
+        args = resumeCloudCluster_args()
         args.cloudClusterId = cloudClusterId
         args.write(self._oprot)
         self._oprot.writeMessageEnd()
         self._oprot.trans.flush()
 
-    def recv_resumeHazelcastCloudCluster(self):
+    def recv_resumeCloudCluster(self):
         iprot = self._iprot
         (fname, mtype, rseqid) = iprot.readMessageBegin()
         if mtype == TMessageType.EXCEPTION:
@@ -971,16 +916,16 @@ class Client(Iface):
             x.read(iprot)
             iprot.readMessageEnd()
             raise x
-        result = resumeHazelcastCloudCluster_result()
+        result = resumeCloudCluster_result()
         result.read(iprot)
         iprot.readMessageEnd()
         if result.success is not None:
             return result.success
         if result.cloudException is not None:
             raise result.cloudException
-        raise TApplicationException(TApplicationException.MISSING_RESULT, "resumeHazelcastCloudCluster failed: unknown result")
+        raise TApplicationException(TApplicationException.MISSING_RESULT, "resumeCloudCluster failed: unknown result")
 
-    def deleteHazelcastCloudCluster(self, cloudClusterId):
+    def deleteCloudCluster(self, cloudClusterId):
         """
         Deletes the given cluster
         @return boolean
@@ -992,18 +937,18 @@ class Client(Iface):
          - cloudClusterId
 
         """
-        self.send_deleteHazelcastCloudCluster(cloudClusterId)
-        self.recv_deleteHazelcastCloudCluster()
+        self.send_deleteCloudCluster(cloudClusterId)
+        self.recv_deleteCloudCluster()
 
-    def send_deleteHazelcastCloudCluster(self, cloudClusterId):
-        self._oprot.writeMessageBegin('deleteHazelcastCloudCluster', TMessageType.CALL, self._seqid)
-        args = deleteHazelcastCloudCluster_args()
+    def send_deleteCloudCluster(self, cloudClusterId):
+        self._oprot.writeMessageBegin('deleteCloudCluster', TMessageType.CALL, self._seqid)
+        args = deleteCloudCluster_args()
         args.cloudClusterId = cloudClusterId
         args.write(self._oprot)
         self._oprot.writeMessageEnd()
         self._oprot.trans.flush()
 
-    def recv_deleteHazelcastCloudCluster(self):
+    def recv_deleteCloudCluster(self):
         iprot = self._iprot
         (fname, mtype, rseqid) = iprot.readMessageBegin()
         if mtype == TMessageType.EXCEPTION:
@@ -1011,7 +956,7 @@ class Client(Iface):
             x.read(iprot)
             iprot.readMessageEnd()
             raise x
-        result = deleteHazelcastCloudCluster_result()
+        result = deleteCloudCluster_result()
         result.read(iprot)
         iprot.readMessageEnd()
         if result.cloudException is not None:
@@ -1073,14 +1018,13 @@ class Processor(Iface, TProcessor):
         self._processMap["terminateCluster"] = Processor.process_terminateCluster
         self._processMap["splitMemberFromCluster"] = Processor.process_splitMemberFromCluster
         self._processMap["mergeMemberToCluster"] = Processor.process_mergeMemberToCluster
-        self._processMap["loginToHazelcastCloudUsingEnvironment"] = Processor.process_loginToHazelcastCloudUsingEnvironment
-        self._processMap["loginToHazelcastCloud"] = Processor.process_loginToHazelcastCloud
-        self._processMap["createHazelcastCloudStandardCluster"] = Processor.process_createHazelcastCloudStandardCluster
-        self._processMap["setHazelcastCloudClusterMemberCount"] = Processor.process_setHazelcastCloudClusterMemberCount
-        self._processMap["getHazelcastCloudCluster"] = Processor.process_getHazelcastCloudCluster
-        self._processMap["stopHazelcastCloudCluster"] = Processor.process_stopHazelcastCloudCluster
-        self._processMap["resumeHazelcastCloudCluster"] = Processor.process_resumeHazelcastCloudCluster
-        self._processMap["deleteHazelcastCloudCluster"] = Processor.process_deleteHazelcastCloudCluster
+        self._processMap["loginToCloudUsingEnvironment"] = Processor.process_loginToCloudUsingEnvironment
+        self._processMap["loginToCloud"] = Processor.process_loginToCloud
+        self._processMap["createCloudCluster"] = Processor.process_createCloudCluster
+        self._processMap["getCloudCluster"] = Processor.process_getCloudCluster
+        self._processMap["stopCloudCluster"] = Processor.process_stopCloudCluster
+        self._processMap["resumeCloudCluster"] = Processor.process_resumeCloudCluster
+        self._processMap["deleteCloudCluster"] = Processor.process_deleteCloudCluster
         self._processMap["executeOnController"] = Processor.process_executeOnController
         self._on_message_begin = None
 
@@ -1435,13 +1379,13 @@ class Processor(Iface, TProcessor):
         oprot.writeMessageEnd()
         oprot.trans.flush()
 
-    def process_loginToHazelcastCloudUsingEnvironment(self, seqid, iprot, oprot):
-        args = loginToHazelcastCloudUsingEnvironment_args()
+    def process_loginToCloudUsingEnvironment(self, seqid, iprot, oprot):
+        args = loginToCloudUsingEnvironment_args()
         args.read(iprot)
         iprot.readMessageEnd()
-        result = loginToHazelcastCloudUsingEnvironment_result()
+        result = loginToCloudUsingEnvironment_result()
         try:
-            self._handler.loginToHazelcastCloudUsingEnvironment()
+            self._handler.loginToCloudUsingEnvironment()
             msg_type = TMessageType.REPLY
         except TTransport.TTransportException:
             raise
@@ -1456,18 +1400,18 @@ class Processor(Iface, TProcessor):
             logging.exception('Unexpected exception in handler')
             msg_type = TMessageType.EXCEPTION
             result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
-        oprot.writeMessageBegin("loginToHazelcastCloudUsingEnvironment", msg_type, seqid)
+        oprot.writeMessageBegin("loginToCloudUsingEnvironment", msg_type, seqid)
         result.write(oprot)
         oprot.writeMessageEnd()
         oprot.trans.flush()
 
-    def process_loginToHazelcastCloud(self, seqid, iprot, oprot):
-        args = loginToHazelcastCloud_args()
+    def process_loginToCloud(self, seqid, iprot, oprot):
+        args = loginToCloud_args()
         args.read(iprot)
         iprot.readMessageEnd()
-        result = loginToHazelcastCloud_result()
+        result = loginToCloud_result()
         try:
-            self._handler.loginToHazelcastCloud(args.baseUrl, args.apiKey, args.apiSecret)
+            self._handler.loginToCloud(args.baseUrl, args.apiKey, args.apiSecret)
             msg_type = TMessageType.REPLY
         except TTransport.TTransportException:
             raise
@@ -1482,18 +1426,18 @@ class Processor(Iface, TProcessor):
             logging.exception('Unexpected exception in handler')
             msg_type = TMessageType.EXCEPTION
             result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
-        oprot.writeMessageBegin("loginToHazelcastCloud", msg_type, seqid)
+        oprot.writeMessageBegin("loginToCloud", msg_type, seqid)
         result.write(oprot)
         oprot.writeMessageEnd()
         oprot.trans.flush()
 
-    def process_createHazelcastCloudStandardCluster(self, seqid, iprot, oprot):
-        args = createHazelcastCloudStandardCluster_args()
+    def process_createCloudCluster(self, seqid, iprot, oprot):
+        args = createCloudCluster_args()
         args.read(iprot)
         iprot.readMessageEnd()
-        result = createHazelcastCloudStandardCluster_result()
+        result = createCloudCluster_result()
         try:
-            result.success = self._handler.createHazelcastCloudStandardCluster(args.hazelcastVersion, args.isTlsEnabled)
+            result.success = self._handler.createCloudCluster(args.hazelcastVersion, args.isTlsEnabled)
             msg_type = TMessageType.REPLY
         except TTransport.TTransportException:
             raise
@@ -1508,18 +1452,18 @@ class Processor(Iface, TProcessor):
             logging.exception('Unexpected exception in handler')
             msg_type = TMessageType.EXCEPTION
             result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
-        oprot.writeMessageBegin("createHazelcastCloudStandardCluster", msg_type, seqid)
+        oprot.writeMessageBegin("createCloudCluster", msg_type, seqid)
         result.write(oprot)
         oprot.writeMessageEnd()
         oprot.trans.flush()
 
-    def process_setHazelcastCloudClusterMemberCount(self, seqid, iprot, oprot):
-        args = setHazelcastCloudClusterMemberCount_args()
+    def process_getCloudCluster(self, seqid, iprot, oprot):
+        args = getCloudCluster_args()
         args.read(iprot)
         iprot.readMessageEnd()
-        result = setHazelcastCloudClusterMemberCount_result()
+        result = getCloudCluster_result()
         try:
-            self._handler.setHazelcastCloudClusterMemberCount(args.cloudClusterId, args.totalMemberCount)
+            result.success = self._handler.getCloudCluster(args.cloudClusterId)
             msg_type = TMessageType.REPLY
         except TTransport.TTransportException:
             raise
@@ -1534,18 +1478,18 @@ class Processor(Iface, TProcessor):
             logging.exception('Unexpected exception in handler')
             msg_type = TMessageType.EXCEPTION
             result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
-        oprot.writeMessageBegin("setHazelcastCloudClusterMemberCount", msg_type, seqid)
+        oprot.writeMessageBegin("getCloudCluster", msg_type, seqid)
         result.write(oprot)
         oprot.writeMessageEnd()
         oprot.trans.flush()
 
-    def process_getHazelcastCloudCluster(self, seqid, iprot, oprot):
-        args = getHazelcastCloudCluster_args()
+    def process_stopCloudCluster(self, seqid, iprot, oprot):
+        args = stopCloudCluster_args()
         args.read(iprot)
         iprot.readMessageEnd()
-        result = getHazelcastCloudCluster_result()
+        result = stopCloudCluster_result()
         try:
-            result.success = self._handler.getHazelcastCloudCluster(args.cloudClusterId)
+            result.success = self._handler.stopCloudCluster(args.cloudClusterId)
             msg_type = TMessageType.REPLY
         except TTransport.TTransportException:
             raise
@@ -1560,18 +1504,18 @@ class Processor(Iface, TProcessor):
             logging.exception('Unexpected exception in handler')
             msg_type = TMessageType.EXCEPTION
             result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
-        oprot.writeMessageBegin("getHazelcastCloudCluster", msg_type, seqid)
+        oprot.writeMessageBegin("stopCloudCluster", msg_type, seqid)
         result.write(oprot)
         oprot.writeMessageEnd()
         oprot.trans.flush()
 
-    def process_stopHazelcastCloudCluster(self, seqid, iprot, oprot):
-        args = stopHazelcastCloudCluster_args()
+    def process_resumeCloudCluster(self, seqid, iprot, oprot):
+        args = resumeCloudCluster_args()
         args.read(iprot)
         iprot.readMessageEnd()
-        result = stopHazelcastCloudCluster_result()
+        result = resumeCloudCluster_result()
         try:
-            result.success = self._handler.stopHazelcastCloudCluster(args.cloudClusterId)
+            result.success = self._handler.resumeCloudCluster(args.cloudClusterId)
             msg_type = TMessageType.REPLY
         except TTransport.TTransportException:
             raise
@@ -1586,18 +1530,18 @@ class Processor(Iface, TProcessor):
             logging.exception('Unexpected exception in handler')
             msg_type = TMessageType.EXCEPTION
             result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
-        oprot.writeMessageBegin("stopHazelcastCloudCluster", msg_type, seqid)
+        oprot.writeMessageBegin("resumeCloudCluster", msg_type, seqid)
         result.write(oprot)
         oprot.writeMessageEnd()
         oprot.trans.flush()
 
-    def process_resumeHazelcastCloudCluster(self, seqid, iprot, oprot):
-        args = resumeHazelcastCloudCluster_args()
+    def process_deleteCloudCluster(self, seqid, iprot, oprot):
+        args = deleteCloudCluster_args()
         args.read(iprot)
         iprot.readMessageEnd()
-        result = resumeHazelcastCloudCluster_result()
+        result = deleteCloudCluster_result()
         try:
-            result.success = self._handler.resumeHazelcastCloudCluster(args.cloudClusterId)
+            self._handler.deleteCloudCluster(args.cloudClusterId)
             msg_type = TMessageType.REPLY
         except TTransport.TTransportException:
             raise
@@ -1612,33 +1556,7 @@ class Processor(Iface, TProcessor):
             logging.exception('Unexpected exception in handler')
             msg_type = TMessageType.EXCEPTION
             result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
-        oprot.writeMessageBegin("resumeHazelcastCloudCluster", msg_type, seqid)
-        result.write(oprot)
-        oprot.writeMessageEnd()
-        oprot.trans.flush()
-
-    def process_deleteHazelcastCloudCluster(self, seqid, iprot, oprot):
-        args = deleteHazelcastCloudCluster_args()
-        args.read(iprot)
-        iprot.readMessageEnd()
-        result = deleteHazelcastCloudCluster_result()
-        try:
-            self._handler.deleteHazelcastCloudCluster(args.cloudClusterId)
-            msg_type = TMessageType.REPLY
-        except TTransport.TTransportException:
-            raise
-        except CloudException as cloudException:
-            msg_type = TMessageType.REPLY
-            result.cloudException = cloudException
-        except TApplicationException as ex:
-            logging.exception('TApplication exception in handler')
-            msg_type = TMessageType.EXCEPTION
-            result = ex
-        except Exception:
-            logging.exception('Unexpected exception in handler')
-            msg_type = TMessageType.EXCEPTION
-            result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
-        oprot.writeMessageBegin("deleteHazelcastCloudCluster", msg_type, seqid)
+        oprot.writeMessageBegin("deleteCloudCluster", msg_type, seqid)
         result.write(oprot)
         oprot.writeMessageEnd()
         oprot.trans.flush()
@@ -3459,7 +3377,7 @@ mergeMemberToCluster_result.thrift_spec = (
 )
 
 
-class loginToHazelcastCloudUsingEnvironment_args(object):
+class loginToCloudUsingEnvironment_args(object):
 
 
     def read(self, iprot):
@@ -3480,7 +3398,7 @@ class loginToHazelcastCloudUsingEnvironment_args(object):
         if oprot._fast_encode is not None and self.thrift_spec is not None:
             oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
             return
-        oprot.writeStructBegin('loginToHazelcastCloudUsingEnvironment_args')
+        oprot.writeStructBegin('loginToCloudUsingEnvironment_args')
         oprot.writeFieldStop()
         oprot.writeStructEnd()
 
@@ -3497,12 +3415,12 @@ class loginToHazelcastCloudUsingEnvironment_args(object):
 
     def __ne__(self, other):
         return not (self == other)
-all_structs.append(loginToHazelcastCloudUsingEnvironment_args)
-loginToHazelcastCloudUsingEnvironment_args.thrift_spec = (
+all_structs.append(loginToCloudUsingEnvironment_args)
+loginToCloudUsingEnvironment_args.thrift_spec = (
 )
 
 
-class loginToHazelcastCloudUsingEnvironment_result(object):
+class loginToCloudUsingEnvironment_result(object):
     """
     Attributes:
      - cloudException
@@ -3536,7 +3454,7 @@ class loginToHazelcastCloudUsingEnvironment_result(object):
         if oprot._fast_encode is not None and self.thrift_spec is not None:
             oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
             return
-        oprot.writeStructBegin('loginToHazelcastCloudUsingEnvironment_result')
+        oprot.writeStructBegin('loginToCloudUsingEnvironment_result')
         if self.cloudException is not None:
             oprot.writeFieldBegin('cloudException', TType.STRUCT, 1)
             self.cloudException.write(oprot)
@@ -3557,14 +3475,14 @@ class loginToHazelcastCloudUsingEnvironment_result(object):
 
     def __ne__(self, other):
         return not (self == other)
-all_structs.append(loginToHazelcastCloudUsingEnvironment_result)
-loginToHazelcastCloudUsingEnvironment_result.thrift_spec = (
+all_structs.append(loginToCloudUsingEnvironment_result)
+loginToCloudUsingEnvironment_result.thrift_spec = (
     None,  # 0
     (1, TType.STRUCT, 'cloudException', [CloudException, None], None, ),  # 1
 )
 
 
-class loginToHazelcastCloud_args(object):
+class loginToCloud_args(object):
     """
     Attributes:
      - baseUrl
@@ -3612,7 +3530,7 @@ class loginToHazelcastCloud_args(object):
         if oprot._fast_encode is not None and self.thrift_spec is not None:
             oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
             return
-        oprot.writeStructBegin('loginToHazelcastCloud_args')
+        oprot.writeStructBegin('loginToCloud_args')
         if self.baseUrl is not None:
             oprot.writeFieldBegin('baseUrl', TType.STRING, 1)
             oprot.writeString(self.baseUrl.encode('utf-8') if sys.version_info[0] == 2 else self.baseUrl)
@@ -3641,8 +3559,8 @@ class loginToHazelcastCloud_args(object):
 
     def __ne__(self, other):
         return not (self == other)
-all_structs.append(loginToHazelcastCloud_args)
-loginToHazelcastCloud_args.thrift_spec = (
+all_structs.append(loginToCloud_args)
+loginToCloud_args.thrift_spec = (
     None,  # 0
     (1, TType.STRING, 'baseUrl', 'UTF8', None, ),  # 1
     (2, TType.STRING, 'apiKey', 'UTF8', None, ),  # 2
@@ -3650,7 +3568,7 @@ loginToHazelcastCloud_args.thrift_spec = (
 )
 
 
-class loginToHazelcastCloud_result(object):
+class loginToCloud_result(object):
     """
     Attributes:
      - cloudException
@@ -3684,7 +3602,7 @@ class loginToHazelcastCloud_result(object):
         if oprot._fast_encode is not None and self.thrift_spec is not None:
             oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
             return
-        oprot.writeStructBegin('loginToHazelcastCloud_result')
+        oprot.writeStructBegin('loginToCloud_result')
         if self.cloudException is not None:
             oprot.writeFieldBegin('cloudException', TType.STRUCT, 1)
             self.cloudException.write(oprot)
@@ -3705,14 +3623,14 @@ class loginToHazelcastCloud_result(object):
 
     def __ne__(self, other):
         return not (self == other)
-all_structs.append(loginToHazelcastCloud_result)
-loginToHazelcastCloud_result.thrift_spec = (
+all_structs.append(loginToCloud_result)
+loginToCloud_result.thrift_spec = (
     None,  # 0
     (1, TType.STRUCT, 'cloudException', [CloudException, None], None, ),  # 1
 )
 
 
-class createHazelcastCloudStandardCluster_args(object):
+class createCloudCluster_args(object):
     """
     Attributes:
      - hazelcastVersion
@@ -3753,7 +3671,7 @@ class createHazelcastCloudStandardCluster_args(object):
         if oprot._fast_encode is not None and self.thrift_spec is not None:
             oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
             return
-        oprot.writeStructBegin('createHazelcastCloudStandardCluster_args')
+        oprot.writeStructBegin('createCloudCluster_args')
         if self.hazelcastVersion is not None:
             oprot.writeFieldBegin('hazelcastVersion', TType.STRING, 1)
             oprot.writeString(self.hazelcastVersion.encode('utf-8') if sys.version_info[0] == 2 else self.hazelcastVersion)
@@ -3778,15 +3696,15 @@ class createHazelcastCloudStandardCluster_args(object):
 
     def __ne__(self, other):
         return not (self == other)
-all_structs.append(createHazelcastCloudStandardCluster_args)
-createHazelcastCloudStandardCluster_args.thrift_spec = (
+all_structs.append(createCloudCluster_args)
+createCloudCluster_args.thrift_spec = (
     None,  # 0
     (1, TType.STRING, 'hazelcastVersion', 'UTF8', None, ),  # 1
     (2, TType.BOOL, 'isTlsEnabled', None, None, ),  # 2
 )
 
 
-class createHazelcastCloudStandardCluster_result(object):
+class createCloudCluster_result(object):
     """
     Attributes:
      - success
@@ -3828,7 +3746,7 @@ class createHazelcastCloudStandardCluster_result(object):
         if oprot._fast_encode is not None and self.thrift_spec is not None:
             oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
             return
-        oprot.writeStructBegin('createHazelcastCloudStandardCluster_result')
+        oprot.writeStructBegin('createCloudCluster_result')
         if self.success is not None:
             oprot.writeFieldBegin('success', TType.STRUCT, 0)
             self.success.write(oprot)
@@ -3853,25 +3771,23 @@ class createHazelcastCloudStandardCluster_result(object):
 
     def __ne__(self, other):
         return not (self == other)
-all_structs.append(createHazelcastCloudStandardCluster_result)
-createHazelcastCloudStandardCluster_result.thrift_spec = (
+all_structs.append(createCloudCluster_result)
+createCloudCluster_result.thrift_spec = (
     (0, TType.STRUCT, 'success', [CloudCluster, None], None, ),  # 0
     (1, TType.STRUCT, 'cloudException', [CloudException, None], None, ),  # 1
 )
 
 
-class setHazelcastCloudClusterMemberCount_args(object):
+class getCloudCluster_args(object):
     """
     Attributes:
      - cloudClusterId
-     - totalMemberCount
 
     """
 
 
-    def __init__(self, cloudClusterId=None, totalMemberCount=None,):
+    def __init__(self, cloudClusterId=None,):
         self.cloudClusterId = cloudClusterId
-        self.totalMemberCount = totalMemberCount
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -3887,11 +3803,6 @@ class setHazelcastCloudClusterMemberCount_args(object):
                     self.cloudClusterId = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                 else:
                     iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.I32:
-                    self.totalMemberCount = iprot.readI32()
-                else:
-                    iprot.skip(ftype)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -3901,14 +3812,10 @@ class setHazelcastCloudClusterMemberCount_args(object):
         if oprot._fast_encode is not None and self.thrift_spec is not None:
             oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
             return
-        oprot.writeStructBegin('setHazelcastCloudClusterMemberCount_args')
+        oprot.writeStructBegin('getCloudCluster_args')
         if self.cloudClusterId is not None:
             oprot.writeFieldBegin('cloudClusterId', TType.STRING, 1)
             oprot.writeString(self.cloudClusterId.encode('utf-8') if sys.version_info[0] == 2 else self.cloudClusterId)
-            oprot.writeFieldEnd()
-        if self.totalMemberCount is not None:
-            oprot.writeFieldBegin('totalMemberCount', TType.I32, 2)
-            oprot.writeI32(self.totalMemberCount)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -3926,15 +3833,422 @@ class setHazelcastCloudClusterMemberCount_args(object):
 
     def __ne__(self, other):
         return not (self == other)
-all_structs.append(setHazelcastCloudClusterMemberCount_args)
-setHazelcastCloudClusterMemberCount_args.thrift_spec = (
+all_structs.append(getCloudCluster_args)
+getCloudCluster_args.thrift_spec = (
     None,  # 0
     (1, TType.STRING, 'cloudClusterId', 'UTF8', None, ),  # 1
-    (2, TType.I32, 'totalMemberCount', None, None, ),  # 2
 )
 
 
-class setHazelcastCloudClusterMemberCount_result(object):
+class getCloudCluster_result(object):
+    """
+    Attributes:
+     - success
+     - cloudException
+
+    """
+
+
+    def __init__(self, success=None, cloudException=None,):
+        self.success = success
+        self.cloudException = cloudException
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 0:
+                if ftype == TType.STRUCT:
+                    self.success = CloudCluster()
+                    self.success.read(iprot)
+                else:
+                    iprot.skip(ftype)
+            elif fid == 1:
+                if ftype == TType.STRUCT:
+                    self.cloudException = CloudException.read(iprot)
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('getCloudCluster_result')
+        if self.success is not None:
+            oprot.writeFieldBegin('success', TType.STRUCT, 0)
+            self.success.write(oprot)
+            oprot.writeFieldEnd()
+        if self.cloudException is not None:
+            oprot.writeFieldBegin('cloudException', TType.STRUCT, 1)
+            self.cloudException.write(oprot)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+all_structs.append(getCloudCluster_result)
+getCloudCluster_result.thrift_spec = (
+    (0, TType.STRUCT, 'success', [CloudCluster, None], None, ),  # 0
+    (1, TType.STRUCT, 'cloudException', [CloudException, None], None, ),  # 1
+)
+
+
+class stopCloudCluster_args(object):
+    """
+    Attributes:
+     - cloudClusterId
+
+    """
+
+
+    def __init__(self, cloudClusterId=None,):
+        self.cloudClusterId = cloudClusterId
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 1:
+                if ftype == TType.STRING:
+                    self.cloudClusterId = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('stopCloudCluster_args')
+        if self.cloudClusterId is not None:
+            oprot.writeFieldBegin('cloudClusterId', TType.STRING, 1)
+            oprot.writeString(self.cloudClusterId.encode('utf-8') if sys.version_info[0] == 2 else self.cloudClusterId)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+all_structs.append(stopCloudCluster_args)
+stopCloudCluster_args.thrift_spec = (
+    None,  # 0
+    (1, TType.STRING, 'cloudClusterId', 'UTF8', None, ),  # 1
+)
+
+
+class stopCloudCluster_result(object):
+    """
+    Attributes:
+     - success
+     - cloudException
+
+    """
+
+
+    def __init__(self, success=None, cloudException=None,):
+        self.success = success
+        self.cloudException = cloudException
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 0:
+                if ftype == TType.STRUCT:
+                    self.success = CloudCluster()
+                    self.success.read(iprot)
+                else:
+                    iprot.skip(ftype)
+            elif fid == 1:
+                if ftype == TType.STRUCT:
+                    self.cloudException = CloudException.read(iprot)
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('stopCloudCluster_result')
+        if self.success is not None:
+            oprot.writeFieldBegin('success', TType.STRUCT, 0)
+            self.success.write(oprot)
+            oprot.writeFieldEnd()
+        if self.cloudException is not None:
+            oprot.writeFieldBegin('cloudException', TType.STRUCT, 1)
+            self.cloudException.write(oprot)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+all_structs.append(stopCloudCluster_result)
+stopCloudCluster_result.thrift_spec = (
+    (0, TType.STRUCT, 'success', [CloudCluster, None], None, ),  # 0
+    (1, TType.STRUCT, 'cloudException', [CloudException, None], None, ),  # 1
+)
+
+
+class resumeCloudCluster_args(object):
+    """
+    Attributes:
+     - cloudClusterId
+
+    """
+
+
+    def __init__(self, cloudClusterId=None,):
+        self.cloudClusterId = cloudClusterId
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 1:
+                if ftype == TType.STRING:
+                    self.cloudClusterId = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('resumeCloudCluster_args')
+        if self.cloudClusterId is not None:
+            oprot.writeFieldBegin('cloudClusterId', TType.STRING, 1)
+            oprot.writeString(self.cloudClusterId.encode('utf-8') if sys.version_info[0] == 2 else self.cloudClusterId)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+all_structs.append(resumeCloudCluster_args)
+resumeCloudCluster_args.thrift_spec = (
+    None,  # 0
+    (1, TType.STRING, 'cloudClusterId', 'UTF8', None, ),  # 1
+)
+
+
+class resumeCloudCluster_result(object):
+    """
+    Attributes:
+     - success
+     - cloudException
+
+    """
+
+
+    def __init__(self, success=None, cloudException=None,):
+        self.success = success
+        self.cloudException = cloudException
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 0:
+                if ftype == TType.STRUCT:
+                    self.success = CloudCluster()
+                    self.success.read(iprot)
+                else:
+                    iprot.skip(ftype)
+            elif fid == 1:
+                if ftype == TType.STRUCT:
+                    self.cloudException = CloudException.read(iprot)
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('resumeCloudCluster_result')
+        if self.success is not None:
+            oprot.writeFieldBegin('success', TType.STRUCT, 0)
+            self.success.write(oprot)
+            oprot.writeFieldEnd()
+        if self.cloudException is not None:
+            oprot.writeFieldBegin('cloudException', TType.STRUCT, 1)
+            self.cloudException.write(oprot)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+all_structs.append(resumeCloudCluster_result)
+resumeCloudCluster_result.thrift_spec = (
+    (0, TType.STRUCT, 'success', [CloudCluster, None], None, ),  # 0
+    (1, TType.STRUCT, 'cloudException', [CloudException, None], None, ),  # 1
+)
+
+
+class deleteCloudCluster_args(object):
+    """
+    Attributes:
+     - cloudClusterId
+
+    """
+
+
+    def __init__(self, cloudClusterId=None,):
+        self.cloudClusterId = cloudClusterId
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 1:
+                if ftype == TType.STRING:
+                    self.cloudClusterId = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('deleteCloudCluster_args')
+        if self.cloudClusterId is not None:
+            oprot.writeFieldBegin('cloudClusterId', TType.STRING, 1)
+            oprot.writeString(self.cloudClusterId.encode('utf-8') if sys.version_info[0] == 2 else self.cloudClusterId)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+all_structs.append(deleteCloudCluster_args)
+deleteCloudCluster_args.thrift_spec = (
+    None,  # 0
+    (1, TType.STRING, 'cloudClusterId', 'UTF8', None, ),  # 1
+)
+
+
+class deleteCloudCluster_result(object):
     """
     Attributes:
      - cloudException
@@ -3968,7 +4282,7 @@ class setHazelcastCloudClusterMemberCount_result(object):
         if oprot._fast_encode is not None and self.thrift_spec is not None:
             oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
             return
-        oprot.writeStructBegin('setHazelcastCloudClusterMemberCount_result')
+        oprot.writeStructBegin('deleteCloudCluster_result')
         if self.cloudException is not None:
             oprot.writeFieldBegin('cloudException', TType.STRUCT, 1)
             self.cloudException.write(oprot)
@@ -3989,540 +4303,8 @@ class setHazelcastCloudClusterMemberCount_result(object):
 
     def __ne__(self, other):
         return not (self == other)
-all_structs.append(setHazelcastCloudClusterMemberCount_result)
-setHazelcastCloudClusterMemberCount_result.thrift_spec = (
-    None,  # 0
-    (1, TType.STRUCT, 'cloudException', [CloudException, None], None, ),  # 1
-)
-
-
-class getHazelcastCloudCluster_args(object):
-    """
-    Attributes:
-     - cloudClusterId
-
-    """
-
-
-    def __init__(self, cloudClusterId=None,):
-        self.cloudClusterId = cloudClusterId
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.STRING:
-                    self.cloudClusterId = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('getHazelcastCloudCluster_args')
-        if self.cloudClusterId is not None:
-            oprot.writeFieldBegin('cloudClusterId', TType.STRING, 1)
-            oprot.writeString(self.cloudClusterId.encode('utf-8') if sys.version_info[0] == 2 else self.cloudClusterId)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-all_structs.append(getHazelcastCloudCluster_args)
-getHazelcastCloudCluster_args.thrift_spec = (
-    None,  # 0
-    (1, TType.STRING, 'cloudClusterId', 'UTF8', None, ),  # 1
-)
-
-
-class getHazelcastCloudCluster_result(object):
-    """
-    Attributes:
-     - success
-     - cloudException
-
-    """
-
-
-    def __init__(self, success=None, cloudException=None,):
-        self.success = success
-        self.cloudException = cloudException
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 0:
-                if ftype == TType.STRUCT:
-                    self.success = CloudCluster()
-                    self.success.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 1:
-                if ftype == TType.STRUCT:
-                    self.cloudException = CloudException.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('getHazelcastCloudCluster_result')
-        if self.success is not None:
-            oprot.writeFieldBegin('success', TType.STRUCT, 0)
-            self.success.write(oprot)
-            oprot.writeFieldEnd()
-        if self.cloudException is not None:
-            oprot.writeFieldBegin('cloudException', TType.STRUCT, 1)
-            self.cloudException.write(oprot)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-all_structs.append(getHazelcastCloudCluster_result)
-getHazelcastCloudCluster_result.thrift_spec = (
-    (0, TType.STRUCT, 'success', [CloudCluster, None], None, ),  # 0
-    (1, TType.STRUCT, 'cloudException', [CloudException, None], None, ),  # 1
-)
-
-
-class stopHazelcastCloudCluster_args(object):
-    """
-    Attributes:
-     - cloudClusterId
-
-    """
-
-
-    def __init__(self, cloudClusterId=None,):
-        self.cloudClusterId = cloudClusterId
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.STRING:
-                    self.cloudClusterId = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('stopHazelcastCloudCluster_args')
-        if self.cloudClusterId is not None:
-            oprot.writeFieldBegin('cloudClusterId', TType.STRING, 1)
-            oprot.writeString(self.cloudClusterId.encode('utf-8') if sys.version_info[0] == 2 else self.cloudClusterId)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-all_structs.append(stopHazelcastCloudCluster_args)
-stopHazelcastCloudCluster_args.thrift_spec = (
-    None,  # 0
-    (1, TType.STRING, 'cloudClusterId', 'UTF8', None, ),  # 1
-)
-
-
-class stopHazelcastCloudCluster_result(object):
-    """
-    Attributes:
-     - success
-     - cloudException
-
-    """
-
-
-    def __init__(self, success=None, cloudException=None,):
-        self.success = success
-        self.cloudException = cloudException
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 0:
-                if ftype == TType.STRUCT:
-                    self.success = CloudCluster()
-                    self.success.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 1:
-                if ftype == TType.STRUCT:
-                    self.cloudException = CloudException.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('stopHazelcastCloudCluster_result')
-        if self.success is not None:
-            oprot.writeFieldBegin('success', TType.STRUCT, 0)
-            self.success.write(oprot)
-            oprot.writeFieldEnd()
-        if self.cloudException is not None:
-            oprot.writeFieldBegin('cloudException', TType.STRUCT, 1)
-            self.cloudException.write(oprot)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-all_structs.append(stopHazelcastCloudCluster_result)
-stopHazelcastCloudCluster_result.thrift_spec = (
-    (0, TType.STRUCT, 'success', [CloudCluster, None], None, ),  # 0
-    (1, TType.STRUCT, 'cloudException', [CloudException, None], None, ),  # 1
-)
-
-
-class resumeHazelcastCloudCluster_args(object):
-    """
-    Attributes:
-     - cloudClusterId
-
-    """
-
-
-    def __init__(self, cloudClusterId=None,):
-        self.cloudClusterId = cloudClusterId
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.STRING:
-                    self.cloudClusterId = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('resumeHazelcastCloudCluster_args')
-        if self.cloudClusterId is not None:
-            oprot.writeFieldBegin('cloudClusterId', TType.STRING, 1)
-            oprot.writeString(self.cloudClusterId.encode('utf-8') if sys.version_info[0] == 2 else self.cloudClusterId)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-all_structs.append(resumeHazelcastCloudCluster_args)
-resumeHazelcastCloudCluster_args.thrift_spec = (
-    None,  # 0
-    (1, TType.STRING, 'cloudClusterId', 'UTF8', None, ),  # 1
-)
-
-
-class resumeHazelcastCloudCluster_result(object):
-    """
-    Attributes:
-     - success
-     - cloudException
-
-    """
-
-
-    def __init__(self, success=None, cloudException=None,):
-        self.success = success
-        self.cloudException = cloudException
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 0:
-                if ftype == TType.STRUCT:
-                    self.success = CloudCluster()
-                    self.success.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 1:
-                if ftype == TType.STRUCT:
-                    self.cloudException = CloudException.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('resumeHazelcastCloudCluster_result')
-        if self.success is not None:
-            oprot.writeFieldBegin('success', TType.STRUCT, 0)
-            self.success.write(oprot)
-            oprot.writeFieldEnd()
-        if self.cloudException is not None:
-            oprot.writeFieldBegin('cloudException', TType.STRUCT, 1)
-            self.cloudException.write(oprot)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-all_structs.append(resumeHazelcastCloudCluster_result)
-resumeHazelcastCloudCluster_result.thrift_spec = (
-    (0, TType.STRUCT, 'success', [CloudCluster, None], None, ),  # 0
-    (1, TType.STRUCT, 'cloudException', [CloudException, None], None, ),  # 1
-)
-
-
-class deleteHazelcastCloudCluster_args(object):
-    """
-    Attributes:
-     - cloudClusterId
-
-    """
-
-
-    def __init__(self, cloudClusterId=None,):
-        self.cloudClusterId = cloudClusterId
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.STRING:
-                    self.cloudClusterId = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('deleteHazelcastCloudCluster_args')
-        if self.cloudClusterId is not None:
-            oprot.writeFieldBegin('cloudClusterId', TType.STRING, 1)
-            oprot.writeString(self.cloudClusterId.encode('utf-8') if sys.version_info[0] == 2 else self.cloudClusterId)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-all_structs.append(deleteHazelcastCloudCluster_args)
-deleteHazelcastCloudCluster_args.thrift_spec = (
-    None,  # 0
-    (1, TType.STRING, 'cloudClusterId', 'UTF8', None, ),  # 1
-)
-
-
-class deleteHazelcastCloudCluster_result(object):
-    """
-    Attributes:
-     - cloudException
-
-    """
-
-
-    def __init__(self, cloudException=None,):
-        self.cloudException = cloudException
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.cloudException = CloudException.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('deleteHazelcastCloudCluster_result')
-        if self.cloudException is not None:
-            oprot.writeFieldBegin('cloudException', TType.STRUCT, 1)
-            self.cloudException.write(oprot)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-all_structs.append(deleteHazelcastCloudCluster_result)
-deleteHazelcastCloudCluster_result.thrift_spec = (
+all_structs.append(deleteCloudCluster_result)
+deleteCloudCluster_result.thrift_spec = (
     None,  # 0
     (1, TType.STRUCT, 'cloudException', [CloudException, None], None, ),  # 1
 )

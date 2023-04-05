@@ -118,34 +118,30 @@ type TestCluster struct {
 
 // Cloud APIs
 
-func LoginToHazelcastCloudUsingEnvironment(ctx context.Context) error {
-	return Rc.LoginToHazelcastCloudUsingEnvironment(ctx)
+func LoginToCloudUsingEnvironment(ctx context.Context) error {
+	return Rc.LoginToCloudUsingEnvironment(ctx)
 }
 
-func LoginToHazelcastCloud(ctx context.Context, uri string, apiKey string, apiSecret string) error {
-	return Rc.LoginToHazelcastCloud(ctx, uri, apiKey, apiSecret)
+func LoginToCloud(ctx context.Context, uri string, apiKey string, apiSecret string) error {
+	return Rc.LoginToCloud(ctx, uri, apiKey, apiSecret)
 }
 
-func CreateHazelcastCloudStandardCluster(ctx context.Context, hzVersion string, isTlsEnabled bool) (*CloudCluster, error) {
-	return Rc.CreateHazelcastCloudStandardCluster(ctx, hzVersion, isTlsEnabled)
+func CreateCloudCluster(ctx context.Context, hzVersion string, isTlsEnabled bool) (*CloudCluster, error) {
+	return Rc.CreateCloudCluster(ctx, hzVersion, isTlsEnabled)
 }
 
-func GetHazelcastCloudCluster(ctx context.Context, clusterID string) (*CloudCluster, error) {
-	return Rc.GetHazelcastCloudCluster(ctx, clusterID)
+func GetCloudCluster(ctx context.Context, clusterID string) (*CloudCluster, error) {
+	return Rc.GetCloudCluster(ctx, clusterID)
 }
 
-func SetHazelcastCloudClusterMemberCount(ctx context.Context, clusterID string, totalMemberCount int32) error {
-	return Rc.SetHazelcastCloudClusterMemberCount(ctx, clusterID, totalMemberCount)
+func StopCloudCluster(ctx context.Context, clusterID string) (*CloudCluster, error) {
+	return Rc.StopCloudCluster(ctx, clusterID)
 }
 
-func StopHazelcastCloudCluster(ctx context.Context, clusterID string) (*CloudCluster, error) {
-	return Rc.StopHazelcastCloudCluster(ctx, clusterID)
+func ResumeCloudCluster(ctx context.Context, clusterID string) (*CloudCluster, error) {
+	return Rc.ResumeCloudCluster(ctx, clusterID)
 }
 
-func ResumeHazelcastCloudCluster(ctx context.Context, clusterID string) (*CloudCluster, error) {
-	return Rc.ResumeHazelcastCloudCluster(ctx, clusterID)
-}
-
-func DeleteHazelcastCloudCluster(ctx context.Context, clusterID string) error {
-	return Rc.DeleteHazelcastCloudCluster(ctx, clusterID)
+func DeleteCloudCluster(ctx context.Context, clusterID string) error {
+	return Rc.DeleteCloudCluster(ctx, clusterID)
 }

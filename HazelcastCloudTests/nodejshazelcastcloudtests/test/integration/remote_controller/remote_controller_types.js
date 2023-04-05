@@ -55,12 +55,12 @@ Cluster.prototype.read = function(input) {
     }
     switch (fid) {
       case 1:
-        if (ftype == Thrift.Type.STRING) {
-          this.id = input.readString();
-        } else {
-          input.skip(ftype);
-        }
-        break;
+      if (ftype == Thrift.Type.STRING) {
+        this.id = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       case 0:
         input.skip(ftype);
         break;
@@ -88,7 +88,7 @@ Cluster.prototype.write = function(output) {
 var CloudCluster = module.exports.CloudCluster = function(args) {
   this.id = null;
   this.name = null;
-  this.nameForConnect = null;
+  this.releaseName = null;
   this.hazelcastVersion = null;
   this.isTlsEnabled = null;
   this.state = null;
@@ -102,8 +102,8 @@ var CloudCluster = module.exports.CloudCluster = function(args) {
     if (args.name !== undefined && args.name !== null) {
       this.name = args.name;
     }
-    if (args.nameForConnect !== undefined && args.nameForConnect !== null) {
-      this.nameForConnect = args.nameForConnect;
+    if (args.releaseName !== undefined && args.releaseName !== null) {
+      this.releaseName = args.releaseName;
     }
     if (args.hazelcastVersion !== undefined && args.hazelcastVersion !== null) {
       this.hazelcastVersion = args.hazelcastVersion;
@@ -137,68 +137,68 @@ CloudCluster.prototype.read = function(input) {
     }
     switch (fid) {
       case 1:
-        if (ftype == Thrift.Type.STRING) {
-          this.id = input.readString();
-        } else {
-          input.skip(ftype);
-        }
-        break;
+      if (ftype == Thrift.Type.STRING) {
+        this.id = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       case 2:
-        if (ftype == Thrift.Type.STRING) {
-          this.name = input.readString();
-        } else {
-          input.skip(ftype);
-        }
-        break;
+      if (ftype == Thrift.Type.STRING) {
+        this.name = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       case 3:
-        if (ftype == Thrift.Type.STRING) {
-          this.nameForConnect = input.readString();
-        } else {
-          input.skip(ftype);
-        }
-        break;
+      if (ftype == Thrift.Type.STRING) {
+        this.releaseName = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       case 4:
-        if (ftype == Thrift.Type.STRING) {
-          this.hazelcastVersion = input.readString();
-        } else {
-          input.skip(ftype);
-        }
-        break;
+      if (ftype == Thrift.Type.STRING) {
+        this.hazelcastVersion = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       case 5:
-        if (ftype == Thrift.Type.BOOL) {
-          this.isTlsEnabled = input.readBool();
-        } else {
-          input.skip(ftype);
-        }
-        break;
+      if (ftype == Thrift.Type.BOOL) {
+        this.isTlsEnabled = input.readBool();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       case 6:
-        if (ftype == Thrift.Type.STRING) {
-          this.state = input.readString();
-        } else {
-          input.skip(ftype);
-        }
-        break;
+      if (ftype == Thrift.Type.STRING) {
+        this.state = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       case 7:
-        if (ftype == Thrift.Type.STRING) {
-          this.token = input.readString();
-        } else {
-          input.skip(ftype);
-        }
-        break;
+      if (ftype == Thrift.Type.STRING) {
+        this.token = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       case 8:
-        if (ftype == Thrift.Type.STRING) {
-          this.certificatePath = input.readString();
-        } else {
-          input.skip(ftype);
-        }
-        break;
+      if (ftype == Thrift.Type.STRING) {
+        this.certificatePath = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       case 9:
-        if (ftype == Thrift.Type.STRING) {
-          this.tlsPassword = input.readString();
-        } else {
-          input.skip(ftype);
-        }
-        break;
+      if (ftype == Thrift.Type.STRING) {
+        this.tlsPassword = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       default:
         input.skip(ftype);
     }
@@ -220,9 +220,9 @@ CloudCluster.prototype.write = function(output) {
     output.writeString(this.name);
     output.writeFieldEnd();
   }
-  if (this.nameForConnect !== null && this.nameForConnect !== undefined) {
-    output.writeFieldBegin('nameForConnect', Thrift.Type.STRING, 3);
-    output.writeString(this.nameForConnect);
+  if (this.releaseName !== null && this.releaseName !== undefined) {
+    output.writeFieldBegin('releaseName', Thrift.Type.STRING, 3);
+    output.writeString(this.releaseName);
     output.writeFieldEnd();
   }
   if (this.hazelcastVersion !== null && this.hazelcastVersion !== undefined) {
@@ -288,26 +288,26 @@ Member.prototype.read = function(input) {
     }
     switch (fid) {
       case 1:
-        if (ftype == Thrift.Type.STRING) {
-          this.uuid = input.readString();
-        } else {
-          input.skip(ftype);
-        }
-        break;
+      if (ftype == Thrift.Type.STRING) {
+        this.uuid = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       case 2:
-        if (ftype == Thrift.Type.STRING) {
-          this.host = input.readString();
-        } else {
-          input.skip(ftype);
-        }
-        break;
+      if (ftype == Thrift.Type.STRING) {
+        this.host = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       case 3:
-        if (ftype == Thrift.Type.I32) {
-          this.port = input.readI32();
-        } else {
-          input.skip(ftype);
-        }
-        break;
+      if (ftype == Thrift.Type.I32) {
+        this.port = input.readI32();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       default:
         input.skip(ftype);
     }
@@ -367,26 +367,26 @@ Response.prototype.read = function(input) {
     }
     switch (fid) {
       case 1:
-        if (ftype == Thrift.Type.BOOL) {
-          this.success = input.readBool();
-        } else {
-          input.skip(ftype);
-        }
-        break;
+      if (ftype == Thrift.Type.BOOL) {
+        this.success = input.readBool();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       case 2:
-        if (ftype == Thrift.Type.STRING) {
-          this.message = input.readString();
-        } else {
-          input.skip(ftype);
-        }
-        break;
+      if (ftype == Thrift.Type.STRING) {
+        this.message = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       case 3:
-        if (ftype == Thrift.Type.STRING) {
-          this.result = input.readBinary();
-        } else {
-          input.skip(ftype);
-        }
-        break;
+      if (ftype == Thrift.Type.STRING) {
+        this.result = input.readBinary();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       default:
         input.skip(ftype);
     }
@@ -441,12 +441,12 @@ ServerException.prototype.read = function(input) {
     }
     switch (fid) {
       case 1:
-        if (ftype == Thrift.Type.STRING) {
-          this.message = input.readString();
-        } else {
-          input.skip(ftype);
-        }
-        break;
+      if (ftype == Thrift.Type.STRING) {
+        this.message = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       case 0:
         input.skip(ftype);
         break;
@@ -494,12 +494,12 @@ CloudException.prototype.read = function(input) {
     }
     switch (fid) {
       case 1:
-        if (ftype == Thrift.Type.STRING) {
-          this.message = input.readString();
-        } else {
-          input.skip(ftype);
-        }
-        break;
+      if (ftype == Thrift.Type.STRING) {
+        this.message = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       case 0:
         input.skip(ftype);
         break;
@@ -523,3 +523,4 @@ CloudException.prototype.write = function(output) {
   output.writeStructEnd();
   return;
 };
+

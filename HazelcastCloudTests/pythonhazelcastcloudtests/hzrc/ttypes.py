@@ -99,7 +99,7 @@ class CloudCluster(object):
     Attributes:
      - id
      - name
-     - nameForConnect
+     - releaseName
      - hazelcastVersion
      - isTlsEnabled
      - state
@@ -110,10 +110,10 @@ class CloudCluster(object):
     """
 
 
-    def __init__(self, id=None, name=None, nameForConnect=None, hazelcastVersion=None, isTlsEnabled=None, state=None, token=None, certificatePath=None, tlsPassword=None,):
+    def __init__(self, id=None, name=None, releaseName=None, hazelcastVersion=None, isTlsEnabled=None, state=None, token=None, certificatePath=None, tlsPassword=None,):
         self.id = id
         self.name = name
-        self.nameForConnect = nameForConnect
+        self.releaseName = releaseName
         self.hazelcastVersion = hazelcastVersion
         self.isTlsEnabled = isTlsEnabled
         self.state = state
@@ -142,7 +142,7 @@ class CloudCluster(object):
                     iprot.skip(ftype)
             elif fid == 3:
                 if ftype == TType.STRING:
-                    self.nameForConnect = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                    self.releaseName = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                 else:
                     iprot.skip(ftype)
             elif fid == 4:
@@ -193,9 +193,9 @@ class CloudCluster(object):
             oprot.writeFieldBegin('name', TType.STRING, 2)
             oprot.writeString(self.name.encode('utf-8') if sys.version_info[0] == 2 else self.name)
             oprot.writeFieldEnd()
-        if self.nameForConnect is not None:
-            oprot.writeFieldBegin('nameForConnect', TType.STRING, 3)
-            oprot.writeString(self.nameForConnect.encode('utf-8') if sys.version_info[0] == 2 else self.nameForConnect)
+        if self.releaseName is not None:
+            oprot.writeFieldBegin('releaseName', TType.STRING, 3)
+            oprot.writeString(self.releaseName.encode('utf-8') if sys.version_info[0] == 2 else self.releaseName)
             oprot.writeFieldEnd()
         if self.hazelcastVersion is not None:
             oprot.writeFieldBegin('hazelcastVersion', TType.STRING, 4)
@@ -551,7 +551,7 @@ CloudCluster.thrift_spec = (
     None,  # 0
     (1, TType.STRING, 'id', 'UTF8', None, ),  # 1
     (2, TType.STRING, 'name', 'UTF8', None, ),  # 2
-    (3, TType.STRING, 'nameForConnect', 'UTF8', None, ),  # 3
+    (3, TType.STRING, 'releaseName', 'UTF8', None, ),  # 3
     (4, TType.STRING, 'hazelcastVersion', 'UTF8', None, ),  # 4
     (5, TType.BOOL, 'isTlsEnabled', None, None, ),  # 5
     (6, TType.STRING, 'state', 'UTF8', None, ),  # 6

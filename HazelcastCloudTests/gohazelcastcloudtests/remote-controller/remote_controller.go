@@ -19,13 +19,13 @@
 package it
 
 import (
-  "bytes"
-  "context"
-  "database/sql/driver"
-  "errors"
-  "fmt"
-  "time"
-  thrift "github.com/apache/thrift/lib/go/thrift"
+	"bytes"
+	"context"
+	"database/sql/driver"
+	"errors"
+	"fmt"
+	"time"
+	thrift "github.com/apache/thrift/lib/go/thrift"
 )
 
 // (needed to ensure safety because of naive import list construction.)
@@ -55,10 +55,10 @@ func (p Lang) String() string {
 
 func LangFromString(s string) (Lang, error) {
   switch s {
-  case "JAVASCRIPT": return Lang_JAVASCRIPT, nil
-  case "GROOVY": return Lang_GROOVY, nil
-  case "PYTHON": return Lang_PYTHON, nil
-  case "RUBY": return Lang_RUBY, nil
+  case "JAVASCRIPT": return Lang_JAVASCRIPT, nil 
+  case "GROOVY": return Lang_GROOVY, nil 
+  case "PYTHON": return Lang_PYTHON, nil 
+  case "RUBY": return Lang_RUBY, nil 
   }
   return Lang(0), fmt.Errorf("not a valid Lang string")
 }
@@ -67,32 +67,32 @@ func LangFromString(s string) (Lang, error) {
 func LangPtr(v Lang) *Lang { return &v }
 
 func (p Lang) MarshalText() ([]byte, error) {
-  return []byte(p.String()), nil
+return []byte(p.String()), nil
 }
 
 func (p *Lang) UnmarshalText(text []byte) error {
-  q, err := LangFromString(string(text))
-  if (err != nil) {
-    return err
-  }
-  *p = q
-  return nil
+q, err := LangFromString(string(text))
+if (err != nil) {
+return err
+}
+*p = q
+return nil
 }
 
 func (p *Lang) Scan(value interface{}) error {
-  v, ok := value.(int64)
-  if !ok {
-    return errors.New("Scan value is not int64")
-  }
-  *p = Lang(v)
-  return nil
+v, ok := value.(int64)
+if !ok {
+return errors.New("Scan value is not int64")
+}
+*p = Lang(v)
+return nil
 }
 
 func (p * Lang) Value() (driver.Value, error) {
   if p == nil {
     return nil, nil
   }
-  return int64(*p), nil
+return int64(*p), nil
 }
 // Attributes:
 //  - ID
@@ -148,10 +148,10 @@ func (p *Cluster) Read(ctx context.Context, iprot thrift.TProtocol) error {
 
 func (p *Cluster)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 1: ", err)
-  } else {
-    p.ID = v
-  }
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.ID = v
+}
   return nil
 }
 
@@ -172,7 +172,7 @@ func (p *Cluster) writeField1(ctx context.Context, oprot thrift.TProtocol) (err 
   if err := oprot.WriteFieldBegin(ctx, "id", thrift.STRING, 1); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:id: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.ID)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.id (1) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.id (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 1:id: ", p), err) }
   return err
@@ -198,7 +198,7 @@ func (p *Cluster) String() string {
 // Attributes:
 //  - ID
 //  - Name
-//  - NameForConnect
+//  - ReleaseName
 //  - HazelcastVersion
 //  - IsTlsEnabled
 //  - State
@@ -208,7 +208,7 @@ func (p *Cluster) String() string {
 type CloudCluster struct {
   ID string `thrift:"id,1" db:"id" json:"id"`
   Name string `thrift:"name,2" db:"name" json:"name"`
-  NameForConnect string `thrift:"nameForConnect,3" db:"nameForConnect" json:"nameForConnect"`
+  ReleaseName string `thrift:"releaseName,3" db:"releaseName" json:"releaseName"`
   HazelcastVersion string `thrift:"hazelcastVersion,4" db:"hazelcastVersion" json:"hazelcastVersion"`
   IsTlsEnabled bool `thrift:"isTlsEnabled,5" db:"isTlsEnabled" json:"isTlsEnabled"`
   State string `thrift:"state,6" db:"state" json:"state"`
@@ -230,8 +230,8 @@ func (p *CloudCluster) GetName() string {
   return p.Name
 }
 
-func (p *CloudCluster) GetNameForConnect() string {
-  return p.NameForConnect
+func (p *CloudCluster) GetReleaseName() string {
+  return p.ReleaseName
 }
 
 func (p *CloudCluster) GetHazelcastVersion() string {
@@ -377,82 +377,82 @@ func (p *CloudCluster) Read(ctx context.Context, iprot thrift.TProtocol) error {
 
 func (p *CloudCluster)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 1: ", err)
-  } else {
-    p.ID = v
-  }
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.ID = v
+}
   return nil
 }
 
 func (p *CloudCluster)  ReadField2(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 2: ", err)
-  } else {
-    p.Name = v
-  }
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
+  p.Name = v
+}
   return nil
 }
 
 func (p *CloudCluster)  ReadField3(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 3: ", err)
-  } else {
-    p.NameForConnect = v
-  }
+  return thrift.PrependError("error reading field 3: ", err)
+} else {
+  p.ReleaseName = v
+}
   return nil
 }
 
 func (p *CloudCluster)  ReadField4(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 4: ", err)
-  } else {
-    p.HazelcastVersion = v
-  }
+  return thrift.PrependError("error reading field 4: ", err)
+} else {
+  p.HazelcastVersion = v
+}
   return nil
 }
 
 func (p *CloudCluster)  ReadField5(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBool(ctx); err != nil {
-    return thrift.PrependError("error reading field 5: ", err)
-  } else {
-    p.IsTlsEnabled = v
-  }
+  return thrift.PrependError("error reading field 5: ", err)
+} else {
+  p.IsTlsEnabled = v
+}
   return nil
 }
 
 func (p *CloudCluster)  ReadField6(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 6: ", err)
-  } else {
-    p.State = v
-  }
+  return thrift.PrependError("error reading field 6: ", err)
+} else {
+  p.State = v
+}
   return nil
 }
 
 func (p *CloudCluster)  ReadField7(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 7: ", err)
-  } else {
-    p.Token = v
-  }
+  return thrift.PrependError("error reading field 7: ", err)
+} else {
+  p.Token = v
+}
   return nil
 }
 
 func (p *CloudCluster)  ReadField8(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 8: ", err)
-  } else {
-    p.CertificatePath = v
-  }
+  return thrift.PrependError("error reading field 8: ", err)
+} else {
+  p.CertificatePath = v
+}
   return nil
 }
 
 func (p *CloudCluster)  ReadField9(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 9: ", err)
-  } else {
-    p.TlsPassword = v
-  }
+  return thrift.PrependError("error reading field 9: ", err)
+} else {
+  p.TlsPassword = v
+}
   return nil
 }
 
@@ -481,7 +481,7 @@ func (p *CloudCluster) writeField1(ctx context.Context, oprot thrift.TProtocol) 
   if err := oprot.WriteFieldBegin(ctx, "id", thrift.STRING, 1); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:id: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.ID)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.id (1) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.id (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 1:id: ", p), err) }
   return err
@@ -491,19 +491,19 @@ func (p *CloudCluster) writeField2(ctx context.Context, oprot thrift.TProtocol) 
   if err := oprot.WriteFieldBegin(ctx, "name", thrift.STRING, 2); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:name: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.Name)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.name (2) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.name (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 2:name: ", p), err) }
   return err
 }
 
 func (p *CloudCluster) writeField3(ctx context.Context, oprot thrift.TProtocol) (err error) {
-  if err := oprot.WriteFieldBegin(ctx, "nameForConnect", thrift.STRING, 3); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:nameForConnect: ", p), err) }
-  if err := oprot.WriteString(ctx, string(p.NameForConnect)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.nameForConnect (3) field write error: ", p), err) }
+  if err := oprot.WriteFieldBegin(ctx, "releaseName", thrift.STRING, 3); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:releaseName: ", p), err) }
+  if err := oprot.WriteString(ctx, string(p.ReleaseName)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.releaseName (3) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field end error 3:nameForConnect: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 3:releaseName: ", p), err) }
   return err
 }
 
@@ -511,7 +511,7 @@ func (p *CloudCluster) writeField4(ctx context.Context, oprot thrift.TProtocol) 
   if err := oprot.WriteFieldBegin(ctx, "hazelcastVersion", thrift.STRING, 4); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 4:hazelcastVersion: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.HazelcastVersion)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.hazelcastVersion (4) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.hazelcastVersion (4) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 4:hazelcastVersion: ", p), err) }
   return err
@@ -521,7 +521,7 @@ func (p *CloudCluster) writeField5(ctx context.Context, oprot thrift.TProtocol) 
   if err := oprot.WriteFieldBegin(ctx, "isTlsEnabled", thrift.BOOL, 5); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 5:isTlsEnabled: ", p), err) }
   if err := oprot.WriteBool(ctx, bool(p.IsTlsEnabled)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.isTlsEnabled (5) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.isTlsEnabled (5) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 5:isTlsEnabled: ", p), err) }
   return err
@@ -531,7 +531,7 @@ func (p *CloudCluster) writeField6(ctx context.Context, oprot thrift.TProtocol) 
   if err := oprot.WriteFieldBegin(ctx, "state", thrift.STRING, 6); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 6:state: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.State)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.state (6) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.state (6) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 6:state: ", p), err) }
   return err
@@ -541,7 +541,7 @@ func (p *CloudCluster) writeField7(ctx context.Context, oprot thrift.TProtocol) 
   if err := oprot.WriteFieldBegin(ctx, "token", thrift.STRING, 7); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 7:token: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.Token)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.token (7) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.token (7) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 7:token: ", p), err) }
   return err
@@ -551,7 +551,7 @@ func (p *CloudCluster) writeField8(ctx context.Context, oprot thrift.TProtocol) 
   if err := oprot.WriteFieldBegin(ctx, "certificatePath", thrift.STRING, 8); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 8:certificatePath: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.CertificatePath)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.certificatePath (8) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.certificatePath (8) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 8:certificatePath: ", p), err) }
   return err
@@ -561,7 +561,7 @@ func (p *CloudCluster) writeField9(ctx context.Context, oprot thrift.TProtocol) 
   if err := oprot.WriteFieldBegin(ctx, "tlsPassword", thrift.STRING, 9); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 9:tlsPassword: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.TlsPassword)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.tlsPassword (9) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.tlsPassword (9) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 9:tlsPassword: ", p), err) }
   return err
@@ -575,7 +575,7 @@ func (p *CloudCluster) Equals(other *CloudCluster) bool {
   }
   if p.ID != other.ID { return false }
   if p.Name != other.Name { return false }
-  if p.NameForConnect != other.NameForConnect { return false }
+  if p.ReleaseName != other.ReleaseName { return false }
   if p.HazelcastVersion != other.HazelcastVersion { return false }
   if p.IsTlsEnabled != other.IsTlsEnabled { return false }
   if p.State != other.State { return false }
@@ -678,28 +678,28 @@ func (p *Member) Read(ctx context.Context, iprot thrift.TProtocol) error {
 
 func (p *Member)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 1: ", err)
-  } else {
-    p.UUID = v
-  }
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.UUID = v
+}
   return nil
 }
 
 func (p *Member)  ReadField2(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 2: ", err)
-  } else {
-    p.Host = v
-  }
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
+  p.Host = v
+}
   return nil
 }
 
 func (p *Member)  ReadField3(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI32(ctx); err != nil {
-    return thrift.PrependError("error reading field 3: ", err)
-  } else {
-    p.Port = v
-  }
+  return thrift.PrependError("error reading field 3: ", err)
+} else {
+  p.Port = v
+}
   return nil
 }
 
@@ -722,7 +722,7 @@ func (p *Member) writeField1(ctx context.Context, oprot thrift.TProtocol) (err e
   if err := oprot.WriteFieldBegin(ctx, "uuid", thrift.STRING, 1); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:uuid: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.UUID)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.uuid (1) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.uuid (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 1:uuid: ", p), err) }
   return err
@@ -732,7 +732,7 @@ func (p *Member) writeField2(ctx context.Context, oprot thrift.TProtocol) (err e
   if err := oprot.WriteFieldBegin(ctx, "host", thrift.STRING, 2); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:host: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.Host)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.host (2) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.host (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 2:host: ", p), err) }
   return err
@@ -742,7 +742,7 @@ func (p *Member) writeField3(ctx context.Context, oprot thrift.TProtocol) (err e
   if err := oprot.WriteFieldBegin(ctx, "port", thrift.I32, 3); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:port: ", p), err) }
   if err := oprot.WriteI32(ctx, int32(p.Port)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.port (3) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.port (3) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 3:port: ", p), err) }
   return err
@@ -853,28 +853,28 @@ func (p *Response) Read(ctx context.Context, iprot thrift.TProtocol) error {
 
 func (p *Response)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBool(ctx); err != nil {
-    return thrift.PrependError("error reading field 1: ", err)
-  } else {
-    p.Success = v
-  }
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.Success = v
+}
   return nil
 }
 
 func (p *Response)  ReadField2(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 2: ", err)
-  } else {
-    p.Message = v
-  }
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
+  p.Message = v
+}
   return nil
 }
 
 func (p *Response)  ReadField3(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBinary(ctx); err != nil {
-    return thrift.PrependError("error reading field 3: ", err)
-  } else {
-    p.Result_ = v
-  }
+  return thrift.PrependError("error reading field 3: ", err)
+} else {
+  p.Result_ = v
+}
   return nil
 }
 
@@ -897,7 +897,7 @@ func (p *Response) writeField1(ctx context.Context, oprot thrift.TProtocol) (err
   if err := oprot.WriteFieldBegin(ctx, "success", thrift.BOOL, 1); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:success: ", p), err) }
   if err := oprot.WriteBool(ctx, bool(p.Success)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.success (1) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.success (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 1:success: ", p), err) }
   return err
@@ -907,7 +907,7 @@ func (p *Response) writeField2(ctx context.Context, oprot thrift.TProtocol) (err
   if err := oprot.WriteFieldBegin(ctx, "message", thrift.STRING, 2); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:message: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.Message)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.message (2) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.message (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 2:message: ", p), err) }
   return err
@@ -917,7 +917,7 @@ func (p *Response) writeField3(ctx context.Context, oprot thrift.TProtocol) (err
   if err := oprot.WriteFieldBegin(ctx, "result", thrift.STRING, 3); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:result: ", p), err) }
   if err := oprot.WriteBinary(ctx, p.Result_); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.result (3) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.result (3) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 3:result: ", p), err) }
   return err
@@ -996,10 +996,10 @@ func (p *ServerException) Read(ctx context.Context, iprot thrift.TProtocol) erro
 
 func (p *ServerException)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 1: ", err)
-  } else {
-    p.Message = v
-  }
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.Message = v
+}
   return nil
 }
 
@@ -1020,7 +1020,7 @@ func (p *ServerException) writeField1(ctx context.Context, oprot thrift.TProtoco
   if err := oprot.WriteFieldBegin(ctx, "message", thrift.STRING, 1); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:message: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.Message)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.message (1) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.message (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 1:message: ", p), err) }
   return err
@@ -1107,10 +1107,10 @@ func (p *CloudException) Read(ctx context.Context, iprot thrift.TProtocol) error
 
 func (p *CloudException)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 1: ", err)
-  } else {
-    p.Message = v
-  }
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.Message = v
+}
   return nil
 }
 
@@ -1131,7 +1131,7 @@ func (p *CloudException) writeField1(ctx context.Context, oprot thrift.TProtocol
   if err := oprot.WriteFieldBegin(ctx, "message", thrift.STRING, 1); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:message: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.Message)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.message (1) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.message (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 1:message: ", p), err) }
   return err
@@ -1208,78 +1208,68 @@ type RemoteController interface {
   //  - ClusterId
   //  - MemberId
   MergeMemberToCluster(ctx context.Context, clusterId string, memberId string) (_r *Cluster, _err error)
-  // Reads the environment variables and calls loginToHazelcastCloud() method with these variables.
+  // Reads the environment variables and calls loginToCloud() method with these variables.
   // @throws CloudException
-  LoginToHazelcastCloudUsingEnvironment(ctx context.Context) (_err error)
-  // Logins the hazelcast cloud, sets the bearer token, uri and baseUrl to HazelcastCloudManager then it will be ready to use cloud API
+  LoginToCloudUsingEnvironment(ctx context.Context) (_err error)
+  // Logins to the cloud, sets the bearerToken, baseUrl variables in CloudManager to make it ready to use cloud API
   // @throws CloudException
-  //
+  // 
   // @param baseUrl -> Base url of the cloud environment. i.e. https://uat.hazelcast.cloud
   // @param apiKey -> Api key of the hazelcast cloud
   // @param apiSecret -> Api secret of the hazelcast cloud
-  //
+  // 
   // Parameters:
   //  - BaseUrl
   //  - ApiKey
   //  - ApiSecret
-  LoginToHazelcastCloud(ctx context.Context, baseUrl string, apiKey string, apiSecret string) (_err error)
-  // Creates a standard cluster
+  LoginToCloud(ctx context.Context, baseUrl string, apiKey string, apiSecret string) (_err error)
+  // Creates a cluster
   // @return CloudCluster
   // @throws CloudException
-  //
-  // @param hazelcastVersion
+  // 
+  // @param hazelcastVersion -> Hazelcast version
   // @param isTlsEnabled -> True if ssl enabled cluster is requested, otherwise false.
-  //
+  // 
   // Parameters:
   //  - HazelcastVersion
   //  - IsTlsEnabled
-  CreateHazelcastCloudStandardCluster(ctx context.Context, hazelcastVersion string, isTlsEnabled bool) (_r *CloudCluster, _err error)
-  // Setting member count of the cluster
-  // @throws CloudException
-  //
-  // @param cloudClusterId
-  // @param totalMemberCount -> Total member count of the cluster
-  //
-  // Parameters:
-  //  - CloudClusterId
-  //  - TotalMemberCount
-  SetHazelcastCloudClusterMemberCount(ctx context.Context, cloudClusterId string, totalMemberCount int32) (_err error)
+  CreateCloudCluster(ctx context.Context, hazelcastVersion string, isTlsEnabled bool) (_r *CloudCluster, _err error)
   // Get information of the given cluster
   // @return CloudCluster
   // @throws CloudException
-  //
-  // @param cloudClusterId
-  //
+  // 
+  // @param cloudClusterId -> Id of the cluster
+  // 
   // Parameters:
   //  - CloudClusterId
-  GetHazelcastCloudCluster(ctx context.Context, cloudClusterId string) (_r *CloudCluster, _err error)
+  GetCloudCluster(ctx context.Context, cloudClusterId string) (_r *CloudCluster, _err error)
   // Stops the given cluster
   // @return CloudCluster
   // @throws CloudException
-  //
-  // @param cloudClusterId
-  //
+  // 
+  // @param cloudClusterId -> Id of the cluster
+  // 
   // Parameters:
   //  - CloudClusterId
-  StopHazelcastCloudCluster(ctx context.Context, cloudClusterId string) (_r *CloudCluster, _err error)
+  StopCloudCluster(ctx context.Context, cloudClusterId string) (_r *CloudCluster, _err error)
   // Resumes the given cluster
   // @return CloudCluster
   // @throws CloudException
-  //
+  // 
   // @param cloudClusterId
-  //
+  // 
   // Parameters:
   //  - CloudClusterId
-  ResumeHazelcastCloudCluster(ctx context.Context, cloudClusterId string) (_r *CloudCluster, _err error)
+  ResumeCloudCluster(ctx context.Context, cloudClusterId string) (_r *CloudCluster, _err error)
   // Deletes the given cluster
   // @return boolean
   // @throws CloudException
-  //
+  // 
   // @param cloudClusterId
-  //
+  // 
   // Parameters:
   //  - CloudClusterId
-  DeleteHazelcastCloudCluster(ctx context.Context, cloudClusterId string) (_err error)
+  DeleteCloudCluster(ctx context.Context, cloudClusterId string) (_err error)
   // Parameters:
   //  - ClusterId
   //  - Script
@@ -1567,13 +1557,13 @@ func (p *RemoteControllerClient) MergeMemberToCluster(ctx context.Context, clust
   return nil, thrift.NewTApplicationException(thrift.MISSING_RESULT, "mergeMemberToCluster failed: unknown result")
 }
 
-// Reads the environment variables and calls loginToHazelcastCloud() method with these variables.
+// Reads the environment variables and calls loginToCloud() method with these variables.
 // @throws CloudException
-func (p *RemoteControllerClient) LoginToHazelcastCloudUsingEnvironment(ctx context.Context) (_err error) {
-  var _args47 RemoteControllerLoginToHazelcastCloudUsingEnvironmentArgs
-  var _result49 RemoteControllerLoginToHazelcastCloudUsingEnvironmentResult
+func (p *RemoteControllerClient) LoginToCloudUsingEnvironment(ctx context.Context) (_err error) {
+  var _args47 RemoteControllerLoginToCloudUsingEnvironmentArgs
+  var _result49 RemoteControllerLoginToCloudUsingEnvironmentResult
   var _meta48 thrift.ResponseMeta
-  _meta48, _err = p.Client_().Call(ctx, "loginToHazelcastCloudUsingEnvironment", &_args47, &_result49)
+  _meta48, _err = p.Client_().Call(ctx, "loginToCloudUsingEnvironment", &_args47, &_result49)
   p.SetLastResponseMeta_(_meta48)
   if _err != nil {
     return
@@ -1586,25 +1576,25 @@ func (p *RemoteControllerClient) LoginToHazelcastCloudUsingEnvironment(ctx conte
   return nil
 }
 
-// Logins the hazelcast cloud, sets the bearer token, uri and baseUrl to HazelcastCloudManager then it will be ready to use cloud API
+// Logins to the cloud, sets the bearerToken, baseUrl variables in CloudManager to make it ready to use cloud API
 // @throws CloudException
-//
+// 
 // @param baseUrl -> Base url of the cloud environment. i.e. https://uat.hazelcast.cloud
 // @param apiKey -> Api key of the hazelcast cloud
 // @param apiSecret -> Api secret of the hazelcast cloud
-//
+// 
 // Parameters:
 //  - BaseUrl
 //  - ApiKey
 //  - ApiSecret
-func (p *RemoteControllerClient) LoginToHazelcastCloud(ctx context.Context, baseUrl string, apiKey string, apiSecret string) (_err error) {
-  var _args50 RemoteControllerLoginToHazelcastCloudArgs
+func (p *RemoteControllerClient) LoginToCloud(ctx context.Context, baseUrl string, apiKey string, apiSecret string) (_err error) {
+  var _args50 RemoteControllerLoginToCloudArgs
   _args50.BaseUrl = baseUrl
   _args50.ApiKey = apiKey
   _args50.ApiSecret = apiSecret
-  var _result52 RemoteControllerLoginToHazelcastCloudResult
+  var _result52 RemoteControllerLoginToCloudResult
   var _meta51 thrift.ResponseMeta
-  _meta51, _err = p.Client_().Call(ctx, "loginToHazelcastCloud", &_args50, &_result52)
+  _meta51, _err = p.Client_().Call(ctx, "loginToCloud", &_args50, &_result52)
   p.SetLastResponseMeta_(_meta51)
   if _err != nil {
     return
@@ -1617,23 +1607,23 @@ func (p *RemoteControllerClient) LoginToHazelcastCloud(ctx context.Context, base
   return nil
 }
 
-// Creates a standard cluster
+// Creates a cluster
 // @return CloudCluster
 // @throws CloudException
-//
-// @param hazelcastVersion
+// 
+// @param hazelcastVersion -> Hazelcast version
 // @param isTlsEnabled -> True if ssl enabled cluster is requested, otherwise false.
-//
+// 
 // Parameters:
 //  - HazelcastVersion
 //  - IsTlsEnabled
-func (p *RemoteControllerClient) CreateHazelcastCloudStandardCluster(ctx context.Context, hazelcastVersion string, isTlsEnabled bool) (_r *CloudCluster, _err error) {
-  var _args53 RemoteControllerCreateHazelcastCloudStandardClusterArgs
+func (p *RemoteControllerClient) CreateCloudCluster(ctx context.Context, hazelcastVersion string, isTlsEnabled bool) (_r *CloudCluster, _err error) {
+  var _args53 RemoteControllerCreateCloudClusterArgs
   _args53.HazelcastVersion = hazelcastVersion
   _args53.IsTlsEnabled = isTlsEnabled
-  var _result55 RemoteControllerCreateHazelcastCloudStandardClusterResult
+  var _result55 RemoteControllerCreateCloudClusterResult
   var _meta54 thrift.ResponseMeta
-  _meta54, _err = p.Client_().Call(ctx, "createHazelcastCloudStandardCluster", &_args53, &_result55)
+  _meta54, _err = p.Client_().Call(ctx, "createCloudCluster", &_args53, &_result55)
   p.SetLastResponseMeta_(_meta54)
   if _err != nil {
     return
@@ -1646,145 +1636,117 @@ func (p *RemoteControllerClient) CreateHazelcastCloudStandardCluster(ctx context
   if _ret56 := _result55.GetSuccess(); _ret56 != nil {
     return _ret56, nil
   }
-  return nil, thrift.NewTApplicationException(thrift.MISSING_RESULT, "createHazelcastCloudStandardCluster failed: unknown result")
+  return nil, thrift.NewTApplicationException(thrift.MISSING_RESULT, "createCloudCluster failed: unknown result")
 }
 
-// Setting member count of the cluster
+// Get information of the given cluster
+// @return CloudCluster
 // @throws CloudException
-//
-// @param cloudClusterId
-// @param totalMemberCount -> Total member count of the cluster
-//
+// 
+// @param cloudClusterId -> Id of the cluster
+// 
 // Parameters:
 //  - CloudClusterId
-//  - TotalMemberCount
-func (p *RemoteControllerClient) SetHazelcastCloudClusterMemberCount(ctx context.Context, cloudClusterId string, totalMemberCount int32) (_err error) {
-  var _args57 RemoteControllerSetHazelcastCloudClusterMemberCountArgs
+func (p *RemoteControllerClient) GetCloudCluster(ctx context.Context, cloudClusterId string) (_r *CloudCluster, _err error) {
+  var _args57 RemoteControllerGetCloudClusterArgs
   _args57.CloudClusterId = cloudClusterId
-  _args57.TotalMemberCount = totalMemberCount
-  var _result59 RemoteControllerSetHazelcastCloudClusterMemberCountResult
+  var _result59 RemoteControllerGetCloudClusterResult
   var _meta58 thrift.ResponseMeta
-  _meta58, _err = p.Client_().Call(ctx, "setHazelcastCloudClusterMemberCount", &_args57, &_result59)
+  _meta58, _err = p.Client_().Call(ctx, "getCloudCluster", &_args57, &_result59)
   p.SetLastResponseMeta_(_meta58)
   if _err != nil {
     return
   }
   switch {
   case _result59.CloudException!= nil:
-    return _result59.CloudException
+    return _r, _result59.CloudException
   }
 
-  return nil
-}
-
-// Get information of the given cluster
-// @return CloudCluster
-// @throws CloudException
-//
-// @param cloudClusterId
-//
-// Parameters:
-//  - CloudClusterId
-func (p *RemoteControllerClient) GetHazelcastCloudCluster(ctx context.Context, cloudClusterId string) (_r *CloudCluster, _err error) {
-  var _args60 RemoteControllerGetHazelcastCloudClusterArgs
-  _args60.CloudClusterId = cloudClusterId
-  var _result62 RemoteControllerGetHazelcastCloudClusterResult
-  var _meta61 thrift.ResponseMeta
-  _meta61, _err = p.Client_().Call(ctx, "getHazelcastCloudCluster", &_args60, &_result62)
-  p.SetLastResponseMeta_(_meta61)
-  if _err != nil {
-    return
+  if _ret60 := _result59.GetSuccess(); _ret60 != nil {
+    return _ret60, nil
   }
-  switch {
-  case _result62.CloudException!= nil:
-    return _r, _result62.CloudException
-  }
-
-  if _ret63 := _result62.GetSuccess(); _ret63 != nil {
-    return _ret63, nil
-  }
-  return nil, thrift.NewTApplicationException(thrift.MISSING_RESULT, "getHazelcastCloudCluster failed: unknown result")
+  return nil, thrift.NewTApplicationException(thrift.MISSING_RESULT, "getCloudCluster failed: unknown result")
 }
 
 // Stops the given cluster
 // @return CloudCluster
 // @throws CloudException
-//
-// @param cloudClusterId
-//
+// 
+// @param cloudClusterId -> Id of the cluster
+// 
 // Parameters:
 //  - CloudClusterId
-func (p *RemoteControllerClient) StopHazelcastCloudCluster(ctx context.Context, cloudClusterId string) (_r *CloudCluster, _err error) {
-  var _args64 RemoteControllerStopHazelcastCloudClusterArgs
-  _args64.CloudClusterId = cloudClusterId
-  var _result66 RemoteControllerStopHazelcastCloudClusterResult
-  var _meta65 thrift.ResponseMeta
-  _meta65, _err = p.Client_().Call(ctx, "stopHazelcastCloudCluster", &_args64, &_result66)
-  p.SetLastResponseMeta_(_meta65)
+func (p *RemoteControllerClient) StopCloudCluster(ctx context.Context, cloudClusterId string) (_r *CloudCluster, _err error) {
+  var _args61 RemoteControllerStopCloudClusterArgs
+  _args61.CloudClusterId = cloudClusterId
+  var _result63 RemoteControllerStopCloudClusterResult
+  var _meta62 thrift.ResponseMeta
+  _meta62, _err = p.Client_().Call(ctx, "stopCloudCluster", &_args61, &_result63)
+  p.SetLastResponseMeta_(_meta62)
   if _err != nil {
     return
   }
   switch {
-  case _result66.CloudException!= nil:
-    return _r, _result66.CloudException
+  case _result63.CloudException!= nil:
+    return _r, _result63.CloudException
   }
 
-  if _ret67 := _result66.GetSuccess(); _ret67 != nil {
-    return _ret67, nil
+  if _ret64 := _result63.GetSuccess(); _ret64 != nil {
+    return _ret64, nil
   }
-  return nil, thrift.NewTApplicationException(thrift.MISSING_RESULT, "stopHazelcastCloudCluster failed: unknown result")
+  return nil, thrift.NewTApplicationException(thrift.MISSING_RESULT, "stopCloudCluster failed: unknown result")
 }
 
 // Resumes the given cluster
 // @return CloudCluster
 // @throws CloudException
-//
+// 
 // @param cloudClusterId
-//
+// 
 // Parameters:
 //  - CloudClusterId
-func (p *RemoteControllerClient) ResumeHazelcastCloudCluster(ctx context.Context, cloudClusterId string) (_r *CloudCluster, _err error) {
-  var _args68 RemoteControllerResumeHazelcastCloudClusterArgs
-  _args68.CloudClusterId = cloudClusterId
-  var _result70 RemoteControllerResumeHazelcastCloudClusterResult
-  var _meta69 thrift.ResponseMeta
-  _meta69, _err = p.Client_().Call(ctx, "resumeHazelcastCloudCluster", &_args68, &_result70)
-  p.SetLastResponseMeta_(_meta69)
+func (p *RemoteControllerClient) ResumeCloudCluster(ctx context.Context, cloudClusterId string) (_r *CloudCluster, _err error) {
+  var _args65 RemoteControllerResumeCloudClusterArgs
+  _args65.CloudClusterId = cloudClusterId
+  var _result67 RemoteControllerResumeCloudClusterResult
+  var _meta66 thrift.ResponseMeta
+  _meta66, _err = p.Client_().Call(ctx, "resumeCloudCluster", &_args65, &_result67)
+  p.SetLastResponseMeta_(_meta66)
   if _err != nil {
     return
   }
   switch {
-  case _result70.CloudException!= nil:
-    return _r, _result70.CloudException
+  case _result67.CloudException!= nil:
+    return _r, _result67.CloudException
   }
 
-  if _ret71 := _result70.GetSuccess(); _ret71 != nil {
-    return _ret71, nil
+  if _ret68 := _result67.GetSuccess(); _ret68 != nil {
+    return _ret68, nil
   }
-  return nil, thrift.NewTApplicationException(thrift.MISSING_RESULT, "resumeHazelcastCloudCluster failed: unknown result")
+  return nil, thrift.NewTApplicationException(thrift.MISSING_RESULT, "resumeCloudCluster failed: unknown result")
 }
 
 // Deletes the given cluster
 // @return boolean
 // @throws CloudException
-//
+// 
 // @param cloudClusterId
-//
+// 
 // Parameters:
 //  - CloudClusterId
-func (p *RemoteControllerClient) DeleteHazelcastCloudCluster(ctx context.Context, cloudClusterId string) (_err error) {
-  var _args72 RemoteControllerDeleteHazelcastCloudClusterArgs
-  _args72.CloudClusterId = cloudClusterId
-  var _result74 RemoteControllerDeleteHazelcastCloudClusterResult
-  var _meta73 thrift.ResponseMeta
-  _meta73, _err = p.Client_().Call(ctx, "deleteHazelcastCloudCluster", &_args72, &_result74)
-  p.SetLastResponseMeta_(_meta73)
+func (p *RemoteControllerClient) DeleteCloudCluster(ctx context.Context, cloudClusterId string) (_err error) {
+  var _args69 RemoteControllerDeleteCloudClusterArgs
+  _args69.CloudClusterId = cloudClusterId
+  var _result71 RemoteControllerDeleteCloudClusterResult
+  var _meta70 thrift.ResponseMeta
+  _meta70, _err = p.Client_().Call(ctx, "deleteCloudCluster", &_args69, &_result71)
+  p.SetLastResponseMeta_(_meta70)
   if _err != nil {
     return
   }
   switch {
-  case _result74.CloudException!= nil:
-    return _result74.CloudException
+  case _result71.CloudException!= nil:
+    return _result71.CloudException
   }
 
   return nil
@@ -1795,19 +1757,19 @@ func (p *RemoteControllerClient) DeleteHazelcastCloudCluster(ctx context.Context
 //  - Script
 //  - Lang
 func (p *RemoteControllerClient) ExecuteOnController(ctx context.Context, clusterId string, script string, lang Lang) (_r *Response, _err error) {
-  var _args75 RemoteControllerExecuteOnControllerArgs
-  _args75.ClusterId = clusterId
-  _args75.Script = script
-  _args75.Lang = lang
-  var _result77 RemoteControllerExecuteOnControllerResult
-  var _meta76 thrift.ResponseMeta
-  _meta76, _err = p.Client_().Call(ctx, "executeOnController", &_args75, &_result77)
-  p.SetLastResponseMeta_(_meta76)
+  var _args72 RemoteControllerExecuteOnControllerArgs
+  _args72.ClusterId = clusterId
+  _args72.Script = script
+  _args72.Lang = lang
+  var _result74 RemoteControllerExecuteOnControllerResult
+  var _meta73 thrift.ResponseMeta
+  _meta73, _err = p.Client_().Call(ctx, "executeOnController", &_args72, &_result74)
+  p.SetLastResponseMeta_(_meta73)
   if _err != nil {
     return
   }
-  if _ret78 := _result77.GetSuccess(); _ret78 != nil {
-    return _ret78, nil
+  if _ret75 := _result74.GetSuccess(); _ret75 != nil {
+    return _ret75, nil
   }
   return nil, thrift.NewTApplicationException(thrift.MISSING_RESULT, "executeOnController failed: unknown result")
 }
@@ -1832,31 +1794,30 @@ func (p *RemoteControllerProcessor) ProcessorMap() map[string]thrift.TProcessorF
 
 func NewRemoteControllerProcessor(handler RemoteController) *RemoteControllerProcessor {
 
-  self79 := &RemoteControllerProcessor{handler:handler, processorMap:make(map[string]thrift.TProcessorFunction)}
-  self79.processorMap["ping"] = &remoteControllerProcessorPing{handler:handler}
-  self79.processorMap["clean"] = &remoteControllerProcessorClean{handler:handler}
-  self79.processorMap["exit"] = &remoteControllerProcessorExit{handler:handler}
-  self79.processorMap["createCluster"] = &remoteControllerProcessorCreateCluster{handler:handler}
-  self79.processorMap["createClusterKeepClusterName"] = &remoteControllerProcessorCreateClusterKeepClusterName{handler:handler}
-  self79.processorMap["startMember"] = &remoteControllerProcessorStartMember{handler:handler}
-  self79.processorMap["shutdownMember"] = &remoteControllerProcessorShutdownMember{handler:handler}
-  self79.processorMap["terminateMember"] = &remoteControllerProcessorTerminateMember{handler:handler}
-  self79.processorMap["suspendMember"] = &remoteControllerProcessorSuspendMember{handler:handler}
-  self79.processorMap["resumeMember"] = &remoteControllerProcessorResumeMember{handler:handler}
-  self79.processorMap["shutdownCluster"] = &remoteControllerProcessorShutdownCluster{handler:handler}
-  self79.processorMap["terminateCluster"] = &remoteControllerProcessorTerminateCluster{handler:handler}
-  self79.processorMap["splitMemberFromCluster"] = &remoteControllerProcessorSplitMemberFromCluster{handler:handler}
-  self79.processorMap["mergeMemberToCluster"] = &remoteControllerProcessorMergeMemberToCluster{handler:handler}
-  self79.processorMap["loginToHazelcastCloudUsingEnvironment"] = &remoteControllerProcessorLoginToHazelcastCloudUsingEnvironment{handler:handler}
-  self79.processorMap["loginToHazelcastCloud"] = &remoteControllerProcessorLoginToHazelcastCloud{handler:handler}
-  self79.processorMap["createHazelcastCloudStandardCluster"] = &remoteControllerProcessorCreateHazelcastCloudStandardCluster{handler:handler}
-  self79.processorMap["setHazelcastCloudClusterMemberCount"] = &remoteControllerProcessorSetHazelcastCloudClusterMemberCount{handler:handler}
-  self79.processorMap["getHazelcastCloudCluster"] = &remoteControllerProcessorGetHazelcastCloudCluster{handler:handler}
-  self79.processorMap["stopHazelcastCloudCluster"] = &remoteControllerProcessorStopHazelcastCloudCluster{handler:handler}
-  self79.processorMap["resumeHazelcastCloudCluster"] = &remoteControllerProcessorResumeHazelcastCloudCluster{handler:handler}
-  self79.processorMap["deleteHazelcastCloudCluster"] = &remoteControllerProcessorDeleteHazelcastCloudCluster{handler:handler}
-  self79.processorMap["executeOnController"] = &remoteControllerProcessorExecuteOnController{handler:handler}
-  return self79
+  self76 := &RemoteControllerProcessor{handler:handler, processorMap:make(map[string]thrift.TProcessorFunction)}
+  self76.processorMap["ping"] = &remoteControllerProcessorPing{handler:handler}
+  self76.processorMap["clean"] = &remoteControllerProcessorClean{handler:handler}
+  self76.processorMap["exit"] = &remoteControllerProcessorExit{handler:handler}
+  self76.processorMap["createCluster"] = &remoteControllerProcessorCreateCluster{handler:handler}
+  self76.processorMap["createClusterKeepClusterName"] = &remoteControllerProcessorCreateClusterKeepClusterName{handler:handler}
+  self76.processorMap["startMember"] = &remoteControllerProcessorStartMember{handler:handler}
+  self76.processorMap["shutdownMember"] = &remoteControllerProcessorShutdownMember{handler:handler}
+  self76.processorMap["terminateMember"] = &remoteControllerProcessorTerminateMember{handler:handler}
+  self76.processorMap["suspendMember"] = &remoteControllerProcessorSuspendMember{handler:handler}
+  self76.processorMap["resumeMember"] = &remoteControllerProcessorResumeMember{handler:handler}
+  self76.processorMap["shutdownCluster"] = &remoteControllerProcessorShutdownCluster{handler:handler}
+  self76.processorMap["terminateCluster"] = &remoteControllerProcessorTerminateCluster{handler:handler}
+  self76.processorMap["splitMemberFromCluster"] = &remoteControllerProcessorSplitMemberFromCluster{handler:handler}
+  self76.processorMap["mergeMemberToCluster"] = &remoteControllerProcessorMergeMemberToCluster{handler:handler}
+  self76.processorMap["loginToCloudUsingEnvironment"] = &remoteControllerProcessorLoginToCloudUsingEnvironment{handler:handler}
+  self76.processorMap["loginToCloud"] = &remoteControllerProcessorLoginToCloud{handler:handler}
+  self76.processorMap["createCloudCluster"] = &remoteControllerProcessorCreateCloudCluster{handler:handler}
+  self76.processorMap["getCloudCluster"] = &remoteControllerProcessorGetCloudCluster{handler:handler}
+  self76.processorMap["stopCloudCluster"] = &remoteControllerProcessorStopCloudCluster{handler:handler}
+  self76.processorMap["resumeCloudCluster"] = &remoteControllerProcessorResumeCloudCluster{handler:handler}
+  self76.processorMap["deleteCloudCluster"] = &remoteControllerProcessorDeleteCloudCluster{handler:handler}
+  self76.processorMap["executeOnController"] = &remoteControllerProcessorExecuteOnController{handler:handler}
+return self76
 }
 
 func (p *RemoteControllerProcessor) Process(ctx context.Context, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
@@ -1867,12 +1828,12 @@ func (p *RemoteControllerProcessor) Process(ctx context.Context, iprot, oprot th
   }
   iprot.Skip(ctx, thrift.STRUCT)
   iprot.ReadMessageEnd(ctx)
-  x80 := thrift.NewTApplicationException(thrift.UNKNOWN_METHOD, "Unknown function " + name)
+  x77 := thrift.NewTApplicationException(thrift.UNKNOWN_METHOD, "Unknown function " + name)
   oprot.WriteMessageBegin(ctx, name, thrift.EXCEPTION, seqId)
-  x80.Write(ctx, oprot)
+  x77.Write(ctx, oprot)
   oprot.WriteMessageEnd(ctx)
   oprot.Flush(ctx)
-  return false, x80
+  return false, x77
 
 }
 
@@ -2161,20 +2122,20 @@ func (p *remoteControllerProcessorCreateCluster) Process(ctx context.Context, se
   var retval *Cluster
   if retval, err2 = p.handler.CreateCluster(ctx, args.HzVersion, args.Xmlconfig); err2 != nil {
     tickerCancel()
-    switch v := err2.(type) {
+  switch v := err2.(type) {
     case *ServerException:
-      result.ServerException = v
+  result.ServerException = v
     default:
-      if err2 == thrift.ErrAbandonRequest {
-        return false, thrift.WrapTException(err2)
-      }
-      x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing createCluster: " + err2.Error())
-      oprot.WriteMessageBegin(ctx, "createCluster", thrift.EXCEPTION, seqId)
-      x.Write(ctx, oprot)
-      oprot.WriteMessageEnd(ctx)
-      oprot.Flush(ctx)
-      return true, thrift.WrapTException(err2)
+    if err2 == thrift.ErrAbandonRequest {
+      return false, thrift.WrapTException(err2)
     }
+    x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing createCluster: " + err2.Error())
+    oprot.WriteMessageBegin(ctx, "createCluster", thrift.EXCEPTION, seqId)
+    x.Write(ctx, oprot)
+    oprot.WriteMessageEnd(ctx)
+    oprot.Flush(ctx)
+    return true, thrift.WrapTException(err2)
+  }
   } else {
     result.Success = retval
   }
@@ -2245,20 +2206,20 @@ func (p *remoteControllerProcessorCreateClusterKeepClusterName) Process(ctx cont
   var retval *Cluster
   if retval, err2 = p.handler.CreateClusterKeepClusterName(ctx, args.HzVersion, args.Xmlconfig); err2 != nil {
     tickerCancel()
-    switch v := err2.(type) {
+  switch v := err2.(type) {
     case *ServerException:
-      result.ServerException = v
+  result.ServerException = v
     default:
-      if err2 == thrift.ErrAbandonRequest {
-        return false, thrift.WrapTException(err2)
-      }
-      x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing createClusterKeepClusterName: " + err2.Error())
-      oprot.WriteMessageBegin(ctx, "createClusterKeepClusterName", thrift.EXCEPTION, seqId)
-      x.Write(ctx, oprot)
-      oprot.WriteMessageEnd(ctx)
-      oprot.Flush(ctx)
-      return true, thrift.WrapTException(err2)
+    if err2 == thrift.ErrAbandonRequest {
+      return false, thrift.WrapTException(err2)
     }
+    x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing createClusterKeepClusterName: " + err2.Error())
+    oprot.WriteMessageBegin(ctx, "createClusterKeepClusterName", thrift.EXCEPTION, seqId)
+    x.Write(ctx, oprot)
+    oprot.WriteMessageEnd(ctx)
+    oprot.Flush(ctx)
+    return true, thrift.WrapTException(err2)
+  }
   } else {
     result.Success = retval
   }
@@ -2329,20 +2290,20 @@ func (p *remoteControllerProcessorStartMember) Process(ctx context.Context, seqI
   var retval *Member
   if retval, err2 = p.handler.StartMember(ctx, args.ClusterId); err2 != nil {
     tickerCancel()
-    switch v := err2.(type) {
+  switch v := err2.(type) {
     case *ServerException:
-      result.ServerException = v
+  result.ServerException = v
     default:
-      if err2 == thrift.ErrAbandonRequest {
-        return false, thrift.WrapTException(err2)
-      }
-      x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing startMember: " + err2.Error())
-      oprot.WriteMessageBegin(ctx, "startMember", thrift.EXCEPTION, seqId)
-      x.Write(ctx, oprot)
-      oprot.WriteMessageEnd(ctx)
-      oprot.Flush(ctx)
-      return true, thrift.WrapTException(err2)
+    if err2 == thrift.ErrAbandonRequest {
+      return false, thrift.WrapTException(err2)
     }
+    x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing startMember: " + err2.Error())
+    oprot.WriteMessageBegin(ctx, "startMember", thrift.EXCEPTION, seqId)
+    x.Write(ctx, oprot)
+    oprot.WriteMessageEnd(ctx)
+    oprot.Flush(ctx)
+    return true, thrift.WrapTException(err2)
+  }
   } else {
     result.Success = retval
   }
@@ -2997,17 +2958,17 @@ func (p *remoteControllerProcessorMergeMemberToCluster) Process(ctx context.Cont
   return true, err
 }
 
-type remoteControllerProcessorLoginToHazelcastCloudUsingEnvironment struct {
+type remoteControllerProcessorLoginToCloudUsingEnvironment struct {
   handler RemoteController
 }
 
-func (p *remoteControllerProcessorLoginToHazelcastCloudUsingEnvironment) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
-  args := RemoteControllerLoginToHazelcastCloudUsingEnvironmentArgs{}
+func (p *remoteControllerProcessorLoginToCloudUsingEnvironment) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+  args := RemoteControllerLoginToCloudUsingEnvironmentArgs{}
   var err2 error
   if err2 = args.Read(ctx, iprot); err2 != nil {
     iprot.ReadMessageEnd(ctx)
     x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err2.Error())
-    oprot.WriteMessageBegin(ctx, "loginToHazelcastCloudUsingEnvironment", thrift.EXCEPTION, seqId)
+    oprot.WriteMessageBegin(ctx, "loginToCloudUsingEnvironment", thrift.EXCEPTION, seqId)
     x.Write(ctx, oprot)
     oprot.WriteMessageEnd(ctx)
     oprot.Flush(ctx)
@@ -3041,26 +3002,26 @@ func (p *remoteControllerProcessorLoginToHazelcastCloudUsingEnvironment) Process
     }(tickerCtx, cancel)
   }
 
-  result := RemoteControllerLoginToHazelcastCloudUsingEnvironmentResult{}
-  if err2 = p.handler.LoginToHazelcastCloudUsingEnvironment(ctx); err2 != nil {
+  result := RemoteControllerLoginToCloudUsingEnvironmentResult{}
+  if err2 = p.handler.LoginToCloudUsingEnvironment(ctx); err2 != nil {
     tickerCancel()
-    switch v := err2.(type) {
+  switch v := err2.(type) {
     case *CloudException:
-      result.CloudException = v
+  result.CloudException = v
     default:
-      if err2 == thrift.ErrAbandonRequest {
-        return false, thrift.WrapTException(err2)
-      }
-      x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing loginToHazelcastCloudUsingEnvironment: " + err2.Error())
-      oprot.WriteMessageBegin(ctx, "loginToHazelcastCloudUsingEnvironment", thrift.EXCEPTION, seqId)
-      x.Write(ctx, oprot)
-      oprot.WriteMessageEnd(ctx)
-      oprot.Flush(ctx)
-      return true, thrift.WrapTException(err2)
+    if err2 == thrift.ErrAbandonRequest {
+      return false, thrift.WrapTException(err2)
     }
+    x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing loginToCloudUsingEnvironment: " + err2.Error())
+    oprot.WriteMessageBegin(ctx, "loginToCloudUsingEnvironment", thrift.EXCEPTION, seqId)
+    x.Write(ctx, oprot)
+    oprot.WriteMessageEnd(ctx)
+    oprot.Flush(ctx)
+    return true, thrift.WrapTException(err2)
+  }
   }
   tickerCancel()
-  if err2 = oprot.WriteMessageBegin(ctx, "loginToHazelcastCloudUsingEnvironment", thrift.REPLY, seqId); err2 != nil {
+  if err2 = oprot.WriteMessageBegin(ctx, "loginToCloudUsingEnvironment", thrift.REPLY, seqId); err2 != nil {
     err = thrift.WrapTException(err2)
   }
   if err2 = result.Write(ctx, oprot); err == nil && err2 != nil {
@@ -3078,17 +3039,17 @@ func (p *remoteControllerProcessorLoginToHazelcastCloudUsingEnvironment) Process
   return true, err
 }
 
-type remoteControllerProcessorLoginToHazelcastCloud struct {
+type remoteControllerProcessorLoginToCloud struct {
   handler RemoteController
 }
 
-func (p *remoteControllerProcessorLoginToHazelcastCloud) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
-  args := RemoteControllerLoginToHazelcastCloudArgs{}
+func (p *remoteControllerProcessorLoginToCloud) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+  args := RemoteControllerLoginToCloudArgs{}
   var err2 error
   if err2 = args.Read(ctx, iprot); err2 != nil {
     iprot.ReadMessageEnd(ctx)
     x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err2.Error())
-    oprot.WriteMessageBegin(ctx, "loginToHazelcastCloud", thrift.EXCEPTION, seqId)
+    oprot.WriteMessageBegin(ctx, "loginToCloud", thrift.EXCEPTION, seqId)
     x.Write(ctx, oprot)
     oprot.WriteMessageEnd(ctx)
     oprot.Flush(ctx)
@@ -3122,26 +3083,26 @@ func (p *remoteControllerProcessorLoginToHazelcastCloud) Process(ctx context.Con
     }(tickerCtx, cancel)
   }
 
-  result := RemoteControllerLoginToHazelcastCloudResult{}
-  if err2 = p.handler.LoginToHazelcastCloud(ctx, args.BaseUrl, args.ApiKey, args.ApiSecret); err2 != nil {
+  result := RemoteControllerLoginToCloudResult{}
+  if err2 = p.handler.LoginToCloud(ctx, args.BaseUrl, args.ApiKey, args.ApiSecret); err2 != nil {
     tickerCancel()
-    switch v := err2.(type) {
+  switch v := err2.(type) {
     case *CloudException:
-      result.CloudException = v
+  result.CloudException = v
     default:
-      if err2 == thrift.ErrAbandonRequest {
-        return false, thrift.WrapTException(err2)
-      }
-      x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing loginToHazelcastCloud: " + err2.Error())
-      oprot.WriteMessageBegin(ctx, "loginToHazelcastCloud", thrift.EXCEPTION, seqId)
-      x.Write(ctx, oprot)
-      oprot.WriteMessageEnd(ctx)
-      oprot.Flush(ctx)
-      return true, thrift.WrapTException(err2)
+    if err2 == thrift.ErrAbandonRequest {
+      return false, thrift.WrapTException(err2)
     }
+    x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing loginToCloud: " + err2.Error())
+    oprot.WriteMessageBegin(ctx, "loginToCloud", thrift.EXCEPTION, seqId)
+    x.Write(ctx, oprot)
+    oprot.WriteMessageEnd(ctx)
+    oprot.Flush(ctx)
+    return true, thrift.WrapTException(err2)
+  }
   }
   tickerCancel()
-  if err2 = oprot.WriteMessageBegin(ctx, "loginToHazelcastCloud", thrift.REPLY, seqId); err2 != nil {
+  if err2 = oprot.WriteMessageBegin(ctx, "loginToCloud", thrift.REPLY, seqId); err2 != nil {
     err = thrift.WrapTException(err2)
   }
   if err2 = result.Write(ctx, oprot); err == nil && err2 != nil {
@@ -3159,17 +3120,17 @@ func (p *remoteControllerProcessorLoginToHazelcastCloud) Process(ctx context.Con
   return true, err
 }
 
-type remoteControllerProcessorCreateHazelcastCloudStandardCluster struct {
+type remoteControllerProcessorCreateCloudCluster struct {
   handler RemoteController
 }
 
-func (p *remoteControllerProcessorCreateHazelcastCloudStandardCluster) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
-  args := RemoteControllerCreateHazelcastCloudStandardClusterArgs{}
+func (p *remoteControllerProcessorCreateCloudCluster) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+  args := RemoteControllerCreateCloudClusterArgs{}
   var err2 error
   if err2 = args.Read(ctx, iprot); err2 != nil {
     iprot.ReadMessageEnd(ctx)
     x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err2.Error())
-    oprot.WriteMessageBegin(ctx, "createHazelcastCloudStandardCluster", thrift.EXCEPTION, seqId)
+    oprot.WriteMessageBegin(ctx, "createCloudCluster", thrift.EXCEPTION, seqId)
     x.Write(ctx, oprot)
     oprot.WriteMessageEnd(ctx)
     oprot.Flush(ctx)
@@ -3203,29 +3164,29 @@ func (p *remoteControllerProcessorCreateHazelcastCloudStandardCluster) Process(c
     }(tickerCtx, cancel)
   }
 
-  result := RemoteControllerCreateHazelcastCloudStandardClusterResult{}
+  result := RemoteControllerCreateCloudClusterResult{}
   var retval *CloudCluster
-  if retval, err2 = p.handler.CreateHazelcastCloudStandardCluster(ctx, args.HazelcastVersion, args.IsTlsEnabled); err2 != nil {
+  if retval, err2 = p.handler.CreateCloudCluster(ctx, args.HazelcastVersion, args.IsTlsEnabled); err2 != nil {
     tickerCancel()
-    switch v := err2.(type) {
+  switch v := err2.(type) {
     case *CloudException:
-      result.CloudException = v
+  result.CloudException = v
     default:
-      if err2 == thrift.ErrAbandonRequest {
-        return false, thrift.WrapTException(err2)
-      }
-      x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing createHazelcastCloudStandardCluster: " + err2.Error())
-      oprot.WriteMessageBegin(ctx, "createHazelcastCloudStandardCluster", thrift.EXCEPTION, seqId)
-      x.Write(ctx, oprot)
-      oprot.WriteMessageEnd(ctx)
-      oprot.Flush(ctx)
-      return true, thrift.WrapTException(err2)
+    if err2 == thrift.ErrAbandonRequest {
+      return false, thrift.WrapTException(err2)
     }
+    x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing createCloudCluster: " + err2.Error())
+    oprot.WriteMessageBegin(ctx, "createCloudCluster", thrift.EXCEPTION, seqId)
+    x.Write(ctx, oprot)
+    oprot.WriteMessageEnd(ctx)
+    oprot.Flush(ctx)
+    return true, thrift.WrapTException(err2)
+  }
   } else {
     result.Success = retval
   }
   tickerCancel()
-  if err2 = oprot.WriteMessageBegin(ctx, "createHazelcastCloudStandardCluster", thrift.REPLY, seqId); err2 != nil {
+  if err2 = oprot.WriteMessageBegin(ctx, "createCloudCluster", thrift.REPLY, seqId); err2 != nil {
     err = thrift.WrapTException(err2)
   }
   if err2 = result.Write(ctx, oprot); err == nil && err2 != nil {
@@ -3243,17 +3204,17 @@ func (p *remoteControllerProcessorCreateHazelcastCloudStandardCluster) Process(c
   return true, err
 }
 
-type remoteControllerProcessorSetHazelcastCloudClusterMemberCount struct {
+type remoteControllerProcessorGetCloudCluster struct {
   handler RemoteController
 }
 
-func (p *remoteControllerProcessorSetHazelcastCloudClusterMemberCount) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
-  args := RemoteControllerSetHazelcastCloudClusterMemberCountArgs{}
+func (p *remoteControllerProcessorGetCloudCluster) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+  args := RemoteControllerGetCloudClusterArgs{}
   var err2 error
   if err2 = args.Read(ctx, iprot); err2 != nil {
     iprot.ReadMessageEnd(ctx)
     x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err2.Error())
-    oprot.WriteMessageBegin(ctx, "setHazelcastCloudClusterMemberCount", thrift.EXCEPTION, seqId)
+    oprot.WriteMessageBegin(ctx, "getCloudCluster", thrift.EXCEPTION, seqId)
     x.Write(ctx, oprot)
     oprot.WriteMessageEnd(ctx)
     oprot.Flush(ctx)
@@ -3287,110 +3248,29 @@ func (p *remoteControllerProcessorSetHazelcastCloudClusterMemberCount) Process(c
     }(tickerCtx, cancel)
   }
 
-  result := RemoteControllerSetHazelcastCloudClusterMemberCountResult{}
-  if err2 = p.handler.SetHazelcastCloudClusterMemberCount(ctx, args.CloudClusterId, args.TotalMemberCount); err2 != nil {
-    tickerCancel()
-    switch v := err2.(type) {
-    case *CloudException:
-      result.CloudException = v
-    default:
-      if err2 == thrift.ErrAbandonRequest {
-        return false, thrift.WrapTException(err2)
-      }
-      x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing setHazelcastCloudClusterMemberCount: " + err2.Error())
-      oprot.WriteMessageBegin(ctx, "setHazelcastCloudClusterMemberCount", thrift.EXCEPTION, seqId)
-      x.Write(ctx, oprot)
-      oprot.WriteMessageEnd(ctx)
-      oprot.Flush(ctx)
-      return true, thrift.WrapTException(err2)
-    }
-  }
-  tickerCancel()
-  if err2 = oprot.WriteMessageBegin(ctx, "setHazelcastCloudClusterMemberCount", thrift.REPLY, seqId); err2 != nil {
-    err = thrift.WrapTException(err2)
-  }
-  if err2 = result.Write(ctx, oprot); err == nil && err2 != nil {
-    err = thrift.WrapTException(err2)
-  }
-  if err2 = oprot.WriteMessageEnd(ctx); err == nil && err2 != nil {
-    err = thrift.WrapTException(err2)
-  }
-  if err2 = oprot.Flush(ctx); err == nil && err2 != nil {
-    err = thrift.WrapTException(err2)
-  }
-  if err != nil {
-    return
-  }
-  return true, err
-}
-
-type remoteControllerProcessorGetHazelcastCloudCluster struct {
-  handler RemoteController
-}
-
-func (p *remoteControllerProcessorGetHazelcastCloudCluster) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
-  args := RemoteControllerGetHazelcastCloudClusterArgs{}
-  var err2 error
-  if err2 = args.Read(ctx, iprot); err2 != nil {
-    iprot.ReadMessageEnd(ctx)
-    x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err2.Error())
-    oprot.WriteMessageBegin(ctx, "getHazelcastCloudCluster", thrift.EXCEPTION, seqId)
-    x.Write(ctx, oprot)
-    oprot.WriteMessageEnd(ctx)
-    oprot.Flush(ctx)
-    return false, thrift.WrapTException(err2)
-  }
-  iprot.ReadMessageEnd(ctx)
-
-  tickerCancel := func() {}
-  // Start a goroutine to do server side connectivity check.
-  if thrift.ServerConnectivityCheckInterval > 0 {
-    var cancel context.CancelFunc
-    ctx, cancel = context.WithCancel(ctx)
-    defer cancel()
-    var tickerCtx context.Context
-    tickerCtx, tickerCancel = context.WithCancel(context.Background())
-    defer tickerCancel()
-    go func(ctx context.Context, cancel context.CancelFunc) {
-      ticker := time.NewTicker(thrift.ServerConnectivityCheckInterval)
-      defer ticker.Stop()
-      for {
-        select {
-        case <-ctx.Done():
-          return
-        case <-ticker.C:
-          if !iprot.Transport().IsOpen() {
-            cancel()
-            return
-          }
-        }
-      }
-    }(tickerCtx, cancel)
-  }
-
-  result := RemoteControllerGetHazelcastCloudClusterResult{}
+  result := RemoteControllerGetCloudClusterResult{}
   var retval *CloudCluster
-  if retval, err2 = p.handler.GetHazelcastCloudCluster(ctx, args.CloudClusterId); err2 != nil {
+  if retval, err2 = p.handler.GetCloudCluster(ctx, args.CloudClusterId); err2 != nil {
     tickerCancel()
-    switch v := err2.(type) {
+  switch v := err2.(type) {
     case *CloudException:
-      result.CloudException = v
+  result.CloudException = v
     default:
-      if err2 == thrift.ErrAbandonRequest {
-        return false, thrift.WrapTException(err2)
-      }
-      x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing getHazelcastCloudCluster: " + err2.Error())
-      oprot.WriteMessageBegin(ctx, "getHazelcastCloudCluster", thrift.EXCEPTION, seqId)
-      x.Write(ctx, oprot)
-      oprot.WriteMessageEnd(ctx)
-      oprot.Flush(ctx)
-      return true, thrift.WrapTException(err2)
+    if err2 == thrift.ErrAbandonRequest {
+      return false, thrift.WrapTException(err2)
     }
+    x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing getCloudCluster: " + err2.Error())
+    oprot.WriteMessageBegin(ctx, "getCloudCluster", thrift.EXCEPTION, seqId)
+    x.Write(ctx, oprot)
+    oprot.WriteMessageEnd(ctx)
+    oprot.Flush(ctx)
+    return true, thrift.WrapTException(err2)
+  }
   } else {
     result.Success = retval
   }
   tickerCancel()
-  if err2 = oprot.WriteMessageBegin(ctx, "getHazelcastCloudCluster", thrift.REPLY, seqId); err2 != nil {
+  if err2 = oprot.WriteMessageBegin(ctx, "getCloudCluster", thrift.REPLY, seqId); err2 != nil {
     err = thrift.WrapTException(err2)
   }
   if err2 = result.Write(ctx, oprot); err == nil && err2 != nil {
@@ -3408,17 +3288,17 @@ func (p *remoteControllerProcessorGetHazelcastCloudCluster) Process(ctx context.
   return true, err
 }
 
-type remoteControllerProcessorStopHazelcastCloudCluster struct {
+type remoteControllerProcessorStopCloudCluster struct {
   handler RemoteController
 }
 
-func (p *remoteControllerProcessorStopHazelcastCloudCluster) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
-  args := RemoteControllerStopHazelcastCloudClusterArgs{}
+func (p *remoteControllerProcessorStopCloudCluster) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+  args := RemoteControllerStopCloudClusterArgs{}
   var err2 error
   if err2 = args.Read(ctx, iprot); err2 != nil {
     iprot.ReadMessageEnd(ctx)
     x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err2.Error())
-    oprot.WriteMessageBegin(ctx, "stopHazelcastCloudCluster", thrift.EXCEPTION, seqId)
+    oprot.WriteMessageBegin(ctx, "stopCloudCluster", thrift.EXCEPTION, seqId)
     x.Write(ctx, oprot)
     oprot.WriteMessageEnd(ctx)
     oprot.Flush(ctx)
@@ -3452,29 +3332,29 @@ func (p *remoteControllerProcessorStopHazelcastCloudCluster) Process(ctx context
     }(tickerCtx, cancel)
   }
 
-  result := RemoteControllerStopHazelcastCloudClusterResult{}
+  result := RemoteControllerStopCloudClusterResult{}
   var retval *CloudCluster
-  if retval, err2 = p.handler.StopHazelcastCloudCluster(ctx, args.CloudClusterId); err2 != nil {
+  if retval, err2 = p.handler.StopCloudCluster(ctx, args.CloudClusterId); err2 != nil {
     tickerCancel()
-    switch v := err2.(type) {
+  switch v := err2.(type) {
     case *CloudException:
-      result.CloudException = v
+  result.CloudException = v
     default:
-      if err2 == thrift.ErrAbandonRequest {
-        return false, thrift.WrapTException(err2)
-      }
-      x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing stopHazelcastCloudCluster: " + err2.Error())
-      oprot.WriteMessageBegin(ctx, "stopHazelcastCloudCluster", thrift.EXCEPTION, seqId)
-      x.Write(ctx, oprot)
-      oprot.WriteMessageEnd(ctx)
-      oprot.Flush(ctx)
-      return true, thrift.WrapTException(err2)
+    if err2 == thrift.ErrAbandonRequest {
+      return false, thrift.WrapTException(err2)
     }
+    x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing stopCloudCluster: " + err2.Error())
+    oprot.WriteMessageBegin(ctx, "stopCloudCluster", thrift.EXCEPTION, seqId)
+    x.Write(ctx, oprot)
+    oprot.WriteMessageEnd(ctx)
+    oprot.Flush(ctx)
+    return true, thrift.WrapTException(err2)
+  }
   } else {
     result.Success = retval
   }
   tickerCancel()
-  if err2 = oprot.WriteMessageBegin(ctx, "stopHazelcastCloudCluster", thrift.REPLY, seqId); err2 != nil {
+  if err2 = oprot.WriteMessageBegin(ctx, "stopCloudCluster", thrift.REPLY, seqId); err2 != nil {
     err = thrift.WrapTException(err2)
   }
   if err2 = result.Write(ctx, oprot); err == nil && err2 != nil {
@@ -3492,17 +3372,17 @@ func (p *remoteControllerProcessorStopHazelcastCloudCluster) Process(ctx context
   return true, err
 }
 
-type remoteControllerProcessorResumeHazelcastCloudCluster struct {
+type remoteControllerProcessorResumeCloudCluster struct {
   handler RemoteController
 }
 
-func (p *remoteControllerProcessorResumeHazelcastCloudCluster) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
-  args := RemoteControllerResumeHazelcastCloudClusterArgs{}
+func (p *remoteControllerProcessorResumeCloudCluster) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+  args := RemoteControllerResumeCloudClusterArgs{}
   var err2 error
   if err2 = args.Read(ctx, iprot); err2 != nil {
     iprot.ReadMessageEnd(ctx)
     x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err2.Error())
-    oprot.WriteMessageBegin(ctx, "resumeHazelcastCloudCluster", thrift.EXCEPTION, seqId)
+    oprot.WriteMessageBegin(ctx, "resumeCloudCluster", thrift.EXCEPTION, seqId)
     x.Write(ctx, oprot)
     oprot.WriteMessageEnd(ctx)
     oprot.Flush(ctx)
@@ -3536,29 +3416,29 @@ func (p *remoteControllerProcessorResumeHazelcastCloudCluster) Process(ctx conte
     }(tickerCtx, cancel)
   }
 
-  result := RemoteControllerResumeHazelcastCloudClusterResult{}
+  result := RemoteControllerResumeCloudClusterResult{}
   var retval *CloudCluster
-  if retval, err2 = p.handler.ResumeHazelcastCloudCluster(ctx, args.CloudClusterId); err2 != nil {
+  if retval, err2 = p.handler.ResumeCloudCluster(ctx, args.CloudClusterId); err2 != nil {
     tickerCancel()
-    switch v := err2.(type) {
+  switch v := err2.(type) {
     case *CloudException:
-      result.CloudException = v
+  result.CloudException = v
     default:
-      if err2 == thrift.ErrAbandonRequest {
-        return false, thrift.WrapTException(err2)
-      }
-      x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing resumeHazelcastCloudCluster: " + err2.Error())
-      oprot.WriteMessageBegin(ctx, "resumeHazelcastCloudCluster", thrift.EXCEPTION, seqId)
-      x.Write(ctx, oprot)
-      oprot.WriteMessageEnd(ctx)
-      oprot.Flush(ctx)
-      return true, thrift.WrapTException(err2)
+    if err2 == thrift.ErrAbandonRequest {
+      return false, thrift.WrapTException(err2)
     }
+    x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing resumeCloudCluster: " + err2.Error())
+    oprot.WriteMessageBegin(ctx, "resumeCloudCluster", thrift.EXCEPTION, seqId)
+    x.Write(ctx, oprot)
+    oprot.WriteMessageEnd(ctx)
+    oprot.Flush(ctx)
+    return true, thrift.WrapTException(err2)
+  }
   } else {
     result.Success = retval
   }
   tickerCancel()
-  if err2 = oprot.WriteMessageBegin(ctx, "resumeHazelcastCloudCluster", thrift.REPLY, seqId); err2 != nil {
+  if err2 = oprot.WriteMessageBegin(ctx, "resumeCloudCluster", thrift.REPLY, seqId); err2 != nil {
     err = thrift.WrapTException(err2)
   }
   if err2 = result.Write(ctx, oprot); err == nil && err2 != nil {
@@ -3576,17 +3456,17 @@ func (p *remoteControllerProcessorResumeHazelcastCloudCluster) Process(ctx conte
   return true, err
 }
 
-type remoteControllerProcessorDeleteHazelcastCloudCluster struct {
+type remoteControllerProcessorDeleteCloudCluster struct {
   handler RemoteController
 }
 
-func (p *remoteControllerProcessorDeleteHazelcastCloudCluster) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
-  args := RemoteControllerDeleteHazelcastCloudClusterArgs{}
+func (p *remoteControllerProcessorDeleteCloudCluster) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+  args := RemoteControllerDeleteCloudClusterArgs{}
   var err2 error
   if err2 = args.Read(ctx, iprot); err2 != nil {
     iprot.ReadMessageEnd(ctx)
     x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err2.Error())
-    oprot.WriteMessageBegin(ctx, "deleteHazelcastCloudCluster", thrift.EXCEPTION, seqId)
+    oprot.WriteMessageBegin(ctx, "deleteCloudCluster", thrift.EXCEPTION, seqId)
     x.Write(ctx, oprot)
     oprot.WriteMessageEnd(ctx)
     oprot.Flush(ctx)
@@ -3620,26 +3500,26 @@ func (p *remoteControllerProcessorDeleteHazelcastCloudCluster) Process(ctx conte
     }(tickerCtx, cancel)
   }
 
-  result := RemoteControllerDeleteHazelcastCloudClusterResult{}
-  if err2 = p.handler.DeleteHazelcastCloudCluster(ctx, args.CloudClusterId); err2 != nil {
+  result := RemoteControllerDeleteCloudClusterResult{}
+  if err2 = p.handler.DeleteCloudCluster(ctx, args.CloudClusterId); err2 != nil {
     tickerCancel()
-    switch v := err2.(type) {
+  switch v := err2.(type) {
     case *CloudException:
-      result.CloudException = v
+  result.CloudException = v
     default:
-      if err2 == thrift.ErrAbandonRequest {
-        return false, thrift.WrapTException(err2)
-      }
-      x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing deleteHazelcastCloudCluster: " + err2.Error())
-      oprot.WriteMessageBegin(ctx, "deleteHazelcastCloudCluster", thrift.EXCEPTION, seqId)
-      x.Write(ctx, oprot)
-      oprot.WriteMessageEnd(ctx)
-      oprot.Flush(ctx)
-      return true, thrift.WrapTException(err2)
+    if err2 == thrift.ErrAbandonRequest {
+      return false, thrift.WrapTException(err2)
     }
+    x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing deleteCloudCluster: " + err2.Error())
+    oprot.WriteMessageBegin(ctx, "deleteCloudCluster", thrift.EXCEPTION, seqId)
+    x.Write(ctx, oprot)
+    oprot.WriteMessageEnd(ctx)
+    oprot.Flush(ctx)
+    return true, thrift.WrapTException(err2)
+  }
   }
   tickerCancel()
-  if err2 = oprot.WriteMessageBegin(ctx, "deleteHazelcastCloudCluster", thrift.REPLY, seqId); err2 != nil {
+  if err2 = oprot.WriteMessageBegin(ctx, "deleteCloudCluster", thrift.REPLY, seqId); err2 != nil {
     err = thrift.WrapTException(err2)
   }
   if err2 = result.Write(ctx, oprot); err == nil && err2 != nil {
@@ -3805,7 +3685,7 @@ func (p *RemoteControllerPingResult) GetSuccess() bool {
   if !p.IsSetSuccess() {
     return RemoteControllerPingResult_Success_DEFAULT
   }
-  return *p.Success
+return *p.Success
 }
 func (p *RemoteControllerPingResult) IsSetSuccess() bool {
   return p.Success != nil
@@ -3851,10 +3731,10 @@ func (p *RemoteControllerPingResult) Read(ctx context.Context, iprot thrift.TPro
 
 func (p *RemoteControllerPingResult)  ReadField0(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBool(ctx); err != nil {
-    return thrift.PrependError("error reading field 0: ", err)
-  } else {
-    p.Success = &v
-  }
+  return thrift.PrependError("error reading field 0: ", err)
+} else {
+  p.Success = &v
+}
   return nil
 }
 
@@ -3876,7 +3756,7 @@ func (p *RemoteControllerPingResult) writeField0(ctx context.Context, oprot thri
     if err := oprot.WriteFieldBegin(ctx, "success", thrift.BOOL, 0); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := oprot.WriteBool(ctx, bool(*p.Success)); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T.success (0) field write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.success (0) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(ctx); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
@@ -3956,7 +3836,7 @@ func (p *RemoteControllerCleanResult) GetSuccess() bool {
   if !p.IsSetSuccess() {
     return RemoteControllerCleanResult_Success_DEFAULT
   }
-  return *p.Success
+return *p.Success
 }
 func (p *RemoteControllerCleanResult) IsSetSuccess() bool {
   return p.Success != nil
@@ -4002,10 +3882,10 @@ func (p *RemoteControllerCleanResult) Read(ctx context.Context, iprot thrift.TPr
 
 func (p *RemoteControllerCleanResult)  ReadField0(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBool(ctx); err != nil {
-    return thrift.PrependError("error reading field 0: ", err)
-  } else {
-    p.Success = &v
-  }
+  return thrift.PrependError("error reading field 0: ", err)
+} else {
+  p.Success = &v
+}
   return nil
 }
 
@@ -4027,7 +3907,7 @@ func (p *RemoteControllerCleanResult) writeField0(ctx context.Context, oprot thr
     if err := oprot.WriteFieldBegin(ctx, "success", thrift.BOOL, 0); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := oprot.WriteBool(ctx, bool(*p.Success)); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T.success (0) field write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.success (0) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(ctx); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
@@ -4107,7 +3987,7 @@ func (p *RemoteControllerExitResult) GetSuccess() bool {
   if !p.IsSetSuccess() {
     return RemoteControllerExitResult_Success_DEFAULT
   }
-  return *p.Success
+return *p.Success
 }
 func (p *RemoteControllerExitResult) IsSetSuccess() bool {
   return p.Success != nil
@@ -4153,10 +4033,10 @@ func (p *RemoteControllerExitResult) Read(ctx context.Context, iprot thrift.TPro
 
 func (p *RemoteControllerExitResult)  ReadField0(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBool(ctx); err != nil {
-    return thrift.PrependError("error reading field 0: ", err)
-  } else {
-    p.Success = &v
-  }
+  return thrift.PrependError("error reading field 0: ", err)
+} else {
+  p.Success = &v
+}
   return nil
 }
 
@@ -4178,7 +4058,7 @@ func (p *RemoteControllerExitResult) writeField0(ctx context.Context, oprot thri
     if err := oprot.WriteFieldBegin(ctx, "success", thrift.BOOL, 0); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := oprot.WriteBool(ctx, bool(*p.Success)); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T.success (0) field write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.success (0) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(ctx); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
@@ -4262,19 +4142,19 @@ func (p *RemoteControllerCreateClusterArgs) Read(ctx context.Context, iprot thri
 
 func (p *RemoteControllerCreateClusterArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 1: ", err)
-  } else {
-    p.HzVersion = v
-  }
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.HzVersion = v
+}
   return nil
 }
 
 func (p *RemoteControllerCreateClusterArgs)  ReadField2(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 2: ", err)
-  } else {
-    p.Xmlconfig = v
-  }
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
+  p.Xmlconfig = v
+}
   return nil
 }
 
@@ -4296,7 +4176,7 @@ func (p *RemoteControllerCreateClusterArgs) writeField1(ctx context.Context, opr
   if err := oprot.WriteFieldBegin(ctx, "hzVersion", thrift.STRING, 1); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:hzVersion: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.HzVersion)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.hzVersion (1) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.hzVersion (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 1:hzVersion: ", p), err) }
   return err
@@ -4306,7 +4186,7 @@ func (p *RemoteControllerCreateClusterArgs) writeField2(ctx context.Context, opr
   if err := oprot.WriteFieldBegin(ctx, "xmlconfig", thrift.STRING, 2); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:xmlconfig: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.Xmlconfig)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.xmlconfig (2) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.xmlconfig (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 2:xmlconfig: ", p), err) }
   return err
@@ -4336,14 +4216,14 @@ func (p *RemoteControllerCreateClusterResult) GetSuccess() *Cluster {
   if !p.IsSetSuccess() {
     return RemoteControllerCreateClusterResult_Success_DEFAULT
   }
-  return p.Success
+return p.Success
 }
 var RemoteControllerCreateClusterResult_ServerException_DEFAULT *ServerException
 func (p *RemoteControllerCreateClusterResult) GetServerException() *ServerException {
   if !p.IsSetServerException() {
     return RemoteControllerCreateClusterResult_ServerException_DEFAULT
   }
-  return p.ServerException
+return p.ServerException
 }
 func (p *RemoteControllerCreateClusterResult) IsSetSuccess() bool {
   return p.Success != nil
@@ -4534,19 +4414,19 @@ func (p *RemoteControllerCreateClusterKeepClusterNameArgs) Read(ctx context.Cont
 
 func (p *RemoteControllerCreateClusterKeepClusterNameArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 1: ", err)
-  } else {
-    p.HzVersion = v
-  }
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.HzVersion = v
+}
   return nil
 }
 
 func (p *RemoteControllerCreateClusterKeepClusterNameArgs)  ReadField2(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 2: ", err)
-  } else {
-    p.Xmlconfig = v
-  }
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
+  p.Xmlconfig = v
+}
   return nil
 }
 
@@ -4568,7 +4448,7 @@ func (p *RemoteControllerCreateClusterKeepClusterNameArgs) writeField1(ctx conte
   if err := oprot.WriteFieldBegin(ctx, "hzVersion", thrift.STRING, 1); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:hzVersion: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.HzVersion)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.hzVersion (1) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.hzVersion (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 1:hzVersion: ", p), err) }
   return err
@@ -4578,7 +4458,7 @@ func (p *RemoteControllerCreateClusterKeepClusterNameArgs) writeField2(ctx conte
   if err := oprot.WriteFieldBegin(ctx, "xmlconfig", thrift.STRING, 2); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:xmlconfig: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.Xmlconfig)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.xmlconfig (2) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.xmlconfig (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 2:xmlconfig: ", p), err) }
   return err
@@ -4608,14 +4488,14 @@ func (p *RemoteControllerCreateClusterKeepClusterNameResult) GetSuccess() *Clust
   if !p.IsSetSuccess() {
     return RemoteControllerCreateClusterKeepClusterNameResult_Success_DEFAULT
   }
-  return p.Success
+return p.Success
 }
 var RemoteControllerCreateClusterKeepClusterNameResult_ServerException_DEFAULT *ServerException
 func (p *RemoteControllerCreateClusterKeepClusterNameResult) GetServerException() *ServerException {
   if !p.IsSetServerException() {
     return RemoteControllerCreateClusterKeepClusterNameResult_ServerException_DEFAULT
   }
-  return p.ServerException
+return p.ServerException
 }
 func (p *RemoteControllerCreateClusterKeepClusterNameResult) IsSetSuccess() bool {
   return p.Success != nil
@@ -4790,10 +4670,10 @@ func (p *RemoteControllerStartMemberArgs) Read(ctx context.Context, iprot thrift
 
 func (p *RemoteControllerStartMemberArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 1: ", err)
-  } else {
-    p.ClusterId = v
-  }
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.ClusterId = v
+}
   return nil
 }
 
@@ -4814,7 +4694,7 @@ func (p *RemoteControllerStartMemberArgs) writeField1(ctx context.Context, oprot
   if err := oprot.WriteFieldBegin(ctx, "clusterId", thrift.STRING, 1); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:clusterId: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.ClusterId)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.clusterId (1) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.clusterId (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 1:clusterId: ", p), err) }
   return err
@@ -4844,14 +4724,14 @@ func (p *RemoteControllerStartMemberResult) GetSuccess() *Member {
   if !p.IsSetSuccess() {
     return RemoteControllerStartMemberResult_Success_DEFAULT
   }
-  return p.Success
+return p.Success
 }
 var RemoteControllerStartMemberResult_ServerException_DEFAULT *ServerException
 func (p *RemoteControllerStartMemberResult) GetServerException() *ServerException {
   if !p.IsSetServerException() {
     return RemoteControllerStartMemberResult_ServerException_DEFAULT
   }
-  return p.ServerException
+return p.ServerException
 }
 func (p *RemoteControllerStartMemberResult) IsSetSuccess() bool {
   return p.Success != nil
@@ -5042,19 +4922,19 @@ func (p *RemoteControllerShutdownMemberArgs) Read(ctx context.Context, iprot thr
 
 func (p *RemoteControllerShutdownMemberArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 1: ", err)
-  } else {
-    p.ClusterId = v
-  }
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.ClusterId = v
+}
   return nil
 }
 
 func (p *RemoteControllerShutdownMemberArgs)  ReadField2(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 2: ", err)
-  } else {
-    p.MemberId = v
-  }
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
+  p.MemberId = v
+}
   return nil
 }
 
@@ -5076,7 +4956,7 @@ func (p *RemoteControllerShutdownMemberArgs) writeField1(ctx context.Context, op
   if err := oprot.WriteFieldBegin(ctx, "clusterId", thrift.STRING, 1); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:clusterId: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.ClusterId)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.clusterId (1) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.clusterId (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 1:clusterId: ", p), err) }
   return err
@@ -5086,7 +4966,7 @@ func (p *RemoteControllerShutdownMemberArgs) writeField2(ctx context.Context, op
   if err := oprot.WriteFieldBegin(ctx, "memberId", thrift.STRING, 2); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:memberId: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.MemberId)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.memberId (2) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.memberId (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 2:memberId: ", p), err) }
   return err
@@ -5114,7 +4994,7 @@ func (p *RemoteControllerShutdownMemberResult) GetSuccess() bool {
   if !p.IsSetSuccess() {
     return RemoteControllerShutdownMemberResult_Success_DEFAULT
   }
-  return *p.Success
+return *p.Success
 }
 func (p *RemoteControllerShutdownMemberResult) IsSetSuccess() bool {
   return p.Success != nil
@@ -5160,10 +5040,10 @@ func (p *RemoteControllerShutdownMemberResult) Read(ctx context.Context, iprot t
 
 func (p *RemoteControllerShutdownMemberResult)  ReadField0(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBool(ctx); err != nil {
-    return thrift.PrependError("error reading field 0: ", err)
-  } else {
-    p.Success = &v
-  }
+  return thrift.PrependError("error reading field 0: ", err)
+} else {
+  p.Success = &v
+}
   return nil
 }
 
@@ -5185,7 +5065,7 @@ func (p *RemoteControllerShutdownMemberResult) writeField0(ctx context.Context, 
     if err := oprot.WriteFieldBegin(ctx, "success", thrift.BOOL, 0); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := oprot.WriteBool(ctx, bool(*p.Success)); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T.success (0) field write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.success (0) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(ctx); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
@@ -5269,19 +5149,19 @@ func (p *RemoteControllerTerminateMemberArgs) Read(ctx context.Context, iprot th
 
 func (p *RemoteControllerTerminateMemberArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 1: ", err)
-  } else {
-    p.ClusterId = v
-  }
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.ClusterId = v
+}
   return nil
 }
 
 func (p *RemoteControllerTerminateMemberArgs)  ReadField2(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 2: ", err)
-  } else {
-    p.MemberId = v
-  }
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
+  p.MemberId = v
+}
   return nil
 }
 
@@ -5303,7 +5183,7 @@ func (p *RemoteControllerTerminateMemberArgs) writeField1(ctx context.Context, o
   if err := oprot.WriteFieldBegin(ctx, "clusterId", thrift.STRING, 1); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:clusterId: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.ClusterId)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.clusterId (1) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.clusterId (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 1:clusterId: ", p), err) }
   return err
@@ -5313,7 +5193,7 @@ func (p *RemoteControllerTerminateMemberArgs) writeField2(ctx context.Context, o
   if err := oprot.WriteFieldBegin(ctx, "memberId", thrift.STRING, 2); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:memberId: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.MemberId)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.memberId (2) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.memberId (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 2:memberId: ", p), err) }
   return err
@@ -5341,7 +5221,7 @@ func (p *RemoteControllerTerminateMemberResult) GetSuccess() bool {
   if !p.IsSetSuccess() {
     return RemoteControllerTerminateMemberResult_Success_DEFAULT
   }
-  return *p.Success
+return *p.Success
 }
 func (p *RemoteControllerTerminateMemberResult) IsSetSuccess() bool {
   return p.Success != nil
@@ -5387,10 +5267,10 @@ func (p *RemoteControllerTerminateMemberResult) Read(ctx context.Context, iprot 
 
 func (p *RemoteControllerTerminateMemberResult)  ReadField0(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBool(ctx); err != nil {
-    return thrift.PrependError("error reading field 0: ", err)
-  } else {
-    p.Success = &v
-  }
+  return thrift.PrependError("error reading field 0: ", err)
+} else {
+  p.Success = &v
+}
   return nil
 }
 
@@ -5412,7 +5292,7 @@ func (p *RemoteControllerTerminateMemberResult) writeField0(ctx context.Context,
     if err := oprot.WriteFieldBegin(ctx, "success", thrift.BOOL, 0); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := oprot.WriteBool(ctx, bool(*p.Success)); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T.success (0) field write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.success (0) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(ctx); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
@@ -5496,19 +5376,19 @@ func (p *RemoteControllerSuspendMemberArgs) Read(ctx context.Context, iprot thri
 
 func (p *RemoteControllerSuspendMemberArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 1: ", err)
-  } else {
-    p.ClusterId = v
-  }
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.ClusterId = v
+}
   return nil
 }
 
 func (p *RemoteControllerSuspendMemberArgs)  ReadField2(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 2: ", err)
-  } else {
-    p.MemberId = v
-  }
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
+  p.MemberId = v
+}
   return nil
 }
 
@@ -5530,7 +5410,7 @@ func (p *RemoteControllerSuspendMemberArgs) writeField1(ctx context.Context, opr
   if err := oprot.WriteFieldBegin(ctx, "clusterId", thrift.STRING, 1); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:clusterId: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.ClusterId)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.clusterId (1) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.clusterId (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 1:clusterId: ", p), err) }
   return err
@@ -5540,7 +5420,7 @@ func (p *RemoteControllerSuspendMemberArgs) writeField2(ctx context.Context, opr
   if err := oprot.WriteFieldBegin(ctx, "memberId", thrift.STRING, 2); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:memberId: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.MemberId)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.memberId (2) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.memberId (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 2:memberId: ", p), err) }
   return err
@@ -5568,7 +5448,7 @@ func (p *RemoteControllerSuspendMemberResult) GetSuccess() bool {
   if !p.IsSetSuccess() {
     return RemoteControllerSuspendMemberResult_Success_DEFAULT
   }
-  return *p.Success
+return *p.Success
 }
 func (p *RemoteControllerSuspendMemberResult) IsSetSuccess() bool {
   return p.Success != nil
@@ -5614,10 +5494,10 @@ func (p *RemoteControllerSuspendMemberResult) Read(ctx context.Context, iprot th
 
 func (p *RemoteControllerSuspendMemberResult)  ReadField0(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBool(ctx); err != nil {
-    return thrift.PrependError("error reading field 0: ", err)
-  } else {
-    p.Success = &v
-  }
+  return thrift.PrependError("error reading field 0: ", err)
+} else {
+  p.Success = &v
+}
   return nil
 }
 
@@ -5639,7 +5519,7 @@ func (p *RemoteControllerSuspendMemberResult) writeField0(ctx context.Context, o
     if err := oprot.WriteFieldBegin(ctx, "success", thrift.BOOL, 0); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := oprot.WriteBool(ctx, bool(*p.Success)); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T.success (0) field write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.success (0) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(ctx); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
@@ -5723,19 +5603,19 @@ func (p *RemoteControllerResumeMemberArgs) Read(ctx context.Context, iprot thrif
 
 func (p *RemoteControllerResumeMemberArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 1: ", err)
-  } else {
-    p.ClusterId = v
-  }
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.ClusterId = v
+}
   return nil
 }
 
 func (p *RemoteControllerResumeMemberArgs)  ReadField2(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 2: ", err)
-  } else {
-    p.MemberId = v
-  }
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
+  p.MemberId = v
+}
   return nil
 }
 
@@ -5757,7 +5637,7 @@ func (p *RemoteControllerResumeMemberArgs) writeField1(ctx context.Context, opro
   if err := oprot.WriteFieldBegin(ctx, "clusterId", thrift.STRING, 1); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:clusterId: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.ClusterId)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.clusterId (1) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.clusterId (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 1:clusterId: ", p), err) }
   return err
@@ -5767,7 +5647,7 @@ func (p *RemoteControllerResumeMemberArgs) writeField2(ctx context.Context, opro
   if err := oprot.WriteFieldBegin(ctx, "memberId", thrift.STRING, 2); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:memberId: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.MemberId)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.memberId (2) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.memberId (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 2:memberId: ", p), err) }
   return err
@@ -5795,7 +5675,7 @@ func (p *RemoteControllerResumeMemberResult) GetSuccess() bool {
   if !p.IsSetSuccess() {
     return RemoteControllerResumeMemberResult_Success_DEFAULT
   }
-  return *p.Success
+return *p.Success
 }
 func (p *RemoteControllerResumeMemberResult) IsSetSuccess() bool {
   return p.Success != nil
@@ -5841,10 +5721,10 @@ func (p *RemoteControllerResumeMemberResult) Read(ctx context.Context, iprot thr
 
 func (p *RemoteControllerResumeMemberResult)  ReadField0(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBool(ctx); err != nil {
-    return thrift.PrependError("error reading field 0: ", err)
-  } else {
-    p.Success = &v
-  }
+  return thrift.PrependError("error reading field 0: ", err)
+} else {
+  p.Success = &v
+}
   return nil
 }
 
@@ -5866,7 +5746,7 @@ func (p *RemoteControllerResumeMemberResult) writeField0(ctx context.Context, op
     if err := oprot.WriteFieldBegin(ctx, "success", thrift.BOOL, 0); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := oprot.WriteBool(ctx, bool(*p.Success)); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T.success (0) field write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.success (0) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(ctx); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
@@ -5934,10 +5814,10 @@ func (p *RemoteControllerShutdownClusterArgs) Read(ctx context.Context, iprot th
 
 func (p *RemoteControllerShutdownClusterArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 1: ", err)
-  } else {
-    p.ClusterId = v
-  }
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.ClusterId = v
+}
   return nil
 }
 
@@ -5958,7 +5838,7 @@ func (p *RemoteControllerShutdownClusterArgs) writeField1(ctx context.Context, o
   if err := oprot.WriteFieldBegin(ctx, "clusterId", thrift.STRING, 1); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:clusterId: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.ClusterId)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.clusterId (1) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.clusterId (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 1:clusterId: ", p), err) }
   return err
@@ -5986,7 +5866,7 @@ func (p *RemoteControllerShutdownClusterResult) GetSuccess() bool {
   if !p.IsSetSuccess() {
     return RemoteControllerShutdownClusterResult_Success_DEFAULT
   }
-  return *p.Success
+return *p.Success
 }
 func (p *RemoteControllerShutdownClusterResult) IsSetSuccess() bool {
   return p.Success != nil
@@ -6032,10 +5912,10 @@ func (p *RemoteControllerShutdownClusterResult) Read(ctx context.Context, iprot 
 
 func (p *RemoteControllerShutdownClusterResult)  ReadField0(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBool(ctx); err != nil {
-    return thrift.PrependError("error reading field 0: ", err)
-  } else {
-    p.Success = &v
-  }
+  return thrift.PrependError("error reading field 0: ", err)
+} else {
+  p.Success = &v
+}
   return nil
 }
 
@@ -6057,7 +5937,7 @@ func (p *RemoteControllerShutdownClusterResult) writeField0(ctx context.Context,
     if err := oprot.WriteFieldBegin(ctx, "success", thrift.BOOL, 0); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := oprot.WriteBool(ctx, bool(*p.Success)); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T.success (0) field write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.success (0) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(ctx); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
@@ -6125,10 +6005,10 @@ func (p *RemoteControllerTerminateClusterArgs) Read(ctx context.Context, iprot t
 
 func (p *RemoteControllerTerminateClusterArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 1: ", err)
-  } else {
-    p.ClusterId = v
-  }
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.ClusterId = v
+}
   return nil
 }
 
@@ -6149,7 +6029,7 @@ func (p *RemoteControllerTerminateClusterArgs) writeField1(ctx context.Context, 
   if err := oprot.WriteFieldBegin(ctx, "clusterId", thrift.STRING, 1); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:clusterId: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.ClusterId)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.clusterId (1) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.clusterId (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 1:clusterId: ", p), err) }
   return err
@@ -6177,7 +6057,7 @@ func (p *RemoteControllerTerminateClusterResult) GetSuccess() bool {
   if !p.IsSetSuccess() {
     return RemoteControllerTerminateClusterResult_Success_DEFAULT
   }
-  return *p.Success
+return *p.Success
 }
 func (p *RemoteControllerTerminateClusterResult) IsSetSuccess() bool {
   return p.Success != nil
@@ -6223,10 +6103,10 @@ func (p *RemoteControllerTerminateClusterResult) Read(ctx context.Context, iprot
 
 func (p *RemoteControllerTerminateClusterResult)  ReadField0(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBool(ctx); err != nil {
-    return thrift.PrependError("error reading field 0: ", err)
-  } else {
-    p.Success = &v
-  }
+  return thrift.PrependError("error reading field 0: ", err)
+} else {
+  p.Success = &v
+}
   return nil
 }
 
@@ -6248,7 +6128,7 @@ func (p *RemoteControllerTerminateClusterResult) writeField0(ctx context.Context
     if err := oprot.WriteFieldBegin(ctx, "success", thrift.BOOL, 0); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := oprot.WriteBool(ctx, bool(*p.Success)); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T.success (0) field write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.success (0) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(ctx); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
@@ -6316,10 +6196,10 @@ func (p *RemoteControllerSplitMemberFromClusterArgs) Read(ctx context.Context, i
 
 func (p *RemoteControllerSplitMemberFromClusterArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 1: ", err)
-  } else {
-    p.MemberId = v
-  }
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.MemberId = v
+}
   return nil
 }
 
@@ -6340,7 +6220,7 @@ func (p *RemoteControllerSplitMemberFromClusterArgs) writeField1(ctx context.Con
   if err := oprot.WriteFieldBegin(ctx, "memberId", thrift.STRING, 1); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:memberId: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.MemberId)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.memberId (1) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.memberId (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 1:memberId: ", p), err) }
   return err
@@ -6368,7 +6248,7 @@ func (p *RemoteControllerSplitMemberFromClusterResult) GetSuccess() *Cluster {
   if !p.IsSetSuccess() {
     return RemoteControllerSplitMemberFromClusterResult_Success_DEFAULT
   }
-  return p.Success
+return p.Success
 }
 func (p *RemoteControllerSplitMemberFromClusterResult) IsSetSuccess() bool {
   return p.Success != nil
@@ -6523,19 +6403,19 @@ func (p *RemoteControllerMergeMemberToClusterArgs) Read(ctx context.Context, ipr
 
 func (p *RemoteControllerMergeMemberToClusterArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 1: ", err)
-  } else {
-    p.ClusterId = v
-  }
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.ClusterId = v
+}
   return nil
 }
 
 func (p *RemoteControllerMergeMemberToClusterArgs)  ReadField2(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 2: ", err)
-  } else {
-    p.MemberId = v
-  }
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
+  p.MemberId = v
+}
   return nil
 }
 
@@ -6557,7 +6437,7 @@ func (p *RemoteControllerMergeMemberToClusterArgs) writeField1(ctx context.Conte
   if err := oprot.WriteFieldBegin(ctx, "clusterId", thrift.STRING, 1); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:clusterId: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.ClusterId)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.clusterId (1) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.clusterId (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 1:clusterId: ", p), err) }
   return err
@@ -6567,7 +6447,7 @@ func (p *RemoteControllerMergeMemberToClusterArgs) writeField2(ctx context.Conte
   if err := oprot.WriteFieldBegin(ctx, "memberId", thrift.STRING, 2); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:memberId: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.MemberId)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.memberId (2) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.memberId (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 2:memberId: ", p), err) }
   return err
@@ -6595,7 +6475,7 @@ func (p *RemoteControllerMergeMemberToClusterResult) GetSuccess() *Cluster {
   if !p.IsSetSuccess() {
     return RemoteControllerMergeMemberToClusterResult_Success_DEFAULT
   }
-  return p.Success
+return p.Success
 }
 func (p *RemoteControllerMergeMemberToClusterResult) IsSetSuccess() bool {
   return p.Success != nil
@@ -6680,14 +6560,14 @@ func (p *RemoteControllerMergeMemberToClusterResult) String() string {
   return fmt.Sprintf("RemoteControllerMergeMemberToClusterResult(%+v)", *p)
 }
 
-type RemoteControllerLoginToHazelcastCloudUsingEnvironmentArgs struct {
+type RemoteControllerLoginToCloudUsingEnvironmentArgs struct {
 }
 
-func NewRemoteControllerLoginToHazelcastCloudUsingEnvironmentArgs() *RemoteControllerLoginToHazelcastCloudUsingEnvironmentArgs {
-  return &RemoteControllerLoginToHazelcastCloudUsingEnvironmentArgs{}
+func NewRemoteControllerLoginToCloudUsingEnvironmentArgs() *RemoteControllerLoginToCloudUsingEnvironmentArgs {
+  return &RemoteControllerLoginToCloudUsingEnvironmentArgs{}
 }
 
-func (p *RemoteControllerLoginToHazelcastCloudUsingEnvironmentArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerLoginToCloudUsingEnvironmentArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
   if _, err := iprot.ReadStructBegin(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
   }
@@ -6712,8 +6592,8 @@ func (p *RemoteControllerLoginToHazelcastCloudUsingEnvironmentArgs) Read(ctx con
   return nil
 }
 
-func (p *RemoteControllerLoginToHazelcastCloudUsingEnvironmentArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
-  if err := oprot.WriteStructBegin(ctx, "loginToHazelcastCloudUsingEnvironment_args"); err != nil {
+func (p *RemoteControllerLoginToCloudUsingEnvironmentArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin(ctx, "loginToCloudUsingEnvironment_args"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
   if p != nil {
   }
@@ -6724,35 +6604,35 @@ func (p *RemoteControllerLoginToHazelcastCloudUsingEnvironmentArgs) Write(ctx co
   return nil
 }
 
-func (p *RemoteControllerLoginToHazelcastCloudUsingEnvironmentArgs) String() string {
+func (p *RemoteControllerLoginToCloudUsingEnvironmentArgs) String() string {
   if p == nil {
     return "<nil>"
   }
-  return fmt.Sprintf("RemoteControllerLoginToHazelcastCloudUsingEnvironmentArgs(%+v)", *p)
+  return fmt.Sprintf("RemoteControllerLoginToCloudUsingEnvironmentArgs(%+v)", *p)
 }
 
 // Attributes:
 //  - CloudException
-type RemoteControllerLoginToHazelcastCloudUsingEnvironmentResult struct {
+type RemoteControllerLoginToCloudUsingEnvironmentResult struct {
   CloudException *CloudException `thrift:"cloudException,1" db:"cloudException" json:"cloudException,omitempty"`
 }
 
-func NewRemoteControllerLoginToHazelcastCloudUsingEnvironmentResult() *RemoteControllerLoginToHazelcastCloudUsingEnvironmentResult {
-  return &RemoteControllerLoginToHazelcastCloudUsingEnvironmentResult{}
+func NewRemoteControllerLoginToCloudUsingEnvironmentResult() *RemoteControllerLoginToCloudUsingEnvironmentResult {
+  return &RemoteControllerLoginToCloudUsingEnvironmentResult{}
 }
 
-var RemoteControllerLoginToHazelcastCloudUsingEnvironmentResult_CloudException_DEFAULT *CloudException
-func (p *RemoteControllerLoginToHazelcastCloudUsingEnvironmentResult) GetCloudException() *CloudException {
+var RemoteControllerLoginToCloudUsingEnvironmentResult_CloudException_DEFAULT *CloudException
+func (p *RemoteControllerLoginToCloudUsingEnvironmentResult) GetCloudException() *CloudException {
   if !p.IsSetCloudException() {
-    return RemoteControllerLoginToHazelcastCloudUsingEnvironmentResult_CloudException_DEFAULT
+    return RemoteControllerLoginToCloudUsingEnvironmentResult_CloudException_DEFAULT
   }
-  return p.CloudException
+return p.CloudException
 }
-func (p *RemoteControllerLoginToHazelcastCloudUsingEnvironmentResult) IsSetCloudException() bool {
+func (p *RemoteControllerLoginToCloudUsingEnvironmentResult) IsSetCloudException() bool {
   return p.CloudException != nil
 }
 
-func (p *RemoteControllerLoginToHazelcastCloudUsingEnvironmentResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerLoginToCloudUsingEnvironmentResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
   if _, err := iprot.ReadStructBegin(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
   }
@@ -6790,7 +6670,7 @@ func (p *RemoteControllerLoginToHazelcastCloudUsingEnvironmentResult) Read(ctx c
   return nil
 }
 
-func (p *RemoteControllerLoginToHazelcastCloudUsingEnvironmentResult)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerLoginToCloudUsingEnvironmentResult)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   p.CloudException = &CloudException{}
   if err := p.CloudException.Read(ctx, iprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.CloudException), err)
@@ -6798,8 +6678,8 @@ func (p *RemoteControllerLoginToHazelcastCloudUsingEnvironmentResult)  ReadField
   return nil
 }
 
-func (p *RemoteControllerLoginToHazelcastCloudUsingEnvironmentResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
-  if err := oprot.WriteStructBegin(ctx, "loginToHazelcastCloudUsingEnvironment_result"); err != nil {
+func (p *RemoteControllerLoginToCloudUsingEnvironmentResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin(ctx, "loginToCloudUsingEnvironment_result"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
   if p != nil {
     if err := p.writeField1(ctx, oprot); err != nil { return err }
@@ -6811,7 +6691,7 @@ func (p *RemoteControllerLoginToHazelcastCloudUsingEnvironmentResult) Write(ctx 
   return nil
 }
 
-func (p *RemoteControllerLoginToHazelcastCloudUsingEnvironmentResult) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
+func (p *RemoteControllerLoginToCloudUsingEnvironmentResult) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
   if p.IsSetCloudException() {
     if err := oprot.WriteFieldBegin(ctx, "cloudException", thrift.STRUCT, 1); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:cloudException: ", p), err) }
@@ -6824,40 +6704,40 @@ func (p *RemoteControllerLoginToHazelcastCloudUsingEnvironmentResult) writeField
   return err
 }
 
-func (p *RemoteControllerLoginToHazelcastCloudUsingEnvironmentResult) String() string {
+func (p *RemoteControllerLoginToCloudUsingEnvironmentResult) String() string {
   if p == nil {
     return "<nil>"
   }
-  return fmt.Sprintf("RemoteControllerLoginToHazelcastCloudUsingEnvironmentResult(%+v)", *p)
+  return fmt.Sprintf("RemoteControllerLoginToCloudUsingEnvironmentResult(%+v)", *p)
 }
 
 // Attributes:
 //  - BaseUrl
 //  - ApiKey
 //  - ApiSecret
-type RemoteControllerLoginToHazelcastCloudArgs struct {
+type RemoteControllerLoginToCloudArgs struct {
   BaseUrl string `thrift:"baseUrl,1" db:"baseUrl" json:"baseUrl"`
   ApiKey string `thrift:"apiKey,2" db:"apiKey" json:"apiKey"`
   ApiSecret string `thrift:"apiSecret,3" db:"apiSecret" json:"apiSecret"`
 }
 
-func NewRemoteControllerLoginToHazelcastCloudArgs() *RemoteControllerLoginToHazelcastCloudArgs {
-  return &RemoteControllerLoginToHazelcastCloudArgs{}
+func NewRemoteControllerLoginToCloudArgs() *RemoteControllerLoginToCloudArgs {
+  return &RemoteControllerLoginToCloudArgs{}
 }
 
 
-func (p *RemoteControllerLoginToHazelcastCloudArgs) GetBaseUrl() string {
+func (p *RemoteControllerLoginToCloudArgs) GetBaseUrl() string {
   return p.BaseUrl
 }
 
-func (p *RemoteControllerLoginToHazelcastCloudArgs) GetApiKey() string {
+func (p *RemoteControllerLoginToCloudArgs) GetApiKey() string {
   return p.ApiKey
 }
 
-func (p *RemoteControllerLoginToHazelcastCloudArgs) GetApiSecret() string {
+func (p *RemoteControllerLoginToCloudArgs) GetApiSecret() string {
   return p.ApiSecret
 }
-func (p *RemoteControllerLoginToHazelcastCloudArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerLoginToCloudArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
   if _, err := iprot.ReadStructBegin(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
   }
@@ -6915,35 +6795,35 @@ func (p *RemoteControllerLoginToHazelcastCloudArgs) Read(ctx context.Context, ip
   return nil
 }
 
-func (p *RemoteControllerLoginToHazelcastCloudArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerLoginToCloudArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 1: ", err)
-  } else {
-    p.BaseUrl = v
-  }
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.BaseUrl = v
+}
   return nil
 }
 
-func (p *RemoteControllerLoginToHazelcastCloudArgs)  ReadField2(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerLoginToCloudArgs)  ReadField2(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 2: ", err)
-  } else {
-    p.ApiKey = v
-  }
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
+  p.ApiKey = v
+}
   return nil
 }
 
-func (p *RemoteControllerLoginToHazelcastCloudArgs)  ReadField3(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerLoginToCloudArgs)  ReadField3(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 3: ", err)
-  } else {
-    p.ApiSecret = v
-  }
+  return thrift.PrependError("error reading field 3: ", err)
+} else {
+  p.ApiSecret = v
+}
   return nil
 }
 
-func (p *RemoteControllerLoginToHazelcastCloudArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
-  if err := oprot.WriteStructBegin(ctx, "loginToHazelcastCloud_args"); err != nil {
+func (p *RemoteControllerLoginToCloudArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin(ctx, "loginToCloud_args"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
   if p != nil {
     if err := p.writeField1(ctx, oprot); err != nil { return err }
@@ -6957,65 +6837,65 @@ func (p *RemoteControllerLoginToHazelcastCloudArgs) Write(ctx context.Context, o
   return nil
 }
 
-func (p *RemoteControllerLoginToHazelcastCloudArgs) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
+func (p *RemoteControllerLoginToCloudArgs) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin(ctx, "baseUrl", thrift.STRING, 1); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:baseUrl: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.BaseUrl)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.baseUrl (1) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.baseUrl (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 1:baseUrl: ", p), err) }
   return err
 }
 
-func (p *RemoteControllerLoginToHazelcastCloudArgs) writeField2(ctx context.Context, oprot thrift.TProtocol) (err error) {
+func (p *RemoteControllerLoginToCloudArgs) writeField2(ctx context.Context, oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin(ctx, "apiKey", thrift.STRING, 2); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:apiKey: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.ApiKey)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.apiKey (2) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.apiKey (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 2:apiKey: ", p), err) }
   return err
 }
 
-func (p *RemoteControllerLoginToHazelcastCloudArgs) writeField3(ctx context.Context, oprot thrift.TProtocol) (err error) {
+func (p *RemoteControllerLoginToCloudArgs) writeField3(ctx context.Context, oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin(ctx, "apiSecret", thrift.STRING, 3); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:apiSecret: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.ApiSecret)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.apiSecret (3) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.apiSecret (3) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 3:apiSecret: ", p), err) }
   return err
 }
 
-func (p *RemoteControllerLoginToHazelcastCloudArgs) String() string {
+func (p *RemoteControllerLoginToCloudArgs) String() string {
   if p == nil {
     return "<nil>"
   }
-  return fmt.Sprintf("RemoteControllerLoginToHazelcastCloudArgs(%+v)", *p)
+  return fmt.Sprintf("RemoteControllerLoginToCloudArgs(%+v)", *p)
 }
 
 // Attributes:
 //  - CloudException
-type RemoteControllerLoginToHazelcastCloudResult struct {
+type RemoteControllerLoginToCloudResult struct {
   CloudException *CloudException `thrift:"cloudException,1" db:"cloudException" json:"cloudException,omitempty"`
 }
 
-func NewRemoteControllerLoginToHazelcastCloudResult() *RemoteControllerLoginToHazelcastCloudResult {
-  return &RemoteControllerLoginToHazelcastCloudResult{}
+func NewRemoteControllerLoginToCloudResult() *RemoteControllerLoginToCloudResult {
+  return &RemoteControllerLoginToCloudResult{}
 }
 
-var RemoteControllerLoginToHazelcastCloudResult_CloudException_DEFAULT *CloudException
-func (p *RemoteControllerLoginToHazelcastCloudResult) GetCloudException() *CloudException {
+var RemoteControllerLoginToCloudResult_CloudException_DEFAULT *CloudException
+func (p *RemoteControllerLoginToCloudResult) GetCloudException() *CloudException {
   if !p.IsSetCloudException() {
-    return RemoteControllerLoginToHazelcastCloudResult_CloudException_DEFAULT
+    return RemoteControllerLoginToCloudResult_CloudException_DEFAULT
   }
-  return p.CloudException
+return p.CloudException
 }
-func (p *RemoteControllerLoginToHazelcastCloudResult) IsSetCloudException() bool {
+func (p *RemoteControllerLoginToCloudResult) IsSetCloudException() bool {
   return p.CloudException != nil
 }
 
-func (p *RemoteControllerLoginToHazelcastCloudResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerLoginToCloudResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
   if _, err := iprot.ReadStructBegin(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
   }
@@ -7053,7 +6933,7 @@ func (p *RemoteControllerLoginToHazelcastCloudResult) Read(ctx context.Context, 
   return nil
 }
 
-func (p *RemoteControllerLoginToHazelcastCloudResult)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerLoginToCloudResult)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   p.CloudException = &CloudException{}
   if err := p.CloudException.Read(ctx, iprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.CloudException), err)
@@ -7061,8 +6941,8 @@ func (p *RemoteControllerLoginToHazelcastCloudResult)  ReadField1(ctx context.Co
   return nil
 }
 
-func (p *RemoteControllerLoginToHazelcastCloudResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
-  if err := oprot.WriteStructBegin(ctx, "loginToHazelcastCloud_result"); err != nil {
+func (p *RemoteControllerLoginToCloudResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin(ctx, "loginToCloud_result"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
   if p != nil {
     if err := p.writeField1(ctx, oprot); err != nil { return err }
@@ -7074,7 +6954,7 @@ func (p *RemoteControllerLoginToHazelcastCloudResult) Write(ctx context.Context,
   return nil
 }
 
-func (p *RemoteControllerLoginToHazelcastCloudResult) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
+func (p *RemoteControllerLoginToCloudResult) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
   if p.IsSetCloudException() {
     if err := oprot.WriteFieldBegin(ctx, "cloudException", thrift.STRUCT, 1); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:cloudException: ", p), err) }
@@ -7087,34 +6967,34 @@ func (p *RemoteControllerLoginToHazelcastCloudResult) writeField1(ctx context.Co
   return err
 }
 
-func (p *RemoteControllerLoginToHazelcastCloudResult) String() string {
+func (p *RemoteControllerLoginToCloudResult) String() string {
   if p == nil {
     return "<nil>"
   }
-  return fmt.Sprintf("RemoteControllerLoginToHazelcastCloudResult(%+v)", *p)
+  return fmt.Sprintf("RemoteControllerLoginToCloudResult(%+v)", *p)
 }
 
 // Attributes:
 //  - HazelcastVersion
 //  - IsTlsEnabled
-type RemoteControllerCreateHazelcastCloudStandardClusterArgs struct {
+type RemoteControllerCreateCloudClusterArgs struct {
   HazelcastVersion string `thrift:"hazelcastVersion,1" db:"hazelcastVersion" json:"hazelcastVersion"`
   IsTlsEnabled bool `thrift:"isTlsEnabled,2" db:"isTlsEnabled" json:"isTlsEnabled"`
 }
 
-func NewRemoteControllerCreateHazelcastCloudStandardClusterArgs() *RemoteControllerCreateHazelcastCloudStandardClusterArgs {
-  return &RemoteControllerCreateHazelcastCloudStandardClusterArgs{}
+func NewRemoteControllerCreateCloudClusterArgs() *RemoteControllerCreateCloudClusterArgs {
+  return &RemoteControllerCreateCloudClusterArgs{}
 }
 
 
-func (p *RemoteControllerCreateHazelcastCloudStandardClusterArgs) GetHazelcastVersion() string {
+func (p *RemoteControllerCreateCloudClusterArgs) GetHazelcastVersion() string {
   return p.HazelcastVersion
 }
 
-func (p *RemoteControllerCreateHazelcastCloudStandardClusterArgs) GetIsTlsEnabled() bool {
+func (p *RemoteControllerCreateCloudClusterArgs) GetIsTlsEnabled() bool {
   return p.IsTlsEnabled
 }
-func (p *RemoteControllerCreateHazelcastCloudStandardClusterArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerCreateCloudClusterArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
   if _, err := iprot.ReadStructBegin(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
   }
@@ -7162,26 +7042,26 @@ func (p *RemoteControllerCreateHazelcastCloudStandardClusterArgs) Read(ctx conte
   return nil
 }
 
-func (p *RemoteControllerCreateHazelcastCloudStandardClusterArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerCreateCloudClusterArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 1: ", err)
-  } else {
-    p.HazelcastVersion = v
-  }
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.HazelcastVersion = v
+}
   return nil
 }
 
-func (p *RemoteControllerCreateHazelcastCloudStandardClusterArgs)  ReadField2(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerCreateCloudClusterArgs)  ReadField2(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBool(ctx); err != nil {
-    return thrift.PrependError("error reading field 2: ", err)
-  } else {
-    p.IsTlsEnabled = v
-  }
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
+  p.IsTlsEnabled = v
+}
   return nil
 }
 
-func (p *RemoteControllerCreateHazelcastCloudStandardClusterArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
-  if err := oprot.WriteStructBegin(ctx, "createHazelcastCloudStandardCluster_args"); err != nil {
+func (p *RemoteControllerCreateCloudClusterArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin(ctx, "createCloudCluster_args"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
   if p != nil {
     if err := p.writeField1(ctx, oprot); err != nil { return err }
@@ -7194,68 +7074,68 @@ func (p *RemoteControllerCreateHazelcastCloudStandardClusterArgs) Write(ctx cont
   return nil
 }
 
-func (p *RemoteControllerCreateHazelcastCloudStandardClusterArgs) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
+func (p *RemoteControllerCreateCloudClusterArgs) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin(ctx, "hazelcastVersion", thrift.STRING, 1); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:hazelcastVersion: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.HazelcastVersion)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.hazelcastVersion (1) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.hazelcastVersion (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 1:hazelcastVersion: ", p), err) }
   return err
 }
 
-func (p *RemoteControllerCreateHazelcastCloudStandardClusterArgs) writeField2(ctx context.Context, oprot thrift.TProtocol) (err error) {
+func (p *RemoteControllerCreateCloudClusterArgs) writeField2(ctx context.Context, oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin(ctx, "isTlsEnabled", thrift.BOOL, 2); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:isTlsEnabled: ", p), err) }
   if err := oprot.WriteBool(ctx, bool(p.IsTlsEnabled)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.isTlsEnabled (2) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.isTlsEnabled (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 2:isTlsEnabled: ", p), err) }
   return err
 }
 
-func (p *RemoteControllerCreateHazelcastCloudStandardClusterArgs) String() string {
+func (p *RemoteControllerCreateCloudClusterArgs) String() string {
   if p == nil {
     return "<nil>"
   }
-  return fmt.Sprintf("RemoteControllerCreateHazelcastCloudStandardClusterArgs(%+v)", *p)
+  return fmt.Sprintf("RemoteControllerCreateCloudClusterArgs(%+v)", *p)
 }
 
 // Attributes:
 //  - Success
 //  - CloudException
-type RemoteControllerCreateHazelcastCloudStandardClusterResult struct {
+type RemoteControllerCreateCloudClusterResult struct {
   Success *CloudCluster `thrift:"success,0" db:"success" json:"success,omitempty"`
   CloudException *CloudException `thrift:"cloudException,1" db:"cloudException" json:"cloudException,omitempty"`
 }
 
-func NewRemoteControllerCreateHazelcastCloudStandardClusterResult() *RemoteControllerCreateHazelcastCloudStandardClusterResult {
-  return &RemoteControllerCreateHazelcastCloudStandardClusterResult{}
+func NewRemoteControllerCreateCloudClusterResult() *RemoteControllerCreateCloudClusterResult {
+  return &RemoteControllerCreateCloudClusterResult{}
 }
 
-var RemoteControllerCreateHazelcastCloudStandardClusterResult_Success_DEFAULT *CloudCluster
-func (p *RemoteControllerCreateHazelcastCloudStandardClusterResult) GetSuccess() *CloudCluster {
+var RemoteControllerCreateCloudClusterResult_Success_DEFAULT *CloudCluster
+func (p *RemoteControllerCreateCloudClusterResult) GetSuccess() *CloudCluster {
   if !p.IsSetSuccess() {
-    return RemoteControllerCreateHazelcastCloudStandardClusterResult_Success_DEFAULT
+    return RemoteControllerCreateCloudClusterResult_Success_DEFAULT
   }
-  return p.Success
+return p.Success
 }
-var RemoteControllerCreateHazelcastCloudStandardClusterResult_CloudException_DEFAULT *CloudException
-func (p *RemoteControllerCreateHazelcastCloudStandardClusterResult) GetCloudException() *CloudException {
+var RemoteControllerCreateCloudClusterResult_CloudException_DEFAULT *CloudException
+func (p *RemoteControllerCreateCloudClusterResult) GetCloudException() *CloudException {
   if !p.IsSetCloudException() {
-    return RemoteControllerCreateHazelcastCloudStandardClusterResult_CloudException_DEFAULT
+    return RemoteControllerCreateCloudClusterResult_CloudException_DEFAULT
   }
-  return p.CloudException
+return p.CloudException
 }
-func (p *RemoteControllerCreateHazelcastCloudStandardClusterResult) IsSetSuccess() bool {
+func (p *RemoteControllerCreateCloudClusterResult) IsSetSuccess() bool {
   return p.Success != nil
 }
 
-func (p *RemoteControllerCreateHazelcastCloudStandardClusterResult) IsSetCloudException() bool {
+func (p *RemoteControllerCreateCloudClusterResult) IsSetCloudException() bool {
   return p.CloudException != nil
 }
 
-func (p *RemoteControllerCreateHazelcastCloudStandardClusterResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerCreateCloudClusterResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
   if _, err := iprot.ReadStructBegin(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
   }
@@ -7303,7 +7183,7 @@ func (p *RemoteControllerCreateHazelcastCloudStandardClusterResult) Read(ctx con
   return nil
 }
 
-func (p *RemoteControllerCreateHazelcastCloudStandardClusterResult)  ReadField0(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerCreateCloudClusterResult)  ReadField0(ctx context.Context, iprot thrift.TProtocol) error {
   p.Success = &CloudCluster{}
   if err := p.Success.Read(ctx, iprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.Success), err)
@@ -7311,7 +7191,7 @@ func (p *RemoteControllerCreateHazelcastCloudStandardClusterResult)  ReadField0(
   return nil
 }
 
-func (p *RemoteControllerCreateHazelcastCloudStandardClusterResult)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerCreateCloudClusterResult)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   p.CloudException = &CloudException{}
   if err := p.CloudException.Read(ctx, iprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.CloudException), err)
@@ -7319,8 +7199,8 @@ func (p *RemoteControllerCreateHazelcastCloudStandardClusterResult)  ReadField1(
   return nil
 }
 
-func (p *RemoteControllerCreateHazelcastCloudStandardClusterResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
-  if err := oprot.WriteStructBegin(ctx, "createHazelcastCloudStandardCluster_result"); err != nil {
+func (p *RemoteControllerCreateCloudClusterResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin(ctx, "createCloudCluster_result"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
   if p != nil {
     if err := p.writeField0(ctx, oprot); err != nil { return err }
@@ -7333,7 +7213,7 @@ func (p *RemoteControllerCreateHazelcastCloudStandardClusterResult) Write(ctx co
   return nil
 }
 
-func (p *RemoteControllerCreateHazelcastCloudStandardClusterResult) writeField0(ctx context.Context, oprot thrift.TProtocol) (err error) {
+func (p *RemoteControllerCreateCloudClusterResult) writeField0(ctx context.Context, oprot thrift.TProtocol) (err error) {
   if p.IsSetSuccess() {
     if err := oprot.WriteFieldBegin(ctx, "success", thrift.STRUCT, 0); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
@@ -7346,7 +7226,7 @@ func (p *RemoteControllerCreateHazelcastCloudStandardClusterResult) writeField0(
   return err
 }
 
-func (p *RemoteControllerCreateHazelcastCloudStandardClusterResult) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
+func (p *RemoteControllerCreateCloudClusterResult) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
   if p.IsSetCloudException() {
     if err := oprot.WriteFieldBegin(ctx, "cloudException", thrift.STRUCT, 1); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:cloudException: ", p), err) }
@@ -7359,255 +7239,28 @@ func (p *RemoteControllerCreateHazelcastCloudStandardClusterResult) writeField1(
   return err
 }
 
-func (p *RemoteControllerCreateHazelcastCloudStandardClusterResult) String() string {
+func (p *RemoteControllerCreateCloudClusterResult) String() string {
   if p == nil {
     return "<nil>"
   }
-  return fmt.Sprintf("RemoteControllerCreateHazelcastCloudStandardClusterResult(%+v)", *p)
+  return fmt.Sprintf("RemoteControllerCreateCloudClusterResult(%+v)", *p)
 }
 
 // Attributes:
 //  - CloudClusterId
-//  - TotalMemberCount
-type RemoteControllerSetHazelcastCloudClusterMemberCountArgs struct {
-  CloudClusterId string `thrift:"cloudClusterId,1" db:"cloudClusterId" json:"cloudClusterId"`
-  TotalMemberCount int32 `thrift:"totalMemberCount,2" db:"totalMemberCount" json:"totalMemberCount"`
-}
-
-func NewRemoteControllerSetHazelcastCloudClusterMemberCountArgs() *RemoteControllerSetHazelcastCloudClusterMemberCountArgs {
-  return &RemoteControllerSetHazelcastCloudClusterMemberCountArgs{}
-}
-
-
-func (p *RemoteControllerSetHazelcastCloudClusterMemberCountArgs) GetCloudClusterId() string {
-  return p.CloudClusterId
-}
-
-func (p *RemoteControllerSetHazelcastCloudClusterMemberCountArgs) GetTotalMemberCount() int32 {
-  return p.TotalMemberCount
-}
-func (p *RemoteControllerSetHazelcastCloudClusterMemberCountArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
-  if _, err := iprot.ReadStructBegin(ctx); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
-  }
-
-
-  for {
-    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
-    if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
-    }
-    if fieldTypeId == thrift.STOP { break; }
-    switch fieldId {
-    case 1:
-      if fieldTypeId == thrift.STRING {
-        if err := p.ReadField1(ctx, iprot); err != nil {
-          return err
-        }
-      } else {
-        if err := iprot.Skip(ctx, fieldTypeId); err != nil {
-          return err
-        }
-      }
-    case 2:
-      if fieldTypeId == thrift.I32 {
-        if err := p.ReadField2(ctx, iprot); err != nil {
-          return err
-        }
-      } else {
-        if err := iprot.Skip(ctx, fieldTypeId); err != nil {
-          return err
-        }
-      }
-    default:
-      if err := iprot.Skip(ctx, fieldTypeId); err != nil {
-        return err
-      }
-    }
-    if err := iprot.ReadFieldEnd(ctx); err != nil {
-      return err
-    }
-  }
-  if err := iprot.ReadStructEnd(ctx); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
-  }
-  return nil
-}
-
-func (p *RemoteControllerSetHazelcastCloudClusterMemberCountArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
-  if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 1: ", err)
-  } else {
-    p.CloudClusterId = v
-  }
-  return nil
-}
-
-func (p *RemoteControllerSetHazelcastCloudClusterMemberCountArgs)  ReadField2(ctx context.Context, iprot thrift.TProtocol) error {
-  if v, err := iprot.ReadI32(ctx); err != nil {
-    return thrift.PrependError("error reading field 2: ", err)
-  } else {
-    p.TotalMemberCount = v
-  }
-  return nil
-}
-
-func (p *RemoteControllerSetHazelcastCloudClusterMemberCountArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
-  if err := oprot.WriteStructBegin(ctx, "setHazelcastCloudClusterMemberCount_args"); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
-  if p != nil {
-    if err := p.writeField1(ctx, oprot); err != nil { return err }
-    if err := p.writeField2(ctx, oprot); err != nil { return err }
-  }
-  if err := oprot.WriteFieldStop(ctx); err != nil {
-    return thrift.PrependError("write field stop error: ", err) }
-  if err := oprot.WriteStructEnd(ctx); err != nil {
-    return thrift.PrependError("write struct stop error: ", err) }
-  return nil
-}
-
-func (p *RemoteControllerSetHazelcastCloudClusterMemberCountArgs) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
-  if err := oprot.WriteFieldBegin(ctx, "cloudClusterId", thrift.STRING, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:cloudClusterId: ", p), err) }
-  if err := oprot.WriteString(ctx, string(p.CloudClusterId)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.cloudClusterId (1) field write error: ", p), err) }
-  if err := oprot.WriteFieldEnd(ctx); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:cloudClusterId: ", p), err) }
-  return err
-}
-
-func (p *RemoteControllerSetHazelcastCloudClusterMemberCountArgs) writeField2(ctx context.Context, oprot thrift.TProtocol) (err error) {
-  if err := oprot.WriteFieldBegin(ctx, "totalMemberCount", thrift.I32, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:totalMemberCount: ", p), err) }
-  if err := oprot.WriteI32(ctx, int32(p.TotalMemberCount)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.totalMemberCount (2) field write error: ", p), err) }
-  if err := oprot.WriteFieldEnd(ctx); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:totalMemberCount: ", p), err) }
-  return err
-}
-
-func (p *RemoteControllerSetHazelcastCloudClusterMemberCountArgs) String() string {
-  if p == nil {
-    return "<nil>"
-  }
-  return fmt.Sprintf("RemoteControllerSetHazelcastCloudClusterMemberCountArgs(%+v)", *p)
-}
-
-// Attributes:
-//  - CloudException
-type RemoteControllerSetHazelcastCloudClusterMemberCountResult struct {
-  CloudException *CloudException `thrift:"cloudException,1" db:"cloudException" json:"cloudException,omitempty"`
-}
-
-func NewRemoteControllerSetHazelcastCloudClusterMemberCountResult() *RemoteControllerSetHazelcastCloudClusterMemberCountResult {
-  return &RemoteControllerSetHazelcastCloudClusterMemberCountResult{}
-}
-
-var RemoteControllerSetHazelcastCloudClusterMemberCountResult_CloudException_DEFAULT *CloudException
-func (p *RemoteControllerSetHazelcastCloudClusterMemberCountResult) GetCloudException() *CloudException {
-  if !p.IsSetCloudException() {
-    return RemoteControllerSetHazelcastCloudClusterMemberCountResult_CloudException_DEFAULT
-  }
-  return p.CloudException
-}
-func (p *RemoteControllerSetHazelcastCloudClusterMemberCountResult) IsSetCloudException() bool {
-  return p.CloudException != nil
-}
-
-func (p *RemoteControllerSetHazelcastCloudClusterMemberCountResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
-  if _, err := iprot.ReadStructBegin(ctx); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
-  }
-
-
-  for {
-    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
-    if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
-    }
-    if fieldTypeId == thrift.STOP { break; }
-    switch fieldId {
-    case 1:
-      if fieldTypeId == thrift.STRUCT {
-        if err := p.ReadField1(ctx, iprot); err != nil {
-          return err
-        }
-      } else {
-        if err := iprot.Skip(ctx, fieldTypeId); err != nil {
-          return err
-        }
-      }
-    default:
-      if err := iprot.Skip(ctx, fieldTypeId); err != nil {
-        return err
-      }
-    }
-    if err := iprot.ReadFieldEnd(ctx); err != nil {
-      return err
-    }
-  }
-  if err := iprot.ReadStructEnd(ctx); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
-  }
-  return nil
-}
-
-func (p *RemoteControllerSetHazelcastCloudClusterMemberCountResult)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
-  p.CloudException = &CloudException{}
-  if err := p.CloudException.Read(ctx, iprot); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.CloudException), err)
-  }
-  return nil
-}
-
-func (p *RemoteControllerSetHazelcastCloudClusterMemberCountResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
-  if err := oprot.WriteStructBegin(ctx, "setHazelcastCloudClusterMemberCount_result"); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
-  if p != nil {
-    if err := p.writeField1(ctx, oprot); err != nil { return err }
-  }
-  if err := oprot.WriteFieldStop(ctx); err != nil {
-    return thrift.PrependError("write field stop error: ", err) }
-  if err := oprot.WriteStructEnd(ctx); err != nil {
-    return thrift.PrependError("write struct stop error: ", err) }
-  return nil
-}
-
-func (p *RemoteControllerSetHazelcastCloudClusterMemberCountResult) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
-  if p.IsSetCloudException() {
-    if err := oprot.WriteFieldBegin(ctx, "cloudException", thrift.STRUCT, 1); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:cloudException: ", p), err) }
-    if err := p.CloudException.Write(ctx, oprot); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.CloudException), err)
-    }
-    if err := oprot.WriteFieldEnd(ctx); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write field end error 1:cloudException: ", p), err) }
-  }
-  return err
-}
-
-func (p *RemoteControllerSetHazelcastCloudClusterMemberCountResult) String() string {
-  if p == nil {
-    return "<nil>"
-  }
-  return fmt.Sprintf("RemoteControllerSetHazelcastCloudClusterMemberCountResult(%+v)", *p)
-}
-
-// Attributes:
-//  - CloudClusterId
-type RemoteControllerGetHazelcastCloudClusterArgs struct {
+type RemoteControllerGetCloudClusterArgs struct {
   CloudClusterId string `thrift:"cloudClusterId,1" db:"cloudClusterId" json:"cloudClusterId"`
 }
 
-func NewRemoteControllerGetHazelcastCloudClusterArgs() *RemoteControllerGetHazelcastCloudClusterArgs {
-  return &RemoteControllerGetHazelcastCloudClusterArgs{}
+func NewRemoteControllerGetCloudClusterArgs() *RemoteControllerGetCloudClusterArgs {
+  return &RemoteControllerGetCloudClusterArgs{}
 }
 
 
-func (p *RemoteControllerGetHazelcastCloudClusterArgs) GetCloudClusterId() string {
+func (p *RemoteControllerGetCloudClusterArgs) GetCloudClusterId() string {
   return p.CloudClusterId
 }
-func (p *RemoteControllerGetHazelcastCloudClusterArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerGetCloudClusterArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
   if _, err := iprot.ReadStructBegin(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
   }
@@ -7645,17 +7298,17 @@ func (p *RemoteControllerGetHazelcastCloudClusterArgs) Read(ctx context.Context,
   return nil
 }
 
-func (p *RemoteControllerGetHazelcastCloudClusterArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerGetCloudClusterArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 1: ", err)
-  } else {
-    p.CloudClusterId = v
-  }
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.CloudClusterId = v
+}
   return nil
 }
 
-func (p *RemoteControllerGetHazelcastCloudClusterArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
-  if err := oprot.WriteStructBegin(ctx, "getHazelcastCloudCluster_args"); err != nil {
+func (p *RemoteControllerGetCloudClusterArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin(ctx, "getCloudCluster_args"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
   if p != nil {
     if err := p.writeField1(ctx, oprot); err != nil { return err }
@@ -7667,58 +7320,58 @@ func (p *RemoteControllerGetHazelcastCloudClusterArgs) Write(ctx context.Context
   return nil
 }
 
-func (p *RemoteControllerGetHazelcastCloudClusterArgs) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
+func (p *RemoteControllerGetCloudClusterArgs) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin(ctx, "cloudClusterId", thrift.STRING, 1); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:cloudClusterId: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.CloudClusterId)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.cloudClusterId (1) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.cloudClusterId (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 1:cloudClusterId: ", p), err) }
   return err
 }
 
-func (p *RemoteControllerGetHazelcastCloudClusterArgs) String() string {
+func (p *RemoteControllerGetCloudClusterArgs) String() string {
   if p == nil {
     return "<nil>"
   }
-  return fmt.Sprintf("RemoteControllerGetHazelcastCloudClusterArgs(%+v)", *p)
+  return fmt.Sprintf("RemoteControllerGetCloudClusterArgs(%+v)", *p)
 }
 
 // Attributes:
 //  - Success
 //  - CloudException
-type RemoteControllerGetHazelcastCloudClusterResult struct {
+type RemoteControllerGetCloudClusterResult struct {
   Success *CloudCluster `thrift:"success,0" db:"success" json:"success,omitempty"`
   CloudException *CloudException `thrift:"cloudException,1" db:"cloudException" json:"cloudException,omitempty"`
 }
 
-func NewRemoteControllerGetHazelcastCloudClusterResult() *RemoteControllerGetHazelcastCloudClusterResult {
-  return &RemoteControllerGetHazelcastCloudClusterResult{}
+func NewRemoteControllerGetCloudClusterResult() *RemoteControllerGetCloudClusterResult {
+  return &RemoteControllerGetCloudClusterResult{}
 }
 
-var RemoteControllerGetHazelcastCloudClusterResult_Success_DEFAULT *CloudCluster
-func (p *RemoteControllerGetHazelcastCloudClusterResult) GetSuccess() *CloudCluster {
+var RemoteControllerGetCloudClusterResult_Success_DEFAULT *CloudCluster
+func (p *RemoteControllerGetCloudClusterResult) GetSuccess() *CloudCluster {
   if !p.IsSetSuccess() {
-    return RemoteControllerGetHazelcastCloudClusterResult_Success_DEFAULT
+    return RemoteControllerGetCloudClusterResult_Success_DEFAULT
   }
-  return p.Success
+return p.Success
 }
-var RemoteControllerGetHazelcastCloudClusterResult_CloudException_DEFAULT *CloudException
-func (p *RemoteControllerGetHazelcastCloudClusterResult) GetCloudException() *CloudException {
+var RemoteControllerGetCloudClusterResult_CloudException_DEFAULT *CloudException
+func (p *RemoteControllerGetCloudClusterResult) GetCloudException() *CloudException {
   if !p.IsSetCloudException() {
-    return RemoteControllerGetHazelcastCloudClusterResult_CloudException_DEFAULT
+    return RemoteControllerGetCloudClusterResult_CloudException_DEFAULT
   }
-  return p.CloudException
+return p.CloudException
 }
-func (p *RemoteControllerGetHazelcastCloudClusterResult) IsSetSuccess() bool {
+func (p *RemoteControllerGetCloudClusterResult) IsSetSuccess() bool {
   return p.Success != nil
 }
 
-func (p *RemoteControllerGetHazelcastCloudClusterResult) IsSetCloudException() bool {
+func (p *RemoteControllerGetCloudClusterResult) IsSetCloudException() bool {
   return p.CloudException != nil
 }
 
-func (p *RemoteControllerGetHazelcastCloudClusterResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerGetCloudClusterResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
   if _, err := iprot.ReadStructBegin(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
   }
@@ -7766,7 +7419,7 @@ func (p *RemoteControllerGetHazelcastCloudClusterResult) Read(ctx context.Contex
   return nil
 }
 
-func (p *RemoteControllerGetHazelcastCloudClusterResult)  ReadField0(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerGetCloudClusterResult)  ReadField0(ctx context.Context, iprot thrift.TProtocol) error {
   p.Success = &CloudCluster{}
   if err := p.Success.Read(ctx, iprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.Success), err)
@@ -7774,7 +7427,7 @@ func (p *RemoteControllerGetHazelcastCloudClusterResult)  ReadField0(ctx context
   return nil
 }
 
-func (p *RemoteControllerGetHazelcastCloudClusterResult)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerGetCloudClusterResult)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   p.CloudException = &CloudException{}
   if err := p.CloudException.Read(ctx, iprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.CloudException), err)
@@ -7782,8 +7435,8 @@ func (p *RemoteControllerGetHazelcastCloudClusterResult)  ReadField1(ctx context
   return nil
 }
 
-func (p *RemoteControllerGetHazelcastCloudClusterResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
-  if err := oprot.WriteStructBegin(ctx, "getHazelcastCloudCluster_result"); err != nil {
+func (p *RemoteControllerGetCloudClusterResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin(ctx, "getCloudCluster_result"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
   if p != nil {
     if err := p.writeField0(ctx, oprot); err != nil { return err }
@@ -7796,7 +7449,7 @@ func (p *RemoteControllerGetHazelcastCloudClusterResult) Write(ctx context.Conte
   return nil
 }
 
-func (p *RemoteControllerGetHazelcastCloudClusterResult) writeField0(ctx context.Context, oprot thrift.TProtocol) (err error) {
+func (p *RemoteControllerGetCloudClusterResult) writeField0(ctx context.Context, oprot thrift.TProtocol) (err error) {
   if p.IsSetSuccess() {
     if err := oprot.WriteFieldBegin(ctx, "success", thrift.STRUCT, 0); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
@@ -7809,7 +7462,7 @@ func (p *RemoteControllerGetHazelcastCloudClusterResult) writeField0(ctx context
   return err
 }
 
-func (p *RemoteControllerGetHazelcastCloudClusterResult) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
+func (p *RemoteControllerGetCloudClusterResult) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
   if p.IsSetCloudException() {
     if err := oprot.WriteFieldBegin(ctx, "cloudException", thrift.STRUCT, 1); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:cloudException: ", p), err) }
@@ -7822,28 +7475,28 @@ func (p *RemoteControllerGetHazelcastCloudClusterResult) writeField1(ctx context
   return err
 }
 
-func (p *RemoteControllerGetHazelcastCloudClusterResult) String() string {
+func (p *RemoteControllerGetCloudClusterResult) String() string {
   if p == nil {
     return "<nil>"
   }
-  return fmt.Sprintf("RemoteControllerGetHazelcastCloudClusterResult(%+v)", *p)
+  return fmt.Sprintf("RemoteControllerGetCloudClusterResult(%+v)", *p)
 }
 
 // Attributes:
 //  - CloudClusterId
-type RemoteControllerStopHazelcastCloudClusterArgs struct {
+type RemoteControllerStopCloudClusterArgs struct {
   CloudClusterId string `thrift:"cloudClusterId,1" db:"cloudClusterId" json:"cloudClusterId"`
 }
 
-func NewRemoteControllerStopHazelcastCloudClusterArgs() *RemoteControllerStopHazelcastCloudClusterArgs {
-  return &RemoteControllerStopHazelcastCloudClusterArgs{}
+func NewRemoteControllerStopCloudClusterArgs() *RemoteControllerStopCloudClusterArgs {
+  return &RemoteControllerStopCloudClusterArgs{}
 }
 
 
-func (p *RemoteControllerStopHazelcastCloudClusterArgs) GetCloudClusterId() string {
+func (p *RemoteControllerStopCloudClusterArgs) GetCloudClusterId() string {
   return p.CloudClusterId
 }
-func (p *RemoteControllerStopHazelcastCloudClusterArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerStopCloudClusterArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
   if _, err := iprot.ReadStructBegin(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
   }
@@ -7881,17 +7534,17 @@ func (p *RemoteControllerStopHazelcastCloudClusterArgs) Read(ctx context.Context
   return nil
 }
 
-func (p *RemoteControllerStopHazelcastCloudClusterArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerStopCloudClusterArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 1: ", err)
-  } else {
-    p.CloudClusterId = v
-  }
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.CloudClusterId = v
+}
   return nil
 }
 
-func (p *RemoteControllerStopHazelcastCloudClusterArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
-  if err := oprot.WriteStructBegin(ctx, "stopHazelcastCloudCluster_args"); err != nil {
+func (p *RemoteControllerStopCloudClusterArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin(ctx, "stopCloudCluster_args"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
   if p != nil {
     if err := p.writeField1(ctx, oprot); err != nil { return err }
@@ -7903,58 +7556,58 @@ func (p *RemoteControllerStopHazelcastCloudClusterArgs) Write(ctx context.Contex
   return nil
 }
 
-func (p *RemoteControllerStopHazelcastCloudClusterArgs) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
+func (p *RemoteControllerStopCloudClusterArgs) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin(ctx, "cloudClusterId", thrift.STRING, 1); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:cloudClusterId: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.CloudClusterId)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.cloudClusterId (1) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.cloudClusterId (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 1:cloudClusterId: ", p), err) }
   return err
 }
 
-func (p *RemoteControllerStopHazelcastCloudClusterArgs) String() string {
+func (p *RemoteControllerStopCloudClusterArgs) String() string {
   if p == nil {
     return "<nil>"
   }
-  return fmt.Sprintf("RemoteControllerStopHazelcastCloudClusterArgs(%+v)", *p)
+  return fmt.Sprintf("RemoteControllerStopCloudClusterArgs(%+v)", *p)
 }
 
 // Attributes:
 //  - Success
 //  - CloudException
-type RemoteControllerStopHazelcastCloudClusterResult struct {
+type RemoteControllerStopCloudClusterResult struct {
   Success *CloudCluster `thrift:"success,0" db:"success" json:"success,omitempty"`
   CloudException *CloudException `thrift:"cloudException,1" db:"cloudException" json:"cloudException,omitempty"`
 }
 
-func NewRemoteControllerStopHazelcastCloudClusterResult() *RemoteControllerStopHazelcastCloudClusterResult {
-  return &RemoteControllerStopHazelcastCloudClusterResult{}
+func NewRemoteControllerStopCloudClusterResult() *RemoteControllerStopCloudClusterResult {
+  return &RemoteControllerStopCloudClusterResult{}
 }
 
-var RemoteControllerStopHazelcastCloudClusterResult_Success_DEFAULT *CloudCluster
-func (p *RemoteControllerStopHazelcastCloudClusterResult) GetSuccess() *CloudCluster {
+var RemoteControllerStopCloudClusterResult_Success_DEFAULT *CloudCluster
+func (p *RemoteControllerStopCloudClusterResult) GetSuccess() *CloudCluster {
   if !p.IsSetSuccess() {
-    return RemoteControllerStopHazelcastCloudClusterResult_Success_DEFAULT
+    return RemoteControllerStopCloudClusterResult_Success_DEFAULT
   }
-  return p.Success
+return p.Success
 }
-var RemoteControllerStopHazelcastCloudClusterResult_CloudException_DEFAULT *CloudException
-func (p *RemoteControllerStopHazelcastCloudClusterResult) GetCloudException() *CloudException {
+var RemoteControllerStopCloudClusterResult_CloudException_DEFAULT *CloudException
+func (p *RemoteControllerStopCloudClusterResult) GetCloudException() *CloudException {
   if !p.IsSetCloudException() {
-    return RemoteControllerStopHazelcastCloudClusterResult_CloudException_DEFAULT
+    return RemoteControllerStopCloudClusterResult_CloudException_DEFAULT
   }
-  return p.CloudException
+return p.CloudException
 }
-func (p *RemoteControllerStopHazelcastCloudClusterResult) IsSetSuccess() bool {
+func (p *RemoteControllerStopCloudClusterResult) IsSetSuccess() bool {
   return p.Success != nil
 }
 
-func (p *RemoteControllerStopHazelcastCloudClusterResult) IsSetCloudException() bool {
+func (p *RemoteControllerStopCloudClusterResult) IsSetCloudException() bool {
   return p.CloudException != nil
 }
 
-func (p *RemoteControllerStopHazelcastCloudClusterResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerStopCloudClusterResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
   if _, err := iprot.ReadStructBegin(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
   }
@@ -8002,7 +7655,7 @@ func (p *RemoteControllerStopHazelcastCloudClusterResult) Read(ctx context.Conte
   return nil
 }
 
-func (p *RemoteControllerStopHazelcastCloudClusterResult)  ReadField0(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerStopCloudClusterResult)  ReadField0(ctx context.Context, iprot thrift.TProtocol) error {
   p.Success = &CloudCluster{}
   if err := p.Success.Read(ctx, iprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.Success), err)
@@ -8010,7 +7663,7 @@ func (p *RemoteControllerStopHazelcastCloudClusterResult)  ReadField0(ctx contex
   return nil
 }
 
-func (p *RemoteControllerStopHazelcastCloudClusterResult)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerStopCloudClusterResult)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   p.CloudException = &CloudException{}
   if err := p.CloudException.Read(ctx, iprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.CloudException), err)
@@ -8018,8 +7671,8 @@ func (p *RemoteControllerStopHazelcastCloudClusterResult)  ReadField1(ctx contex
   return nil
 }
 
-func (p *RemoteControllerStopHazelcastCloudClusterResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
-  if err := oprot.WriteStructBegin(ctx, "stopHazelcastCloudCluster_result"); err != nil {
+func (p *RemoteControllerStopCloudClusterResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin(ctx, "stopCloudCluster_result"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
   if p != nil {
     if err := p.writeField0(ctx, oprot); err != nil { return err }
@@ -8032,7 +7685,7 @@ func (p *RemoteControllerStopHazelcastCloudClusterResult) Write(ctx context.Cont
   return nil
 }
 
-func (p *RemoteControllerStopHazelcastCloudClusterResult) writeField0(ctx context.Context, oprot thrift.TProtocol) (err error) {
+func (p *RemoteControllerStopCloudClusterResult) writeField0(ctx context.Context, oprot thrift.TProtocol) (err error) {
   if p.IsSetSuccess() {
     if err := oprot.WriteFieldBegin(ctx, "success", thrift.STRUCT, 0); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
@@ -8045,7 +7698,7 @@ func (p *RemoteControllerStopHazelcastCloudClusterResult) writeField0(ctx contex
   return err
 }
 
-func (p *RemoteControllerStopHazelcastCloudClusterResult) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
+func (p *RemoteControllerStopCloudClusterResult) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
   if p.IsSetCloudException() {
     if err := oprot.WriteFieldBegin(ctx, "cloudException", thrift.STRUCT, 1); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:cloudException: ", p), err) }
@@ -8058,28 +7711,28 @@ func (p *RemoteControllerStopHazelcastCloudClusterResult) writeField1(ctx contex
   return err
 }
 
-func (p *RemoteControllerStopHazelcastCloudClusterResult) String() string {
+func (p *RemoteControllerStopCloudClusterResult) String() string {
   if p == nil {
     return "<nil>"
   }
-  return fmt.Sprintf("RemoteControllerStopHazelcastCloudClusterResult(%+v)", *p)
+  return fmt.Sprintf("RemoteControllerStopCloudClusterResult(%+v)", *p)
 }
 
 // Attributes:
 //  - CloudClusterId
-type RemoteControllerResumeHazelcastCloudClusterArgs struct {
+type RemoteControllerResumeCloudClusterArgs struct {
   CloudClusterId string `thrift:"cloudClusterId,1" db:"cloudClusterId" json:"cloudClusterId"`
 }
 
-func NewRemoteControllerResumeHazelcastCloudClusterArgs() *RemoteControllerResumeHazelcastCloudClusterArgs {
-  return &RemoteControllerResumeHazelcastCloudClusterArgs{}
+func NewRemoteControllerResumeCloudClusterArgs() *RemoteControllerResumeCloudClusterArgs {
+  return &RemoteControllerResumeCloudClusterArgs{}
 }
 
 
-func (p *RemoteControllerResumeHazelcastCloudClusterArgs) GetCloudClusterId() string {
+func (p *RemoteControllerResumeCloudClusterArgs) GetCloudClusterId() string {
   return p.CloudClusterId
 }
-func (p *RemoteControllerResumeHazelcastCloudClusterArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerResumeCloudClusterArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
   if _, err := iprot.ReadStructBegin(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
   }
@@ -8117,17 +7770,17 @@ func (p *RemoteControllerResumeHazelcastCloudClusterArgs) Read(ctx context.Conte
   return nil
 }
 
-func (p *RemoteControllerResumeHazelcastCloudClusterArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerResumeCloudClusterArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 1: ", err)
-  } else {
-    p.CloudClusterId = v
-  }
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.CloudClusterId = v
+}
   return nil
 }
 
-func (p *RemoteControllerResumeHazelcastCloudClusterArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
-  if err := oprot.WriteStructBegin(ctx, "resumeHazelcastCloudCluster_args"); err != nil {
+func (p *RemoteControllerResumeCloudClusterArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin(ctx, "resumeCloudCluster_args"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
   if p != nil {
     if err := p.writeField1(ctx, oprot); err != nil { return err }
@@ -8139,58 +7792,58 @@ func (p *RemoteControllerResumeHazelcastCloudClusterArgs) Write(ctx context.Cont
   return nil
 }
 
-func (p *RemoteControllerResumeHazelcastCloudClusterArgs) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
+func (p *RemoteControllerResumeCloudClusterArgs) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin(ctx, "cloudClusterId", thrift.STRING, 1); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:cloudClusterId: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.CloudClusterId)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.cloudClusterId (1) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.cloudClusterId (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 1:cloudClusterId: ", p), err) }
   return err
 }
 
-func (p *RemoteControllerResumeHazelcastCloudClusterArgs) String() string {
+func (p *RemoteControllerResumeCloudClusterArgs) String() string {
   if p == nil {
     return "<nil>"
   }
-  return fmt.Sprintf("RemoteControllerResumeHazelcastCloudClusterArgs(%+v)", *p)
+  return fmt.Sprintf("RemoteControllerResumeCloudClusterArgs(%+v)", *p)
 }
 
 // Attributes:
 //  - Success
 //  - CloudException
-type RemoteControllerResumeHazelcastCloudClusterResult struct {
+type RemoteControllerResumeCloudClusterResult struct {
   Success *CloudCluster `thrift:"success,0" db:"success" json:"success,omitempty"`
   CloudException *CloudException `thrift:"cloudException,1" db:"cloudException" json:"cloudException,omitempty"`
 }
 
-func NewRemoteControllerResumeHazelcastCloudClusterResult() *RemoteControllerResumeHazelcastCloudClusterResult {
-  return &RemoteControllerResumeHazelcastCloudClusterResult{}
+func NewRemoteControllerResumeCloudClusterResult() *RemoteControllerResumeCloudClusterResult {
+  return &RemoteControllerResumeCloudClusterResult{}
 }
 
-var RemoteControllerResumeHazelcastCloudClusterResult_Success_DEFAULT *CloudCluster
-func (p *RemoteControllerResumeHazelcastCloudClusterResult) GetSuccess() *CloudCluster {
+var RemoteControllerResumeCloudClusterResult_Success_DEFAULT *CloudCluster
+func (p *RemoteControllerResumeCloudClusterResult) GetSuccess() *CloudCluster {
   if !p.IsSetSuccess() {
-    return RemoteControllerResumeHazelcastCloudClusterResult_Success_DEFAULT
+    return RemoteControllerResumeCloudClusterResult_Success_DEFAULT
   }
-  return p.Success
+return p.Success
 }
-var RemoteControllerResumeHazelcastCloudClusterResult_CloudException_DEFAULT *CloudException
-func (p *RemoteControllerResumeHazelcastCloudClusterResult) GetCloudException() *CloudException {
+var RemoteControllerResumeCloudClusterResult_CloudException_DEFAULT *CloudException
+func (p *RemoteControllerResumeCloudClusterResult) GetCloudException() *CloudException {
   if !p.IsSetCloudException() {
-    return RemoteControllerResumeHazelcastCloudClusterResult_CloudException_DEFAULT
+    return RemoteControllerResumeCloudClusterResult_CloudException_DEFAULT
   }
-  return p.CloudException
+return p.CloudException
 }
-func (p *RemoteControllerResumeHazelcastCloudClusterResult) IsSetSuccess() bool {
+func (p *RemoteControllerResumeCloudClusterResult) IsSetSuccess() bool {
   return p.Success != nil
 }
 
-func (p *RemoteControllerResumeHazelcastCloudClusterResult) IsSetCloudException() bool {
+func (p *RemoteControllerResumeCloudClusterResult) IsSetCloudException() bool {
   return p.CloudException != nil
 }
 
-func (p *RemoteControllerResumeHazelcastCloudClusterResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerResumeCloudClusterResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
   if _, err := iprot.ReadStructBegin(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
   }
@@ -8238,7 +7891,7 @@ func (p *RemoteControllerResumeHazelcastCloudClusterResult) Read(ctx context.Con
   return nil
 }
 
-func (p *RemoteControllerResumeHazelcastCloudClusterResult)  ReadField0(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerResumeCloudClusterResult)  ReadField0(ctx context.Context, iprot thrift.TProtocol) error {
   p.Success = &CloudCluster{}
   if err := p.Success.Read(ctx, iprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.Success), err)
@@ -8246,7 +7899,7 @@ func (p *RemoteControllerResumeHazelcastCloudClusterResult)  ReadField0(ctx cont
   return nil
 }
 
-func (p *RemoteControllerResumeHazelcastCloudClusterResult)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerResumeCloudClusterResult)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   p.CloudException = &CloudException{}
   if err := p.CloudException.Read(ctx, iprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.CloudException), err)
@@ -8254,8 +7907,8 @@ func (p *RemoteControllerResumeHazelcastCloudClusterResult)  ReadField1(ctx cont
   return nil
 }
 
-func (p *RemoteControllerResumeHazelcastCloudClusterResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
-  if err := oprot.WriteStructBegin(ctx, "resumeHazelcastCloudCluster_result"); err != nil {
+func (p *RemoteControllerResumeCloudClusterResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin(ctx, "resumeCloudCluster_result"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
   if p != nil {
     if err := p.writeField0(ctx, oprot); err != nil { return err }
@@ -8268,7 +7921,7 @@ func (p *RemoteControllerResumeHazelcastCloudClusterResult) Write(ctx context.Co
   return nil
 }
 
-func (p *RemoteControllerResumeHazelcastCloudClusterResult) writeField0(ctx context.Context, oprot thrift.TProtocol) (err error) {
+func (p *RemoteControllerResumeCloudClusterResult) writeField0(ctx context.Context, oprot thrift.TProtocol) (err error) {
   if p.IsSetSuccess() {
     if err := oprot.WriteFieldBegin(ctx, "success", thrift.STRUCT, 0); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
@@ -8281,7 +7934,7 @@ func (p *RemoteControllerResumeHazelcastCloudClusterResult) writeField0(ctx cont
   return err
 }
 
-func (p *RemoteControllerResumeHazelcastCloudClusterResult) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
+func (p *RemoteControllerResumeCloudClusterResult) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
   if p.IsSetCloudException() {
     if err := oprot.WriteFieldBegin(ctx, "cloudException", thrift.STRUCT, 1); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:cloudException: ", p), err) }
@@ -8294,28 +7947,28 @@ func (p *RemoteControllerResumeHazelcastCloudClusterResult) writeField1(ctx cont
   return err
 }
 
-func (p *RemoteControllerResumeHazelcastCloudClusterResult) String() string {
+func (p *RemoteControllerResumeCloudClusterResult) String() string {
   if p == nil {
     return "<nil>"
   }
-  return fmt.Sprintf("RemoteControllerResumeHazelcastCloudClusterResult(%+v)", *p)
+  return fmt.Sprintf("RemoteControllerResumeCloudClusterResult(%+v)", *p)
 }
 
 // Attributes:
 //  - CloudClusterId
-type RemoteControllerDeleteHazelcastCloudClusterArgs struct {
+type RemoteControllerDeleteCloudClusterArgs struct {
   CloudClusterId string `thrift:"cloudClusterId,1" db:"cloudClusterId" json:"cloudClusterId"`
 }
 
-func NewRemoteControllerDeleteHazelcastCloudClusterArgs() *RemoteControllerDeleteHazelcastCloudClusterArgs {
-  return &RemoteControllerDeleteHazelcastCloudClusterArgs{}
+func NewRemoteControllerDeleteCloudClusterArgs() *RemoteControllerDeleteCloudClusterArgs {
+  return &RemoteControllerDeleteCloudClusterArgs{}
 }
 
 
-func (p *RemoteControllerDeleteHazelcastCloudClusterArgs) GetCloudClusterId() string {
+func (p *RemoteControllerDeleteCloudClusterArgs) GetCloudClusterId() string {
   return p.CloudClusterId
 }
-func (p *RemoteControllerDeleteHazelcastCloudClusterArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerDeleteCloudClusterArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
   if _, err := iprot.ReadStructBegin(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
   }
@@ -8353,17 +8006,17 @@ func (p *RemoteControllerDeleteHazelcastCloudClusterArgs) Read(ctx context.Conte
   return nil
 }
 
-func (p *RemoteControllerDeleteHazelcastCloudClusterArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerDeleteCloudClusterArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 1: ", err)
-  } else {
-    p.CloudClusterId = v
-  }
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.CloudClusterId = v
+}
   return nil
 }
 
-func (p *RemoteControllerDeleteHazelcastCloudClusterArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
-  if err := oprot.WriteStructBegin(ctx, "deleteHazelcastCloudCluster_args"); err != nil {
+func (p *RemoteControllerDeleteCloudClusterArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin(ctx, "deleteCloudCluster_args"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
   if p != nil {
     if err := p.writeField1(ctx, oprot); err != nil { return err }
@@ -8375,45 +8028,45 @@ func (p *RemoteControllerDeleteHazelcastCloudClusterArgs) Write(ctx context.Cont
   return nil
 }
 
-func (p *RemoteControllerDeleteHazelcastCloudClusterArgs) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
+func (p *RemoteControllerDeleteCloudClusterArgs) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin(ctx, "cloudClusterId", thrift.STRING, 1); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:cloudClusterId: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.CloudClusterId)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.cloudClusterId (1) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.cloudClusterId (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 1:cloudClusterId: ", p), err) }
   return err
 }
 
-func (p *RemoteControllerDeleteHazelcastCloudClusterArgs) String() string {
+func (p *RemoteControllerDeleteCloudClusterArgs) String() string {
   if p == nil {
     return "<nil>"
   }
-  return fmt.Sprintf("RemoteControllerDeleteHazelcastCloudClusterArgs(%+v)", *p)
+  return fmt.Sprintf("RemoteControllerDeleteCloudClusterArgs(%+v)", *p)
 }
 
 // Attributes:
 //  - CloudException
-type RemoteControllerDeleteHazelcastCloudClusterResult struct {
+type RemoteControllerDeleteCloudClusterResult struct {
   CloudException *CloudException `thrift:"cloudException,1" db:"cloudException" json:"cloudException,omitempty"`
 }
 
-func NewRemoteControllerDeleteHazelcastCloudClusterResult() *RemoteControllerDeleteHazelcastCloudClusterResult {
-  return &RemoteControllerDeleteHazelcastCloudClusterResult{}
+func NewRemoteControllerDeleteCloudClusterResult() *RemoteControllerDeleteCloudClusterResult {
+  return &RemoteControllerDeleteCloudClusterResult{}
 }
 
-var RemoteControllerDeleteHazelcastCloudClusterResult_CloudException_DEFAULT *CloudException
-func (p *RemoteControllerDeleteHazelcastCloudClusterResult) GetCloudException() *CloudException {
+var RemoteControllerDeleteCloudClusterResult_CloudException_DEFAULT *CloudException
+func (p *RemoteControllerDeleteCloudClusterResult) GetCloudException() *CloudException {
   if !p.IsSetCloudException() {
-    return RemoteControllerDeleteHazelcastCloudClusterResult_CloudException_DEFAULT
+    return RemoteControllerDeleteCloudClusterResult_CloudException_DEFAULT
   }
-  return p.CloudException
+return p.CloudException
 }
-func (p *RemoteControllerDeleteHazelcastCloudClusterResult) IsSetCloudException() bool {
+func (p *RemoteControllerDeleteCloudClusterResult) IsSetCloudException() bool {
   return p.CloudException != nil
 }
 
-func (p *RemoteControllerDeleteHazelcastCloudClusterResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerDeleteCloudClusterResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
   if _, err := iprot.ReadStructBegin(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
   }
@@ -8451,7 +8104,7 @@ func (p *RemoteControllerDeleteHazelcastCloudClusterResult) Read(ctx context.Con
   return nil
 }
 
-func (p *RemoteControllerDeleteHazelcastCloudClusterResult)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RemoteControllerDeleteCloudClusterResult)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   p.CloudException = &CloudException{}
   if err := p.CloudException.Read(ctx, iprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.CloudException), err)
@@ -8459,8 +8112,8 @@ func (p *RemoteControllerDeleteHazelcastCloudClusterResult)  ReadField1(ctx cont
   return nil
 }
 
-func (p *RemoteControllerDeleteHazelcastCloudClusterResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
-  if err := oprot.WriteStructBegin(ctx, "deleteHazelcastCloudCluster_result"); err != nil {
+func (p *RemoteControllerDeleteCloudClusterResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin(ctx, "deleteCloudCluster_result"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
   if p != nil {
     if err := p.writeField1(ctx, oprot); err != nil { return err }
@@ -8472,7 +8125,7 @@ func (p *RemoteControllerDeleteHazelcastCloudClusterResult) Write(ctx context.Co
   return nil
 }
 
-func (p *RemoteControllerDeleteHazelcastCloudClusterResult) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
+func (p *RemoteControllerDeleteCloudClusterResult) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
   if p.IsSetCloudException() {
     if err := oprot.WriteFieldBegin(ctx, "cloudException", thrift.STRUCT, 1); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:cloudException: ", p), err) }
@@ -8485,11 +8138,11 @@ func (p *RemoteControllerDeleteHazelcastCloudClusterResult) writeField1(ctx cont
   return err
 }
 
-func (p *RemoteControllerDeleteHazelcastCloudClusterResult) String() string {
+func (p *RemoteControllerDeleteCloudClusterResult) String() string {
   if p == nil {
     return "<nil>"
   }
-  return fmt.Sprintf("RemoteControllerDeleteHazelcastCloudClusterResult(%+v)", *p)
+  return fmt.Sprintf("RemoteControllerDeleteCloudClusterResult(%+v)", *p)
 }
 
 // Attributes:
@@ -8578,29 +8231,29 @@ func (p *RemoteControllerExecuteOnControllerArgs) Read(ctx context.Context, ipro
 
 func (p *RemoteControllerExecuteOnControllerArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 1: ", err)
-  } else {
-    p.ClusterId = v
-  }
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.ClusterId = v
+}
   return nil
 }
 
 func (p *RemoteControllerExecuteOnControllerArgs)  ReadField2(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(ctx); err != nil {
-    return thrift.PrependError("error reading field 2: ", err)
-  } else {
-    p.Script = v
-  }
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
+  p.Script = v
+}
   return nil
 }
 
 func (p *RemoteControllerExecuteOnControllerArgs)  ReadField3(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI32(ctx); err != nil {
-    return thrift.PrependError("error reading field 3: ", err)
-  } else {
-    temp := Lang(v)
-    p.Lang = temp
-  }
+  return thrift.PrependError("error reading field 3: ", err)
+} else {
+  temp := Lang(v)
+  p.Lang = temp
+}
   return nil
 }
 
@@ -8623,7 +8276,7 @@ func (p *RemoteControllerExecuteOnControllerArgs) writeField1(ctx context.Contex
   if err := oprot.WriteFieldBegin(ctx, "clusterId", thrift.STRING, 1); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:clusterId: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.ClusterId)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.clusterId (1) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.clusterId (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 1:clusterId: ", p), err) }
   return err
@@ -8633,7 +8286,7 @@ func (p *RemoteControllerExecuteOnControllerArgs) writeField2(ctx context.Contex
   if err := oprot.WriteFieldBegin(ctx, "script", thrift.STRING, 2); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:script: ", p), err) }
   if err := oprot.WriteString(ctx, string(p.Script)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.script (2) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.script (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 2:script: ", p), err) }
   return err
@@ -8643,7 +8296,7 @@ func (p *RemoteControllerExecuteOnControllerArgs) writeField3(ctx context.Contex
   if err := oprot.WriteFieldBegin(ctx, "lang", thrift.I32, 3); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:lang: ", p), err) }
   if err := oprot.WriteI32(ctx, int32(p.Lang)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.lang (3) field write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.lang (3) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write field end error 3:lang: ", p), err) }
   return err
@@ -8671,7 +8324,7 @@ func (p *RemoteControllerExecuteOnControllerResult) GetSuccess() *Response {
   if !p.IsSetSuccess() {
     return RemoteControllerExecuteOnControllerResult_Success_DEFAULT
   }
-  return p.Success
+return p.Success
 }
 func (p *RemoteControllerExecuteOnControllerResult) IsSetSuccess() bool {
   return p.Success != nil
@@ -8755,4 +8408,5 @@ func (p *RemoteControllerExecuteOnControllerResult) String() string {
   }
   return fmt.Sprintf("RemoteControllerExecuteOnControllerResult(%+v)", *p)
 }
+
 

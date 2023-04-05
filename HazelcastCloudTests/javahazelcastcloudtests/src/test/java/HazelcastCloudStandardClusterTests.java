@@ -2,10 +2,13 @@ import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.map.IMap;
+
+import com.hazelcast.remotecontroller.CloudCluster;
+import com.hazelcast.remotecontroller.CloudManager;
+import com.hazelcast.remotecontroller.CloudException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,16 +18,22 @@ import org.junit.jupiter.params.provider.ValueSource;
 public class HazelcastCloudStandardClusterTests {
     static CloudCluster sslDisabledCluster;
     static CloudCluster sslEnabledCluster;
-    static CloudCluster tempCluster;
-    static HazelcastCloudManager cloudManager;
+    static CloudCluster cluster;
+    static CloudManager cloudManager;
     private static final Logger TestCasesLogger = LogManager.getLogger(HazelcastCloudStandardClusterTests.class);
 
     @BeforeAll
     public static void setUpClass() throws CloudException {
-        cloudManager = new HazelcastCloudManager();
-        cloudManager.loginToHazelcastCloudUsingEnvironment();
-        sslDisabledCluster = cloudManager.createHazelcastCloudStandardCluster(System.getenv("HZ_VERSION"), false);
-        sslEnabledCluster = cloudManager.createHazelcastCloudStandardCluster(System.getenv("HZ_VERSION"), true);
+        cloudManager = new CloudManager();
+        cloudManager.loginToCloudUsingEnvironment();
+        sslDisabledCluster = cloudManager.createCloudCluster(System.getenv("HZ_VERSION"), false);
+        sslEnabledCluster = cloudManager.createCloudCluster(System.getenv("HZ_VERSION"), true);
+    }
+
+    @AfterAll
+    public static void tearDownClass() throws CloudException {
+        cloudManager.deleteCloudCluster(sslDisabledCluster.id);
+        cloudManager.deleteCloudCluster(sslEnabledCluster.id);
     }
 
     @ParameterizedTest
@@ -35,54 +44,50 @@ public class HazelcastCloudStandardClusterTests {
             "false,false"
     })
     public void StandardClusterTests(Boolean isSmartClient, Boolean isTlsEnabled) throws CloudException {
+        TestCasesLogger.info(String.format("StandardClusterTests started: isSmartClient: %s, isTlsEnabled: %s", isSmartClient, isTlsEnabled));
         ClientConfig config;
-        if(isTlsEnabled)
-        {
-            config = HelperMethods.getConfigForSslEnabledCluster(sslEnabledCluster.getNameForConnect(), sslEnabledCluster.getToken(), isSmartClient, sslEnabledCluster.getCertificatePath(), sslEnabledCluster.getTlsPassword());
-            tempCluster = sslEnabledCluster;
-            config.getConnectionStrategyConfig().getConnectionRetryConfig().setClusterConnectTimeoutMillis(10000);
-        }
-        else
-        {
-            config = HelperMethods.getConfigForSslDisabledCluster(sslDisabledCluster.getNameForConnect(), sslDisabledCluster.getToken(), isSmartClient);
-            tempCluster = sslDisabledCluster;
-            config.getConnectionStrategyConfig().getConnectionRetryConfig().setClusterConnectTimeoutMillis(10000);
+        if (isTlsEnabled) {
+            config = HelperMethods.getConfigForSslEnabledCluster(sslEnabledCluster.getReleaseName(), sslEnabledCluster.getToken(), isSmartClient, sslEnabledCluster.getCertificatePath(), sslEnabledCluster.getTlsPassword());
+            cluster = sslEnabledCluster;
+        } else {
+            config = HelperMethods.getConfigForSslDisabledCluster(sslDisabledCluster.getReleaseName(), sslDisabledCluster.getToken(), isSmartClient);
+            cluster = sslDisabledCluster;
         }
 
-        TestCasesLogger.info("Create client");
+        TestCasesLogger.info("Creating client");
         HazelcastInstance client = HazelcastClient.newHazelcastClient(config);
         IMap<String, String> map = client.getMap("mapForTest");
-        HelperMethods.mapPutgetAndVerify(map);
 
-        TestCasesLogger.info("Scale up cluster from 2 node to 4");
-        cloudManager.setHazelcastCloudClusterMemberCount(tempCluster.getId(), 4);
         HelperMethods.mapPutgetAndVerify(map);
-
-        TestCasesLogger.info("Scale down cluster from 4 node to 2");
-        cloudManager.setHazelcastCloudClusterMemberCount(tempCluster.getId(), 2);
+        TestCasesLogger.info("Stopping cluster");
+        cloudManager.stopCloudCluster(cluster.getId());
+        TestCasesLogger.info("Stopped cluster");
+        TestCasesLogger.info("Resuming cluster");
+        cloudManager.resumeCloudCluster(cluster.getId());
+        TestCasesLogger.info("Resumed cluster");
+        TestCasesLogger.info("Map put get and verify starting");
         HelperMethods.mapPutgetAndVerify(map);
-        TestCasesLogger.info("Stop cluster");
-        CloudCluster test = cloudManager.stopHazelcastCloudCluster(tempCluster.getId());
-        TestCasesLogger.info("Resume cluster");
-        cloudManager.resumeHazelcastCloudCluster(tempCluster.getId());
-        HelperMethods.mapPutgetAndVerify(map);
+        TestCasesLogger.info("Map put get and verify done");
+        client.shutdown();
     }
 
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    public void TryConnectSslClusterWithoutCertificates(Boolean isSmartClient)
-    {
-        ClientConfig config = HelperMethods.getConfigForSslDisabledCluster(sslEnabledCluster.getNameForConnect(), sslEnabledCluster.getToken(), isSmartClient);
+    public void TryConnectSslClusterWithoutCertificates(Boolean isSmartClient) {
+        TestCasesLogger.info(String.format("TryConnectSslClusterWithoutCertificates started: isSmartClient: %s", isSmartClient));
+        ClientConfig config = HelperMethods.getConfigForSslDisabledCluster(sslEnabledCluster.getReleaseName(), sslEnabledCluster.getToken(), isSmartClient);
         config.getConnectionStrategyConfig().getConnectionRetryConfig().setClusterConnectTimeoutMillis(10000);
         boolean value = false;
-        try
-        {
-            HazelcastClient.newHazelcastClient(config);
-        }
-        catch(Exception e)
-        {
+        HazelcastInstance client = null;
+        try {
+            client = HazelcastClient.newHazelcastClient(config);
+        } catch(Exception e) {
             value = true;
+        } finally {
+            if (client != null) {
+                client.shutdown();
+            }
         }
         Assertions.assertTrue(value, "Client shouldn't be able to connect ssl cluster without certificates");
     }

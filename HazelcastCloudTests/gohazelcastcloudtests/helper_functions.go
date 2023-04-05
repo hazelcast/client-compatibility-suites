@@ -4,16 +4,17 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"github.com/hazelcast/hazelcast-go-client"
-	"github.com/hazelcast/hazelcast-go-client/types"
-	"github.com/stretchr/testify/assert"
 	"math/rand"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/hazelcast/hazelcast-go-client"
+	"github.com/hazelcast/hazelcast-go-client/types"
+	"github.com/stretchr/testify/assert"
 )
 
-func MapPutGetAndVerify(t *testing.T, givenMap *hazelcast.Map){
+func MapPutGetAndVerify(t *testing.T, givenMap *hazelcast.Map) {
 	fmt.Println("Putting random keys and values to map and then verify")
 	ctx := context.Background()
 	givenMap.Clear(ctx)
@@ -23,7 +24,7 @@ func MapPutGetAndVerify(t *testing.T, givenMap *hazelcast.Map){
 
 	rand.Seed(time.Now().UTC().UnixNano())
 	iterationCounter := 0
-	for iterationCounter < 20{
+	for iterationCounter < 20 {
 		randKey := rand.Intn(100000)
 		_, err := givenMap.Put(ctx, fmt.Sprintf("key%d", randKey), fmt.Sprintf("value%d", randKey))
 		if err != nil {

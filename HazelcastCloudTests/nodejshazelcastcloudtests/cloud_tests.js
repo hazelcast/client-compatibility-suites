@@ -6,90 +6,93 @@ const {Client} = require("./lib")
 const { expect } = require('chai');
 
 describe('SslEnabledStandardClusterTests', function () {
+    let client;
+    let sslEnabledCluster;
 
-    let smartClient
-    let unisocketClient
-    let sslEnabledCluster
     before(async function (){
-        await RC.loginToHazelcastCloudUsingEnvironment()
-        sslEnabledCluster = await RC.createHazelcastCloudStandardCluster(process.env.HZ_VERSION, true)
+        await RC.loginToCloudUsingEnvironment()
+        sslEnabledCluster = await RC.createCloudCluster(process.env.HZ_VERSION, true)
+    });
+
+    afterEach(async function() {
+        if (client) {
+            await client.shutdown();
+        }
     });
 
     it('TryConnectSslClusterWithoutCertificatesSmartClient', async function() {
         let value = false;
         try {
-            const wrongConfig = Helper.createClientConfigWithoutSsl(sslEnabledCluster.nameForConnect, sslEnabledCluster.token, process.env.BASE_URL, true);
+            const wrongConfig = Helper.createClientConfigWithoutSsl(sslEnabledCluster.releaseName, sslEnabledCluster.token, process.env.BASE_URL, true);
             wrongConfig.connectionStrategy = {connectionRetry: {clusterConnectTimeoutMillis: 10000}};
-            await Client.newHazelcastClient(wrongConfig);
-        }
-        catch
-        {
+            client = await Client.newHazelcastClient(wrongConfig);
+        } catch(e) {
             value = true;
         }
         expect(value).to.be.true;
     });
 
     it('TryConnectSslClusterWithCertificatesSmartClient', async function (){
-        const smartClientConfig = Helper.createClientConfigWithSsl(sslEnabledCluster.nameForConnect, sslEnabledCluster.token, sslEnabledCluster.certificatePath, sslEnabledCluster.tlsPassword, process.env.BASE_URL, true);
-        smartClient = await Client.newHazelcastClient(smartClientConfig);
-        const map = await smartClient.getMap('mapFor_TryConnectSslClusterWithoutCertificatesSmartClient');
-        await Helper.stopResumeScaleUpDownCluster(sslEnabledCluster.id, map);
-        await smartClient.shutdown();
+        const smartClientConfig = Helper.createClientConfigWithSsl(sslEnabledCluster.releaseName, sslEnabledCluster.token, sslEnabledCluster.certificatePath, sslEnabledCluster.tlsPassword, process.env.BASE_URL, true);
+        client = await Client.newHazelcastClient(smartClientConfig);
+        const map = await client.getMap('mapFor_TryConnectSslClusterWithoutCertificatesSmartClient');
+        await Helper.stopResumeCluster(sslEnabledCluster.id, map);
     });
 
     it('TryConnectSslClusterWithoutCertificatesUnisocketClient', async function() {
         let value = false;
         try {
-            const wrongConfig = Helper.createClientConfigWithoutSsl(sslEnabledCluster.nameForConnect, sslEnabledCluster.token, process.env.BASE_URL, false);
+            const wrongConfig = Helper.createClientConfigWithoutSsl(sslEnabledCluster.releaseName, sslEnabledCluster.token, process.env.BASE_URL, false);
             wrongConfig.connectionStrategy = {connectionRetry: {clusterConnectTimeoutMillis: 10000}};
-            await Client.newHazelcastClient(wrongConfig);
-        }
-        catch(e)
-        {
+            client = await Client.newHazelcastClient(wrongConfig);
+        } catch(e) {
             value = true;
         }
         expect(value).to.be.true;
     });
 
     it('TryConnectSslClusterWithCertificatesUnisocketClient', async  function (){
-        const unisocketClientConfig = Helper.createClientConfigWithSsl(sslEnabledCluster.nameForConnect, sslEnabledCluster.token, sslEnabledCluster.certificatePath, sslEnabledCluster.tlsPassword, process.env.BASE_URL, false);
-        unisocketClient = await Client.newHazelcastClient(unisocketClientConfig);
-        const map = await unisocketClient.getMap('mapFor_TryConnectSslClusterWithCertificatesUnisocketClient');
-        await Helper.stopResumeScaleUpDownCluster(sslEnabledCluster.id, map);
-        await unisocketClient.shutdown();
+        const unisocketClientConfig = Helper.createClientConfigWithSsl(sslEnabledCluster.releaseName, sslEnabledCluster.token, sslEnabledCluster.certificatePath, sslEnabledCluster.tlsPassword, process.env.BASE_URL, false);
+        client = await Client.newHazelcastClient(unisocketClientConfig);
+        const map = await client.getMap('mapFor_TryConnectSslClusterWithCertificatesUnisocketClient');
+        await Helper.stopResumeCluster(sslEnabledCluster.id, map);
     });
 
     after(async function (){
-        await RC.deleteHazelcastCloudCluster(sslEnabledCluster.id)
+        await RC.deleteCloudCluster(sslEnabledCluster.id);
     });
 });
 
 describe('SslDisabledStandardClusterTests', function () {
-    let smartClient
-    let unisocketClient
-    let sslDisabledCluster
+    let client;
+    let sslDisabledCluster;
+
     before(async function (){
-        await RC.loginToHazelcastCloudUsingEnvironment()
-        sslDisabledCluster = await RC.createHazelcastCloudStandardCluster(process.env.HZ_VERSION, false)
+        await RC.loginToCloudUsingEnvironment()
+        sslDisabledCluster = await RC.createCloudCluster(process.env.HZ_VERSION, false)
+    });
+
+    afterEach(async function() {
+        if (client) {
+            await client.shutdown();
+        }
     });
 
     it('TryConnectSslDisabledClusterSmartClient', async function (){
-        const smartClientConfig = Helper.createClientConfigWithoutSsl(sslDisabledCluster.nameForConnect, sslDisabledCluster.token, process.env.BASE_URL, true);
-        smartClient = await Client.newHazelcastClient(smartClientConfig);
-        const map = await smartClient.getMap('mapFor_TryConnectSslDisabledClusterSmartClient');
-        await Helper.stopResumeScaleUpDownCluster(sslDisabledCluster.id, map);
-        await smartClient.shutdown();
+        const smartClientConfig = Helper.createClientConfigWithoutSsl(sslDisabledCluster.releaseName, sslDisabledCluster.token, process.env.BASE_URL, true);
+        client = await Client.newHazelcastClient(smartClientConfig);
+        const map = await client.getMap('mapFor_TryConnectSslDisabledClusterSmartClient');
+        await Helper.stopResumeCluster(sslDisabledCluster.id, map);
     });
 
     it('TryConnectSslDisabledClusterUnisocketClient', async  function (){
-        const unisocketClientConfig = Helper.createClientConfigWithoutSsl(sslDisabledCluster.nameForConnect, sslDisabledCluster.token, process.env.BASE_URL, false);
-        unisocketClient = await Client.newHazelcastClient(unisocketClientConfig);
-        const map = await unisocketClient.getMap('mapFor_TryConnectSslDisabledClusterUnisocketClient');
-        await Helper.stopResumeScaleUpDownCluster(sslDisabledCluster.id, map);
-        await unisocketClient.shutdown();
+        const unisocketClientConfig = Helper.createClientConfigWithoutSsl(sslDisabledCluster.releaseName, sslDisabledCluster.token, process.env.BASE_URL, false);
+        client = await Client.newHazelcastClient(unisocketClientConfig);
+        const map = await client.getMap('mapFor_TryConnectSslDisabledClusterUnisocketClient');
+        await Helper.stopResumeCluster(sslDisabledCluster.id, map);
     });
 
     after(async function (){
-        await RC.deleteHazelcastCloudCluster(sslDisabledCluster.id)
+        await RC.deleteCloudCluster(sslDisabledCluster.id);
     });
 });
