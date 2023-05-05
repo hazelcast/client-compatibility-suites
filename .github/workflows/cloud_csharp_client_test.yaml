@@ -46,6 +46,13 @@ jobs:
             5.0.x
             6.0.x
             7.0.x
+            
+      - name: Checkout to ${{ github.event.inputs.branch_name }}
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ github.event.inputs.organization_name }}/hazelcast-csharp-client
+          path: client
+          ref: ${{ github.event.inputs.branch_name }}
 
       - name: Update submodules
         run: |
