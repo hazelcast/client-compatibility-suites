@@ -46,7 +46,7 @@ jobs:
             5.0.x
             6.0.x
             7.0.x
-            
+
       - name: Checkout to ${{ github.event.inputs.branch_name }}
         uses: actions/checkout@v2
         with:
@@ -62,6 +62,7 @@ jobs:
       - name: Build
         shell: pwsh
         run: ./hz.ps1 -localRestore build
+        working-directory: client
 
       - name: Start RC for Viridian
         env:
@@ -71,6 +72,7 @@ jobs:
         run: |
           python start_remote_controller.py --use-simple-server &> rc.log &
           sleep 30
+        working-directory: HazelcastCloudTests/gohazelcastcloudtests
        
       - name: Run cloud tests
         shell: pwsh
