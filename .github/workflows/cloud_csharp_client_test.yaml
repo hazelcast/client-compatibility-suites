@@ -82,7 +82,7 @@ jobs:
           HZ_CLOUD_COORDINATOR_BASE_URL: ${{ github.event.inputs.base_url }}
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hzVersion }}
         run: |
-          ./hz.ps1 -server ${{ github.event.inputs.hzVersion }} test -tf "test = /Hazelcast.Tests.Cloud.ServerlessCloudTests.TestCloud/"
+          ./hz.ps1 -server ${{ github.event.inputs.hzVersion }} test -tf "test == Hazelcast.Tests.Cloud.ServerlessCloudTests.TestCloud"
         working-directory: client
 
       - uses: actions/upload-artifact@v2
