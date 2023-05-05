@@ -78,6 +78,8 @@ jobs:
         shell: pwsh
         env:
           BASE_URL: ${{ github.event.inputs.base_url }}
+          API_KEY: ${{ secrets.APIKEY_VIRIDIAN }}
+          API_SECRET: ${{ secrets.APISECRET_VIRIDIAN }}
           HZ_VERSION: ${{ github.event.inputs.hzVersion }}
           HZ_CLOUD_COORDINATOR_BASE_URL: ${{ github.event.inputs.base_url }}
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hzVersion }}
