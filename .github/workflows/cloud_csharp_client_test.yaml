@@ -1,0 +1,95 @@
+name: Cloud test with Csharp client
+
+on:
+  workflow_dispatch:
+    inputs:
+      organization_name:
+        description: Default is hazelcast, but if you would like to run the workflow with your forked repo, set your github username
+        required: true
+        default: hazelcast
+      branch_name:
+        description: Name of the branch to test client from
+        required: true
+        default: master
+      base_url:
+        description: Base url of the cloud env. I.e https://api.dev.viridian.hazelcast.cloud
+        required: true
+        default: https://api.dev.viridian.hazelcast.cloud
+      hzVersion:
+        description: Version of hazelcast
+        required: true
+
+jobs:
+  test_cloud_csharp:
+    runs-on: ubuntu-latest
+    name: Cloud tests with Csharp
+    steps:
+      - name: Checkout to scripts
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: |
+            2.1.x
+            3.1.x
+            5.0.x
+            6.0.x
+            7.0.x
+
+      - name: Checkout to ${{ github.event.inputs.branch_name }}
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ github.event.inputs.organization_name }}/hazelcast-csharp-client
+          path: client
+          ref: ${{ github.event.inputs.branch_name }}
+
+      - name: Update submodules
+        run: |
+            git submodule update --init
+        working-directory: client
+
+      - name: Build
+        shell: pwsh
+        run: ./hz.ps1 -localRestore build
+        working-directory: client
+
+      - name: Start RC for Viridian
+        env:
+          BASE_URL: ${{ github.event.inputs.base_url }}
+          API_KEY: ${{ secrets.APIKEY_VIRIDIAN }}
+          API_SECRET: ${{ secrets.APISECRET_VIRIDIAN }}
+        run: |
+          python start_remote_controller.py --use-simple-server &> rc.log &
+          sleep 30
+        working-directory: HazelcastCloudTests/gohazelcastcloudtests
+       
+      - name: Run cloud tests
+        shell: pwsh
+        env:
+          BASE_URL: ${{ github.event.inputs.base_url }}
+          API_KEY: ${{ secrets.APIKEY_VIRIDIAN }}
+          API_SECRET: ${{ secrets.APISECRET_VIRIDIAN }}
+          HZ_VERSION: ${{ github.event.inputs.hzVersion }}
+          HZ_CLOUD_COORDINATOR_BASE_URL: ${{ github.event.inputs.base_url }}
+          HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hzVersion }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+        run: |
+          ./hz.ps1 -server ${{ github.event.inputs.hzVersion }} test -tf "test == /Hazelcast.Tests.Cloud.ServerlessCloudTests/" -enterprise ${{ secrets.GH_PAT }}
+        working-directory: client
+
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: rc
+          path: rc.log
