@@ -85,7 +85,7 @@ jobs:
           name: rc
           path: HazelcastCloudTests/dotnethazelcastcloudtests/rc.log
 
-      - uses: actions/upload-artifacts@v3
+      - uses: actions/upload-artifact@v3
         if: always()
         with:
           name: test-results
