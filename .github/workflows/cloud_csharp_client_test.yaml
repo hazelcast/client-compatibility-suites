@@ -68,7 +68,7 @@ jobs:
         run: |
           python start_remote_controller.py --use-simple-server &> rc.log &
           sleep 30
-        working-directory: HazelcastCloudTests/dotnethazelcastcloudtests
+        working-directory: HazelcastCloudTests/gohazelcastcloudtests
        
       - name: Run cloud tests
         shell: pwsh
