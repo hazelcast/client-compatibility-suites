@@ -1,4 +1,4 @@
-name: Cloud test with Csharp client
+name: Cloud test with .NET client
 
 on:
   workflow_dispatch:
@@ -8,56 +8,47 @@ on:
         required: true
         default: hazelcast
       branch_name:
-        description: Name of the branch to test client from
+        description: Name of the client branch to test
         required: true
         default: master
       base_url:
-        description: Base url of the cloud env. I.e https://api.dev.viridian.hazelcast.cloud
+        description: Base url of the cloud env. i.e. https://api.dev.viridian.hazelcast.cloud
         required: true
         default: https://api.dev.viridian.hazelcast.cloud
       hzVersion:
-        description: Version of hazelcast
+        description: Hazelcast cluster version
         required: true
 
 jobs:
   test_cloud_csharp:
     runs-on: ubuntu-latest
-    name: Cloud tests with Csharp
+    name: Cloud tests with .NET
     steps:
-      - name: Checkout to scripts
-        uses: actions/checkout@v2
+      - name: Checkout scripts
+        uses: actions/checkout@v3
 
-      - name: Setup Python
-        uses: actions/setup-python@v2
+      - name: Install Python
+        uses: actions/setup-python@v4
         with:
           python-version: 3.9
 
-      - name: Setup Java
-        uses: actions/setup-java@v1
+      - name: Install Java
+        uses: actions/setup-java@v3
         with:
           java-version: 8
 
       - name: Install .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: |
-            2.1.x
-            3.1.x
-            5.0.x
-            6.0.x
-            7.0.x
+          dotnet-version: 7.0.x
 
-      - name: Checkout to ${{ github.event.inputs.branch_name }}
-        uses: actions/checkout@v2
+      - name: Checkout .NET client branch ${{ github.event.inputs.branch_name }}
+        uses: actions/checkout@v3
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-csharp-client
           path: client
           ref: ${{ github.event.inputs.branch_name }}
-
-      - name: Update submodules
-        run: |
-            git submodule update --init
-        working-directory: client
+          submodules: true
 
       - name: Build
         shell: pwsh
@@ -72,7 +63,7 @@ jobs:
         run: |
           python start_remote_controller.py --use-simple-server &> rc.log &
           sleep 30
-        working-directory: HazelcastCloudTests/gohazelcastcloudtests
+        working-directory: HazelcastCloudTests/dotnethazelcastcloudtests
        
       - name: Run cloud tests
         shell: pwsh
@@ -88,8 +79,14 @@ jobs:
           ./hz.ps1 -server ${{ github.event.inputs.hzVersion }} test -tf "test == /Hazelcast.Tests.Cloud.ServerlessCloudTests/" -enterprise ${{ secrets.GH_PAT }}
         working-directory: client
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: always()
         with:
           name: rc
-          path: rc.log
+          path: HazelcastCloudTests/dotnethazelcastcloudtests/rc.log
+
+      - uses: actions/upload-artifacts@v3
+        if: always()
+        with:
+          name: test-results
+          path: client/temp/tests/results/*.trx
