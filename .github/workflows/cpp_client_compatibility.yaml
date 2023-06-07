@@ -11,8 +11,6 @@ on:
         description: Name of the branch to test client from
         required: true
         default: master
-  schedule:
-    - cron: '0 20 * * *'
 jobs:
   setup_server_matrix:
     name: Setup the server test matrix
