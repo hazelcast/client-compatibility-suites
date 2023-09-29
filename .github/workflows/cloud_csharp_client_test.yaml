@@ -81,7 +81,7 @@ jobs:
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hzVersion }}
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
         run: |
-          ./hz.ps1 -server ${{ github.event.inputs.hzVersion }} test -tf "test == /Hazelcast.Tests.Cloud.ServerlessCloudTests/" -enterprise ${{ secrets.GH_PAT }}
+          ./hz.ps1 -server ${{ github.event.inputs.hzVersion }} test -tf "test == /Hazelcast.Tests.Cloud.ServerlessCloudTests/"
         working-directory: client
 
       - uses: actions/upload-artifact@v3
