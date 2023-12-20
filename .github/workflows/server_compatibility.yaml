@@ -146,7 +146,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
-          java-version: 8
+          java-version: 11
       - name: Checkout to master
         uses: actions/checkout@v2
         with:
@@ -247,7 +247,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
-          java-version: 8
+          java-version: 11
       - name: Checkout to master
         uses: actions/checkout@v2
         with:
@@ -531,7 +531,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
-          java-version: 8
+          java-version: 11
       - name: Checkout master
         uses: actions/checkout@v2
         with:
@@ -644,7 +644,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
-          java-version: 8
+          java-version: 11
             
       - name: Checkout the ${{ matrix.client_tag }}     
         uses: actions/checkout@v2
