@@ -39,7 +39,7 @@ jobs:
     name: Test Node.js client against ${{ matrix.kind }} ${{ matrix.version }} server
     steps:
       - name: Checkout to scripts
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Checkout to test artifacts
         if: ${{ matrix.kind == 'enterprise' }}
         uses: actions/checkout@v2
@@ -56,10 +56,16 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14
-      - name: Setup Java
-        uses: actions/setup-java@v1
+      - name: Read Java Config
+        uses: pietrobolcato/action-read-yaml@1.1.0
+        id: java-config
         with:
-          java-version: 11
+          config: ${{ github.workspace }}/.github/java-config.yml
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ steps.java-config.outputs['java-version'] }}
+          distribution: ${{ steps.java-config.outputs['distribution'] }}
       - name: Download JARs
         run: python download_server_jars.py --version ${{ matrix.version }} --server-kind ${{ matrix.kind }} --dst jars
       - name: Copy certificates JAR to destination with the appropriate name
