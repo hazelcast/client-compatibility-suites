@@ -70,7 +70,7 @@ jobs:
           token: ${{ secrets.GH_PAT }}
       - name: Build JARs
         run: mvn clean install -DskipTests=True
-        working-directory: hazelcast
+        working-directory: hazelcast-mono
       - name: Upload Hazelcast JAR
         uses: actions/upload-artifact@v2
         with:
