@@ -48,12 +48,12 @@ jobs:
         uses: pietrobolcato/action-read-yaml@1.1.0
         id: java-config
         with:
-          config: ${{ github.workspace }}/.github/java-config.yml
+          config: ${{ github.workspace }}/master/.github/java-config.yml
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          java-version: 17
-          distribution: temurin
+          java-version: ${{ steps.java-config.outputs['java-version'] }}
+          distribution: ${{ steps.java-config.outputs['distribution'] }}
       - name: Checkout to test artifacts
         uses: actions/checkout@v2
         with:
@@ -157,8 +157,8 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          java-version: 17
-          distribution: temurin
+          java-version: ${{ steps.java-config.outputs['java-version'] }}
+          distribution: ${{ steps.java-config.outputs['distribution'] }}
       - name: Checkout to master
         uses: actions/checkout@v2
         with:
@@ -264,8 +264,8 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          java-version: 17
-          distribution: temurin
+          java-version: ${{ steps.java-config.outputs['java-version'] }}
+          distribution: ${{ steps.java-config.outputs['distribution'] }}
       - name: Checkout to master
         uses: actions/checkout@v2
         with:
@@ -377,8 +377,8 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          java-version: 17
-          distribution: temurin
+          java-version: ${{ steps.java-config.outputs['java-version'] }}
+          distribution: ${{ steps.java-config.outputs['distribution'] }}
 
       - name: Install .NET
         uses: actions/setup-dotnet@v3
@@ -561,8 +561,8 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          java-version: 17
-          distribution: temurin
+          java-version: ${{ steps.java-config.outputs['java-version'] }}
+          distribution: ${{ steps.java-config.outputs['distribution'] }}
       - name: Checkout master
         uses: actions/checkout@v2
         with:
@@ -680,8 +680,8 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          java-version: 17
-          distribution: temurin
+          java-version: ${{ steps.java-config.outputs['java-version'] }}
+          distribution: ${{ steps.java-config.outputs['distribution'] }}
             
       - name: Checkout the ${{ matrix.client_tag }}     
         uses: actions/checkout@v2
