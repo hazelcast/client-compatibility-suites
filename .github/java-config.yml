@@ -1,2 +1,2 @@
-java-version: 17
-distribution: temurin
+java-version: "17"
+distribution: "temurin"
