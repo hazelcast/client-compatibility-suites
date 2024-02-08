@@ -61,53 +61,44 @@ jobs:
           path: certs
           ref: data
           token: ${{ secrets.GH_PAT }}
-      - name: Checkout to Hazelcast
+      - name: Checkout to Hazelcast Mono
         uses: actions/checkout@v2
         with:
-          repository: ${{ github.event.inputs.organization_name }}/hazelcast
-          path: hazelcast
-          ref: ${{ github.event.inputs.branch_name }}
-      - name: Checkout to Hazelcast Enterprise
-        uses: actions/checkout@v2
-        with:
-          repository: ${{ github.event.inputs.organization_name }}/hazelcast-enterprise
-          path: hazelcast-enterprise
+          repository: ${{ github.event.inputs.organization_name }}/hazelcast-mono
+          path: hazelcast-mono
           ref: ${{ github.event.inputs.branch_name }}
           token: ${{ secrets.GH_PAT }}
       - name: Build JARs
         run: mvn clean install -DskipTests=True
-        working-directory: hazelcast
-      - name: Build Enterprise JARs
-        run: mvn clean install -DskipTests=True
-        working-directory: hazelcast-enterprise
+        working-directory: hazelcast-mono
       - name: Upload Hazelcast JAR
         uses: actions/upload-artifact@v2
         with:
           name: hazelcast
-          path: hazelcast/hazelcast/target/hazelcast-*[!s].jar
+          path: hazelcast-mono/hazelcast/hazelcast/target/hazelcast-*[!s].jar
           retention-days: 1
       - name: Upload Hazelcast SQL JAR (if exists)
         uses: actions/upload-artifact@v2
         with:
           name: hazelcast-sql
-          path: hazelcast/hazelcast-sql/target/hazelcast-sql-*[!s].jar
+          path: hazelcast-mono/hazelcast/hazelcast-sql/target/hazelcast-sql-*[!s].jar
           if-no-files-found: ignore
           retention-days: 1
       - name: Upload Hazelcast tests JAR
         uses: actions/upload-artifact@v2
         with:
           name: hazelcast-tests
-          path: hazelcast/hazelcast/target/hazelcast-*-tests.jar
+          path: hazelcast-mono/hazelcast/hazelcast/target/hazelcast-*-tests.jar
           retention-days: 1
       - name: Upload Hazelcast Enterprise JAR
         uses: actions/upload-artifact@v2
         with:
           name: hazelcast-enterprise
-          path: hazelcast-enterprise/hazelcast-enterprise/target/hazelcast-enterprise-*[!s].jar
+          path: hazelcast-mono/hazelcast-enterprise/target/hazelcast-enterprise-*[!s].jar
           retention-days: 1
       - name: Rename certs.jar as Hazelcast Enterprise tests JAR
         run: |
-          HZ_TESTS_JAR_NAME=$(basename $(ls $GITHUB_WORKSPACE/hazelcast/hazelcast/target/hazelcast-*-tests.jar))
+          HZ_TESTS_JAR_NAME=$(basename $(ls $GITHUB_WORKSPACE/hazelcast-mono/hazelcast/hazelcast/target/hazelcast-*-tests.jar))
           HZ_ENTERPRISE_TESTS_JAR_NAME=$(echo $HZ_TESTS_JAR_NAME | sed "s/hazelcast/hazelcast-enterprise/") 
           mv certs.jar $HZ_ENTERPRISE_TESTS_JAR_NAME
         working-directory: certs
