@@ -454,6 +454,15 @@ jobs:
           cp ${{github.workspace}}\utils\net\utils.ps1 ${{github.workspace}}\tag\build\utils.ps1
           ./hz-latest.ps1 copy-files -copy-files-source  ${{github.workspace}}\utils\net\ssl 
 
+      - name: Use hz.ps1 with no Java Version Check Script for Client < 5.3.1
+        id: backport-no-java-check
+        if: ${{  ((steps.version.outputs.major == '5' && steps.version.outputs.minor < '4') || (steps.version.outputs.major == '4')) }}
+        shell: pwsh
+        working-directory: tag
+        run: |
+          cp ${{github.workspace}}\utils\net\no-java-check\hz.ps1 ${{github.workspace}}\tag\hz.ps1
+          cp ${{github.workspace}}\utils\net\utils.ps1 ${{github.workspace}}\tag\build\utils.ps1
+
       - name: Build
         shell: pwsh
         working-directory: tag 
