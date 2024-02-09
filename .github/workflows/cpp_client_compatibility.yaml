@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: 3.9
       - name: Checkout to scripts
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         
       - name: Set server matrix
         id: set-matrix
@@ -41,12 +41,18 @@ jobs:
     name: Test Cpp client against ${{ matrix.kind }} ${{ matrix.version }} server on ubuntu-latest
     steps:
         
-      - name: Setup Java
-        uses: actions/setup-java@v2
+      - name: Read Java Config
+        uses: pietrobolcato/action-read-yaml@1.1.0
+        id: java-config
         with:
-            distribution: 'adopt'
-            java-version: '8'
-            check-latest: true
+          config: ${{ github.workspace }}/.github/java-config.yml
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ steps.java-config.outputs['java-version'] }}
+          distribution: ${{ steps.java-config.outputs['distribution'] }}
+          check-latest: true
 
       - name: Checkout to test artifacts
         if: ${{ matrix.kind == 'enterprise' }}

@@ -20,12 +20,19 @@ jobs:
     name: Cloud tests with Java
     steps:
       - name: Checkout to scripts
-        uses: actions/checkout@v2
-          
-      - name: Setup Java
-        uses: actions/setup-java@v1
+        uses: actions/checkout@v4
+
+      - name: Read Java Config
+        uses: pietrobolcato/action-read-yaml@1.1.0
+        id: java-config
         with:
-          java-version: 8
+          config: ${{ github.workspace }}/.github/java-config.yml
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ steps.java-config.outputs['java-version'] }}
+          distribution: ${{ steps.java-config.outputs['distribution'] }}
           
       - name: Run cloud tests for Viridian
         env:

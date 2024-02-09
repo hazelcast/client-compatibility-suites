@@ -40,10 +40,20 @@ jobs:
     name: Create and upload JARs
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Java
-        uses: actions/setup-java@v1
+      - name: Checkout to scripts
+        uses: actions/checkout@v4
         with:
-          java-version: 8
+          path: master
+      - name: Read Java Config
+        uses: pietrobolcato/action-read-yaml@1.1.0
+        id: java-config
+        with:
+          config: ${{ github.workspace }}/master/.github/java-config.yml
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ steps.java-config.outputs['java-version'] }}
+          distribution: ${{ steps.java-config.outputs['distribution'] }}
       - name: Checkout to test artifacts
         uses: actions/checkout@v2
         with:
@@ -51,57 +61,44 @@ jobs:
           path: certs
           ref: data
           token: ${{ secrets.GH_PAT }}
-      - name: Checkout to Hazelcast
+      - name: Checkout to Hazelcast Mono
         uses: actions/checkout@v2
         with:
-          repository: ${{ github.event.inputs.organization_name }}/hazelcast
-          path: hazelcast
-          ref: ${{ github.event.inputs.branch_name }}
-      - name: Checkout to Hazelcast Enterprise
-        uses: actions/checkout@v2
-        with:
-          repository: ${{ github.event.inputs.organization_name }}/hazelcast-enterprise
-          path: hazelcast-enterprise
+          repository: ${{ github.event.inputs.organization_name }}/hazelcast-mono
+          path: hazelcast-mono
           ref: ${{ github.event.inputs.branch_name }}
           token: ${{ secrets.GH_PAT }}
-      - name: Checkout to scripts
-        uses: actions/checkout@v2
-        with:
-          path: master
       - name: Build JARs
         run: mvn clean install -DskipTests=True
-        working-directory: hazelcast
-      - name: Build Enterprise JARs
-        run: mvn clean install -DskipTests=True
-        working-directory: hazelcast-enterprise
+        working-directory: hazelcast-mono
       - name: Upload Hazelcast JAR
         uses: actions/upload-artifact@v2
         with:
           name: hazelcast
-          path: hazelcast/hazelcast/target/hazelcast-*[!s].jar
+          path: hazelcast-mono/hazelcast/hazelcast/target/hazelcast-*[!s].jar
           retention-days: 1
       - name: Upload Hazelcast SQL JAR (if exists)
         uses: actions/upload-artifact@v2
         with:
           name: hazelcast-sql
-          path: hazelcast/hazelcast-sql/target/hazelcast-sql-*[!s].jar
+          path: hazelcast-mono/hazelcast/hazelcast-sql/target/hazelcast-sql-*[!s].jar
           if-no-files-found: ignore
           retention-days: 1
       - name: Upload Hazelcast tests JAR
         uses: actions/upload-artifact@v2
         with:
           name: hazelcast-tests
-          path: hazelcast/hazelcast/target/hazelcast-*-tests.jar
+          path: hazelcast-mono/hazelcast/hazelcast/target/hazelcast-*-tests.jar
           retention-days: 1
       - name: Upload Hazelcast Enterprise JAR
         uses: actions/upload-artifact@v2
         with:
           name: hazelcast-enterprise
-          path: hazelcast-enterprise/hazelcast-enterprise/target/hazelcast-enterprise-*[!s].jar
+          path: hazelcast-mono/hazelcast-enterprise/target/hazelcast-enterprise-*[!s].jar
           retention-days: 1
       - name: Rename certs.jar as Hazelcast Enterprise tests JAR
         run: |
-          HZ_TESTS_JAR_NAME=$(basename $(ls $GITHUB_WORKSPACE/hazelcast/hazelcast/target/hazelcast-*-tests.jar))
+          HZ_TESTS_JAR_NAME=$(basename $(ls $GITHUB_WORKSPACE/hazelcast-mono/hazelcast/hazelcast/target/hazelcast-*-tests.jar))
           HZ_ENTERPRISE_TESTS_JAR_NAME=$(echo $HZ_TESTS_JAR_NAME | sed "s/hazelcast/hazelcast-enterprise/") 
           mv certs.jar $HZ_ENTERPRISE_TESTS_JAR_NAME
         working-directory: certs
@@ -138,15 +135,21 @@ jobs:
     name: Test Python client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
       - name: Checkout to scripts
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - name: Setup Java
-        uses: actions/setup-java@v1
+      - name: Read Java Config
+        uses: pietrobolcato/action-read-yaml@1.1.0
+        id: java-config
         with:
-          java-version: 8
+          config: ${{ github.workspace }}/.github/java-config.yml
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ steps.java-config.outputs['java-version'] }}
+          distribution: ${{ steps.java-config.outputs['distribution'] }}
       - name: Checkout to master
         uses: actions/checkout@v2
         with:
@@ -235,7 +238,7 @@ jobs:
         server_kind: [ os, enterprise ]
     name: Test Node.js client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
@@ -244,10 +247,16 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14
-      - name: Setup Java
-        uses: actions/setup-java@v1
+      - name: Read Java Config
+        uses: pietrobolcato/action-read-yaml@1.1.0
+        id: java-config
         with:
-          java-version: 8
+          config: ${{ github.workspace }}/.github/java-config.yml
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ steps.java-config.outputs['java-version'] }}
+          distribution: ${{ steps.java-config.outputs['distribution'] }}
       - name: Checkout to master
         uses: actions/checkout@v2
         with:
@@ -344,16 +353,23 @@ jobs:
         server_kind: [ os, enterprise ]
     name: Test Csharp client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
 
-      - name: Setup Java
-        uses: actions/setup-java@v1
+      - name: Read Java Config
+        uses: pietrobolcato/action-read-yaml@1.1.0
+        id: java-config
         with:
-          java-version: 17
+          config: ${{ github.workspace }}/.github/java-config.yml
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ steps.java-config.outputs['java-version'] }}
+          distribution: ${{ steps.java-config.outputs['distribution'] }}
 
       - name: Install .NET
         uses: actions/setup-dotnet@v3
@@ -445,7 +461,7 @@ jobs:
         working-directory: tag
         run: |
           cp ${{github.workspace}}\utils\net\no-java-check\hz.ps1 ${{github.workspace}}\tag\hz.ps1
-          cp ${{github.workspace}}\utils\net\utils.ps1 ${{github.workspace}}\tag\build\utils.ps1         
+          cp ${{github.workspace}}\utils\net\utils.ps1 ${{github.workspace}}\tag\build\utils.ps1
 
       - name: Build
         shell: pwsh
@@ -532,15 +548,21 @@ jobs:
         server_kind: [ enterprise ] #TODO When tests are divided as OS, ENTERPRISE, OS matrix will be added
     name: Test CPP client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - name: Setup Java
-        uses: actions/setup-java@v1
+      - name: Read Java Config
+        uses: pietrobolcato/action-read-yaml@1.1.0
+        id: java-config
         with:
-          java-version: 8
+          config: ${{ github.workspace }}/.github/java-config.yml
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ steps.java-config.outputs['java-version'] }}
+          distribution: ${{ steps.java-config.outputs['distribution'] }}
       - name: Checkout master
         uses: actions/checkout@v2
         with:
@@ -649,11 +671,17 @@ jobs:
         
     name: Test Go client ${{ matrix.client_tag }} with enterprise server on ubuntu-latest
     steps:
-        
-      - name: Setup Java
-        uses: actions/setup-java@v1
+      - uses: actions/checkout@v4
+      - name: Read Java Config
+        uses: pietrobolcato/action-read-yaml@1.1.0
+        id: java-config
         with:
-          java-version: 8
+          config: ${{ github.workspace }}/.github/java-config.yml
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ steps.java-config.outputs['java-version'] }}
+          distribution: ${{ steps.java-config.outputs['distribution'] }}
             
       - name: Checkout the ${{ matrix.client_tag }}     
         uses: actions/checkout@v2
