@@ -278,7 +278,7 @@ namespace Hazelcast.Tests.Networking
             bool? validateCertificateChain = null,
             bool? validateCertificateName = null,
             bool? checkCertificateRevocation = null,
-            string serverCertificateName = null,
+            string serverCertificateName = "hazelcast.com", // Must be something meaningful otherwise Java throws. 
             string clientCertificatePath = null,
             string clientCertificatePassword = null,
             bool failFast = false)
