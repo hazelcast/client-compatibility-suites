@@ -54,6 +54,8 @@ jobs:
             5.0.x
             6.0.x
             7.0.x
+            8.0.x
+            
       - name: Read Java Config
         uses: pietrobolcato/action-read-yaml@1.1.0
         id: java-config
