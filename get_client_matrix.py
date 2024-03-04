@@ -59,7 +59,7 @@ if __name__ == "__main__":
 
     if client_kind == ClientKind.GO:
         filtered_major_version = [1]
-        unsupported_versions = [Version("1.0")]
+        unsupported_versions = [Version("1.0"), Version("1.1")]
     else:
         filtered_major_version = [4, 5]
         unsupported_versions = [Version("4.0")]
