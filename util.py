@@ -149,6 +149,18 @@ class MajorVersionFilter(ReleaseFilter):
 class StableReleaseFilter(ReleaseFilter):
     def filter(self, release: Release) -> bool:
         return release.version.stable
+    
+
+class SupportedReleaseFilter(ReleaseFilter):
+    def __init__(self, unsupported_versions: List[Version]):
+        self._unsupported_versions = unsupported_versions
+
+    def filter(self, release: Release) -> bool:
+        for version in self._unsupported_versions:
+            if release.version.major == version.major and \
+               release.version.minor == version.minor:
+                return False
+        return True
 
 
 class AbstractReleaseParser(ABC):
