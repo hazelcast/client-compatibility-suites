@@ -464,6 +464,14 @@ jobs:
           cp ${{github.workspace}}\utils\net\no-java-check\hz.ps1 ${{github.workspace}}\tag\hz.ps1
           cp ${{github.workspace}}\utils\net\utils.ps1 ${{github.workspace}}\tag\build\utils.ps1
 
+      - name: Upgrade NUnit Adapter in Testing if Client v5.2.2 or v5.3.1
+        id: backport-no-java-check
+        if: ${{  ((steps.version.outputs.major == '5' && steps.version.outputs.minor == '3' &&  steps.version.outputs.patch == '1') || (steps.version.outputs.major == '5' && steps.version.outputs.minor == '2' &&  steps.version.outputs.patch == '2')) }}
+        shell: pwsh
+        working-directory: tag
+        run: |
+          sed -i 's/<PackageReference Include="NUnit3TestAdapter" Version="4.3.1">/<PackageReference Include="NUnit3TestAdapter" Version="4.5.0">/g' src/Hazelcast.Net.Tests/Hazelcast.Net.Tests.csproj
+
       - name: Build
         shell: pwsh
         working-directory: tag 
