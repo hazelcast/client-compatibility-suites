@@ -465,7 +465,7 @@ jobs:
           cp ${{github.workspace}}\utils\net\utils.ps1 ${{github.workspace}}\tag\build\utils.ps1
 
       - name: Upgrade NUnit Adapter in Testing if Client v5.2.2 or v5.3.1
-        id: backport-no-java-check
+        id: upgrade-nunit-adapter
         if: ${{  ((steps.version.outputs.major == '5' && steps.version.outputs.minor == '3' &&  steps.version.outputs.patch == '1') || (steps.version.outputs.major == '5' && steps.version.outputs.minor == '2' &&  steps.version.outputs.patch == '2')) }}
         working-directory: tag
         run: |
