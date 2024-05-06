@@ -5,8 +5,10 @@ from util import (
     ClientKind,
     ClientReleaseParser,
     StableReleaseFilter,
+    SupportedReleaseFilter,
     MajorVersionFilter,
     MatrixOptionKind,
+    Version,
     get_option_from_release,
     get_latest_patch_releases,
 )
@@ -57,11 +59,15 @@ if __name__ == "__main__":
 
     if client_kind == ClientKind.GO:
         filtered_major_version = [1]
+        unsupported_versions = [Version("1.0"), Version("1.1")]
     else:
         filtered_major_version = [4, 5]
+        unsupported_versions = [Version("4.0")]
+
     filters = [
         MajorVersionFilter(filtered_major_version),
         StableReleaseFilter(),
+        SupportedReleaseFilter(unsupported_versions)
     ]
 
     client_release_parser = ClientReleaseParser(client_kind, filters)
