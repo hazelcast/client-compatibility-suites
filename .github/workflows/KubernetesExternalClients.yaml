@@ -227,11 +227,11 @@ jobs:
         
     steps: 
     
-    - name: Setup .NET Core 7.0
+    - name: Setup .NET Core 8.0
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: |
-            7.0.x
+            8.0.x
     - name: Checkout to scripts
       uses: actions/checkout@v2
         
