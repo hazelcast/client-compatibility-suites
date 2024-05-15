@@ -61,9 +61,9 @@ CURRENT_STABLE_SERVER_PATTERN = re.compile(
     "========== Current Stable\n---\n(.*?)---", re.DOTALL
 )
 PREVIOUS_STABLE_SERVER_PATTERN = re.compile(
-    "========== Previous Stable\n---\n(.*?)---\n========== Development: SHOW",
+    "========== Previous Stable\n---\n(.*?)---\n========== Development:",
     re.DOTALL,
-)
+) 
 
 
 class ClientKind(Enum):
