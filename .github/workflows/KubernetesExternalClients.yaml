@@ -248,7 +248,7 @@ jobs:
         cd KubernetesExternalClients/csharp/clientSourceCode/src/KubernetesTest       
         sed -i "s/<EXTERNAL-IP>/${{needs.create-gke-cluster.outputs.external-ip}}/g" Program.cs
         dotnet build -c Release
-        cd bin/Release/net7.0
+        cd bin/Release/net8.0
         dotnet KubernetesTest.dll &> output.txt && tail -n 20 output.txt &> last20lines.txt
         cat last20lines.txt
         if [ $(grep -o 'Current map size:' last20lines.txt | wc -l) != $"20" ]; then exit 1; fi
