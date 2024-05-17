@@ -1,7 +1,7 @@
-FROM mcr.microsoft.com/dotnet/aspnet:7.0
+FROM mcr.microsoft.com/dotnet/runtime:8.0
 
-COPY clientSourceCode/src/KubernetesTest/bin/Release/net7.0 net7.0/
+COPY clientSourceCode/src/KubernetesTest/bin/Release/net8.0 net8.0/
 
-WORKDIR /net7.0
+WORKDIR /net8.0
 
 CMD ["dotnet", "KubernetesTest.dll"]
