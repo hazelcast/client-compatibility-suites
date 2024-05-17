@@ -81,7 +81,7 @@ jobs:
         working-directory: client
 
       - name: test version check    
-        run: echo ${{  version.comparison.outputs.comparison-result }}
+        run: echo ${{  steps.version.outputs.comparison-result }}
 
       - name: Build
         shell: pwsh
