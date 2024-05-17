@@ -15,7 +15,7 @@ namespace Client
             var options = new HazelcastOptionsBuilder().Build();
             Console.WriteLine("Reconnect mode is set");
             
-            options.Networking.ReconnectMode = ReconnectMode.ReconnectAsync;
+            options.Networking.ReconnectMode = ReconnectMode.ReconnectSync;
             options.Networking.Addresses.Add("hz-hazelcast");
             
             // this must be consistent with what's in the GitHub action: if the action waits for 120s before testing
