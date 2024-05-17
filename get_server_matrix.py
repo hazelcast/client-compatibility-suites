@@ -22,8 +22,8 @@ def parse_args() -> argparse.Namespace:
 
 if __name__ == "__main__":
     args = parse_args()
-    unsupported_versions = [Version("4.0")]
-    filters: List[ReleaseFilter] = [MajorVersionFilter([4, 5]), SupportedReleaseFilter(unsupported_versions)]
+    unsupported_versions = []
+    filters: List[ReleaseFilter] = [MajorVersionFilter([5]), SupportedReleaseFilter(unsupported_versions)]
     server_release_parser = ServerReleaseParser(filters)
     releases = server_release_parser.get_all_releases()
     latest_patch_releases = get_latest_patch_releases(releases)
