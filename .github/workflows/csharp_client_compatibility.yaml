@@ -59,7 +59,7 @@ jobs:
           compare-to: 5.3.0
 
       - name: test version check    
-        run: echo "${{ '>' == steps.comparison.outputs.comparison-result && 'option1' || 'option2' }}"
+        run: echo "${{ '>' == steps.version.outputs.comparison-result && 'option1' || 'option2' }}"
             
       - name: Read Java Config
         uses: pietrobolcato/action-read-yaml@9f13718d61111b69f30ab4ac683e67a56d254e1d
@@ -102,7 +102,7 @@ jobs:
         run: ./hz.ps1 -enterprise -noRestore -localRestore -server ${{ matrix.version }} test ${{ secrets.GH_PAT }}
         working-directory: client        
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ '>' == steps.comparison.outputs.comparison-result && secrets.HAZELCAST_ENTERPRISE_KEY || secrets.HAZELCAST_ENTERPRISE_KEY_V5 }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ '>' == steps.version.outputs.comparison-result && secrets.HAZELCAST_ENTERPRISE_KEY || secrets.HAZELCAST_ENTERPRISE_KEY_V5 }}
           HAZELCAST_SERVER_VERSION: ${{ matrix.version }}
 
           
