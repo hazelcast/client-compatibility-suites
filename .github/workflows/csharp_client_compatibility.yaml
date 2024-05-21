@@ -23,11 +23,14 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
+
       - name: Checkout to scripts
         uses: actions/checkout@v2
+
       - name: Set server matrix
         id: set-matrix
         run: echo "::set-output name=matrix::$( python get_server_matrix.py )"
+
   test_client:
     needs: [setup_server_matrix]
     runs-on: ${{ matrix.os }}
@@ -37,24 +40,29 @@ jobs:
         version: ${{ fromJson(needs.setup_server_matrix.outputs.matrix) }}
         kind: [os, enterprise]
         os: [ ubuntu-latest, windows-latest ]
+
     name: Test CSharp ${{ github.event.inputs.branch_name }} branch against ${{ matrix.kind }} ${{ matrix.version }} server on ${{ matrix.os }}
     steps:      
       - name: Checkout to scripts
         uses: actions/checkout@v4
+
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
+
       - name: Install .NET
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: |
-            2.1.x
-            3.1.x
-            5.0.x
-            6.0.x
-            7.0.x
             8.0.x
+
+      - uses: madhead/semver-utils@latest
+        name: Check Server Version to Determine License Version
+        id: version
+        with:
+          version: ${{ matrix.version }}
+          compare-to: 5.3.0
             
       - name: Read Java Config
         uses: pietrobolcato/action-read-yaml@9f13718d61111b69f30ab4ac683e67a56d254e1d
@@ -67,34 +75,39 @@ jobs:
         with:
           java-version: ${{ steps.java-config.outputs['java-version'] }}
           distribution: ${{ steps.java-config.outputs['distribution'] }}
+
       - name: Checkout to ${{ github.event.inputs.branch_name }}
         uses: actions/checkout@v2
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-csharp-client
           path: client
           ref: ${{ github.event.inputs.branch_name }}
+
       - name: Update submodules
         run: |
             git submodule update --init
         working-directory: client
+
       - name: Build
         shell: pwsh
         run: ./hz.ps1 -localRestore build
         working-directory: client      
+
       - name: Run non-enterprise tests
         shell: pwsh
         if: ${{ matrix.kind == 'os' }}
         run: ./hz.ps1 -server ${{ matrix.version }} test
         working-directory: client
         env:
-          HAZELCAST_SERVER_VERSION: ${{ matrix.version }}
+          HAZELCAST_SERVER_VERSION: ${{ matrix.version }}      
+        
       - name: Run all tests        
         shell: pwsh
         if: ${{ matrix.kind == 'enterprise' }}
         run: ./hz.ps1 -enterprise -noRestore -localRestore -server ${{ matrix.version }} test ${{ secrets.GH_PAT }}
         working-directory: client        
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ '>' == steps.version.outputs.comparison-result && secrets.HAZELCAST_ENTERPRISE_KEY || secrets.HAZELCAST_ENTERPRISE_KEY_V5 }}
           HAZELCAST_SERVER_VERSION: ${{ matrix.version }}
 
           
