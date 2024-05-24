@@ -32,17 +32,14 @@ jobs:
         with:
           python-version: 3.9
 
-      - name: Read Java Config
-        uses: pietrobolcato/action-read-yaml@9f13718d61111b69f30ab4ac683e67a56d254e1d
-        id: java-config
-        with:
-          config: ${{ github.workspace }}/.github/java-config.yml
+      - name: Read Java Config   
+        run: cat ${{ github.workspace }}/.github/java-config.env >> $GITHUB_ENV
 
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          java-version: ${{ steps.java-config.outputs['java-version'] }}
-          distribution: ${{ steps.java-config.outputs['distribution'] }}
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
           
       - name: Checkout to ${{ github.event.inputs.branch_name }}
         uses: actions/checkout@v2
