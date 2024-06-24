@@ -455,6 +455,10 @@ jobs:
           cp ${{github.workspace}}\utils\net\no-java-check\hz.ps1 ${{github.workspace}}\tag\hz.ps1
           cp ${{github.workspace}}\utils\net\utils.ps1 ${{github.workspace}}\tag\build\utils.ps1
 
+      - name: Disable snapshot check
+        run: |
+          python3 ${{github.workspace}}\utils\net\disable-snapshot-repo-check.py ${{github.workspace}}\tag\hz.ps1
+
       - name: Upgrade NUnit Adapter in Testing if Client v5.2.2 or v5.3.1
         id: upgrade-nunit-adapter
         if: ${{  ((steps.version.outputs.major == '5' && steps.version.outputs.minor == '3' &&  steps.version.outputs.patch == '1') || (steps.version.outputs.major == '5' && steps.version.outputs.minor == '2' &&  steps.version.outputs.patch == '2')) }}
