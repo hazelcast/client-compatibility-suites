@@ -455,7 +455,7 @@ jobs:
           cp ${{github.workspace}}\utils\net\no-java-check\hz.ps1 ${{github.workspace}}\tag\hz.ps1
           cp ${{github.workspace}}\utils\net\utils.ps1 ${{github.workspace}}\tag\build\utils.ps1
 
-      - name: Disable snapshot check
+      - name: Disable snapshot repo check in ps1 script
         run: |
           python ${{github.workspace}}\utils\net\disable-snapshot-repo-check.py ${{github.workspace}}\tag\hz.ps1
 
