@@ -359,7 +359,9 @@ $hzRCVersion = "0.8-SNAPSHOT" # use appropriate version
 #$hzRCVersion = "0.5-SNAPSHOT" # for 3.12.x
 
 # determine java code repositories for tests
-$mvnOssSnapshotRepo = "https://oss.sonatype.org/content/repositories/snapshots"
+$mvnOssPublicRepo = "https://oss.sonatype.org/content/repositories/snapshots"
+$mvnOssSnapshotRepo = "https://hazelcast.jfrog.io/artifactory/snapshot-internal"
+$mvnOssSnapshotRepoBasicAuth = "https://repository.hazelcast.com/snapshot-internal"
 $mvnEntSnapshotRepo = "https://repository.hazelcast.com/snapshot"
 $mvnOssReleaseRepo = "https://repo1.maven.org/maven2"
 $mvnEntReleaseRepo = "https://repository.hazelcast.com/release"
@@ -619,8 +621,9 @@ function determine-server-version {
     }
 
     $url = "$mvnOssSnapshotRepo/com/hazelcast/hazelcast/$version/maven-metadata.xml"
-    Write-Output "GET $url"
-    $response = invoke-web-request $url
+    Write-Output "GET1 $url"  
+
+    $response = invoke-web-request $url $null $script:ossRepoRequestHeader
     if ($response.StatusCode -eq 200) {
         Write-Output "Server: found version $version on Maven, using this version"
         return
@@ -629,8 +632,9 @@ function determine-server-version {
     Write-Output "Server: could not find version $version on Maven ($($response.StatusCode))"
 
     $url2 = "$mvnOssSnapshotRepo/com/hazelcast/hazelcast/maven-metadata.xml"
-    Write-Output "GET $url2"
-    $response2 = invoke-web-request $url2
+    Write-Output "GET2 $url2"
+
+    $response2 = invoke-web-request $url $null $script:ossRepoRequestHeader
     if ($response2.StatusCode -ne 200) {
         Die "Error: could not download metadata from Maven ($($response2.StatusCode))"
     }
@@ -654,7 +658,8 @@ function determine-server-version {
         Write-Output "Server: try listed version $nodeVersion"
         $url = "$mvnOssSnapshotRepo/com/hazelcast/hazelcast/$nodeVersion/maven-metadata.xml"
         Write-Output "Maven: $url"
-        $response = invoke-web-request $url
+        
+        $response = invoke-web-request $url $null $script:ossRepoRequestHeader
         if ($response.StatusCode -eq 200) {
             Write-Output "Server: found version $nodeVersion on Maven, using this version"
             $script:serverVersion = $nodeVersion
@@ -671,9 +676,17 @@ function determine-server-version {
 # get a Maven artifact
 function download-maven-artifact ( $repoUrl, $group, $artifact, $jversion, $classifier, $dest ) {
 
+    $headers = $null
+
     if ($jversion.EndsWith("-SNAPSHOT")) {
         $url = "$repoUrl/$group/$artifact/$jversion/maven-metadata.xml"
-        $response = invoke-web-request $url
+        
+        if($repoUrl -eq $mvnOssSnapshotRepo){                  
+            $headers = $script:ossRepoRequestHeader
+        }
+
+        $response = invoke-web-request $url $null $headers
+        
         if ($response.StatusCode -ne 200) {
             Die "Failed to download $url ($($response.StatusCode))"
         }
@@ -708,6 +721,7 @@ function download-maven-artifact ( $repoUrl, $group, $artifact, $jversion, $clas
         $url += "-$classifier"
     }
     $url += ".jar"
+    $response = invoke-web-request $url $dest $headers
     $response = invoke-web-request $url $dest
     if ($response.StatusCode -ne 200) {
         Die "Failed to download $url ($($response.StatusCode))"
@@ -802,7 +816,7 @@ function ensure-server-files {
     if (-not (verify-server-files)) { determine-server-version }
 
     # ensure we have the remote controller + hazelcast test jar
-    ensure-jar "hazelcast-remote-controller-${hzRCVersion}.jar" $mvnOssSnapshotRepo "com.hazelcast:hazelcast-remote-controller:${hzRCVersion}"
+        ensure-jar "hazelcast-remote-controller-${hzRCVersion}.jar" $mvnOssPublicRepo "com.hazelcast:hazelcast-remote-controller:${hzRCVersion}"
     ensure-jar "hazelcast-${serverVersion}-tests.jar" $mvnOssRepo "com.hazelcast:hazelcast:${serverVersion}:jar:tests"
 
     if ($options.enterprise) {
@@ -2665,6 +2679,7 @@ register-needs java server-version server-files # ensure server files *after* se
 register-needs enterprise-key nuget-api-key
 register-needs build-proj can-sign docfx
 register-needs certs
+register-needs oss-snapshot-repo
 
 # gather needs from actions
 $actions | foreach-object {
