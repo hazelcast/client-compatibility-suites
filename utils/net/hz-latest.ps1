@@ -192,7 +192,7 @@ $actions = @(
     },
     @{ name = "test";
        desc = "runs the tests";
-       need = @( "git", "dotnet-complete", "java", "server-files", "build-proj", "enterprise-key", "certs", "snapshot-repo" )
+       need = @( "git", "dotnet-complete", "java", "server-files", "build-proj", "enterprise-key", "certs", "snapshot-repo")
     },
     @{ name = "build-docs";
        desc = "builds the documentation";
@@ -367,7 +367,7 @@ $mvnOssReleaseRepo = "https://repo1.maven.org/maven2"
 $mvnEntReleaseRepo = "https://repository.hazelcast.com/release"
 
 if ($isSnapshot) {
-
+    
     $mvnOssRepo = $mvnOssSnapshotRepo
     $mvnEntRepo = $mvnEntSnapshotRepo
 
@@ -499,7 +499,7 @@ function ensure-snapshot-repo {
             $script:ossRepoRequestHeader = $null
             Die "No token or credentials for OSS repository. Provide HZ_SNAPSHOT_REPO_TOKEN or 
         HZ_SNAPSHOT_INTERNAL_USERNAME and HZ_SNAPSHOT_INTERNAL_PASSWORD environment variables."
-
+             
         }
         $script:ossRepoTokenType = $ossRepoTokenType
         $script:ossRepoToken = $token
@@ -622,8 +622,9 @@ function determine-server-version {
 
     $url = "$mvnOssSnapshotRepo/com/hazelcast/hazelcast/$version/maven-metadata.xml"
     Write-Output "GET1 $url"  
-
+    
     $response = invoke-web-request $url $null $script:ossRepoRequestHeader
+
     if ($response.StatusCode -eq 200) {
         Write-Output "Server: found version $version on Maven, using this version"
         return
@@ -658,7 +659,7 @@ function determine-server-version {
         Write-Output "Server: try listed version $nodeVersion"
         $url = "$mvnOssSnapshotRepo/com/hazelcast/hazelcast/$nodeVersion/maven-metadata.xml"
         Write-Output "Maven: $url"
-        
+
         $response = invoke-web-request $url $null $script:ossRepoRequestHeader
         if ($response.StatusCode -eq 200) {
             Write-Output "Server: found version $nodeVersion on Maven, using this version"
@@ -677,7 +678,7 @@ function determine-server-version {
 function download-maven-artifact ( $repoUrl, $group, $artifact, $jversion, $classifier, $dest ) {
 
     $headers = $null
-
+    
     if ($jversion.EndsWith("-SNAPSHOT")) {
         $url = "$repoUrl/$group/$artifact/$jversion/maven-metadata.xml"
         
@@ -802,6 +803,7 @@ function verify-server-files {
     # all clear
     return $true
 }
+
 
 # ensures we have all jars & config required for the remote controller and the server,
 # by downloading them if needed, and add them to the $script:options.classpath

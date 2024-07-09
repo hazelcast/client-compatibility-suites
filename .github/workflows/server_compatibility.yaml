@@ -493,7 +493,7 @@ jobs:
           ./hz-latest.ps1 test -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
         working-directory: tag      
         env:
-          HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}                    
+          HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}          
           HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
           HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
 
