@@ -215,13 +215,13 @@ $actions = @(
        uniq = $true;
        desc = "runs the remote controller for tests";
        note = "This command downloads the required JARs and configuration file.";
-       need = @( "java", "server-files", "enterprise-key", "snapshot-repo" ) )
+       need = @( "java", "server-files", "enterprise-key", "snapshot-repo" )
     },
     @{ name = "start-remote-controller";
        uniq = $true;
        desc = "starts the remote controller for tests";
        note = "This command downloads the required JARs and configuration file.";
-       need = @( "java", "server-files", "enterprise-key", "snapshot-repo" ) )
+       need = @( "java", "server-files", "enterprise-key", "snapshot-repo" )
     },
     @{ name = "stop-remote-controller";
        uniq = $true;
@@ -231,13 +231,13 @@ $actions = @(
        uniq = $true;
        desc = "runs a server for tests";
        note = "This command downloads the required JARs and configuration file.";
-       need = @( "java", "server-files", "enterprise-key", "snapshot-repo" ) )
+       need = @( "java", "server-files", "enterprise-key", "snapshot-repo" )
     },
     @{ name = "get-server";
        uniq = $true;
        desc = "gets a server for tests";
        note = "This command downloads the required JARs and configuration file.";
-       need = @( "java", "server-files", "enterprise-key", "snapshot-repo" ) )
+       need = @( "java", "server-files", "enterprise-key", "snapshot-repo" )
     },
     @{ name = "generate-codecs";
        uniq = $true;
