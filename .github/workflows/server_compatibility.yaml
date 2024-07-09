@@ -483,6 +483,8 @@ jobs:
         working-directory: tag      
         env:
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}
+          HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
+          HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
 
       - name: Run non-enterprise tests with compatibility
         if: ${{ matrix.server_kind == 'os' && steps.backport-tests.outcome == 'success'  }}
@@ -491,7 +493,9 @@ jobs:
           ./hz-latest.ps1 test -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
         working-directory: tag      
         env:
-          HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}          
+          HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}                    
+          HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
+          HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
 
       - name: Run all tests
         if: ${{ matrix.server_kind == 'enterprise' && steps.backport-tests.outcome == 'skipped'  }}
@@ -514,6 +518,8 @@ jobs:
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }} 
+          HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
+          HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
       
       # upload logs
       - name: Upload RC and Server logs
