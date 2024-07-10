@@ -1,4 +1,9 @@
 # utilities for hz.ps1
+#
+# This script is a copy of the C# Client version
+# https://github.com/hazelcast/hazelcast-csharp-client/blob/master/build/utils.ps1
+# But with some minor changes
+# TODO remove this script and use the version from the C# client directly
 
 # die - PowerShell display of errors is a pain
 function Die ( $message ) {
