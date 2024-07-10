@@ -436,15 +436,15 @@ jobs:
         run: |
           echo "${{steps.version.outputs.major}}.${{steps.version.outputs.minor }}.${{steps.version.outputs.patch }}"
 
-      - name: Backport OS SNAPSHOT repo via hz-latest.ps1 for client < 5.5.0
-        id: backport-tests
-        if: ${{  (steps.version.outputs.major <= '5' || (steps.version.outputs.major == '5' || steps.version.outputs.minor < '5')) }}
+      - name: Copy `hz-latest.ps1` to local workspace
         shell: pwsh
         working-directory: tag
         run: |
-          cp ${{github.workspace}}\utils\net\hz-latest.ps1 ${{github.workspace}}\tag\hz-latest.ps1
+          # This is only currently required for <5.5.0 clients, where the location of the OS SNAPSHOT repo needs to be provided
+          # However, for consistency it should always be used and `hz-latest.ps1` must be kept in sync, as there are guaranteed to be further future breaking changes
+          cp ${{github.workspace}}\utils\net\hz-latest.ps1 ${{github.workspace}}\tag\hz.ps1
           cp ${{github.workspace}}\utils\net\utils.ps1 ${{github.workspace}}\tag\build\utils.ps1
-          ./hz-latest.ps1 copy-files -copy-files-source  ${{github.workspace}}\utils\net\ssl 
+          ./hz.ps1 copy-files -copy-files-source  ${{github.workspace}}\utils\net\ssl 
 
       - name: Upgrade NUnit Adapter in Testing if Client v5.2.2 or v5.3.1
         id: upgrade-nunit-adapter
@@ -464,10 +464,10 @@ jobs:
         shell: pwsh
         working-directory: tag 
         run: |
-          ./hz-latest.ps1 clean, build
+          ./hz.ps1 clean, build
 
       - name: Run non-enterprise tests
-        if: ${{ matrix.server_kind == 'os' && steps.backport-tests.outcome == 'skipped'  }}
+        if: ${{ matrix.server_kind == 'os' }}
         shell: pwsh
         run: |
           ./hz.ps1 test -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
@@ -478,10 +478,10 @@ jobs:
           HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
 
       - name: Run non-enterprise tests with compatibility
-        if: ${{ matrix.server_kind == 'os' && steps.backport-tests.outcome == 'success'  }}
+        if: ${{ matrix.server_kind == 'os' }}
         shell: pwsh
         run: |
-          ./hz-latest.ps1 test -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
+          ./hz.ps1 test -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
         working-directory: tag      
         env:
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}          
@@ -489,7 +489,7 @@ jobs:
           HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
 
       - name: Run all tests
-        if: ${{ matrix.server_kind == 'enterprise' && steps.backport-tests.outcome == 'skipped'  }}
+        if: ${{ matrix.server_kind == 'enterprise' }}
         shell: pwsh
         run: |
            ./hz.ps1 -enterprise -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
@@ -501,10 +501,10 @@ jobs:
           HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
 
       - name: Run all tests with compatibility
-        if: ${{matrix.server_kind == 'enterprise' && steps.backport-tests.outcome == 'success'}}
+        if: ${{matrix.server_kind == 'enterprise' }}
         shell: pwsh
         run: |
-           ./hz-latest.ps1 -enterprise -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
+           ./hz.ps1 -enterprise -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
         working-directory: tag
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
