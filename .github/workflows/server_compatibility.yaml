@@ -52,14 +52,14 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
       - name: Checkout to test artifacts
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: hazelcast/private-test-artifacts
           path: certs
           ref: data
           token: ${{ secrets.GH_PAT }}
       - name: Checkout to Hazelcast Mono
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-mono
           path: hazelcast-mono
@@ -113,11 +113,11 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
       - name: Checkout to scripts
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Set client matrix
         id: set-matrix
         run: echo "::set-output name=matrix::$( python get_client_matrix.py --client py --option tag --use-latest-patch-versions )"
@@ -134,7 +134,7 @@ jobs:
       - name: Checkout to scripts
         uses: actions/checkout@v4
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
       - name: Read Java Config
@@ -145,13 +145,13 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
       - name: Checkout to master
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: hazelcast/hazelcast-python-client
           path: master
           ref: master
       - name: Checkout to tag
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: hazelcast/hazelcast-python-client
           path: tag
@@ -214,11 +214,11 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
       - name: Checkout to scripts
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Set client matrix
         id: set-matrix
         run: echo "::set-output name=matrix::$( python get_client_matrix.py --client node --option tag --use-latest-patch-versions )"
@@ -234,7 +234,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
       - name: Setup Node.js
@@ -249,13 +249,13 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
       - name: Checkout to master
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: hazelcast/hazelcast-nodejs-client
           path: master
           ref: master
       - name: Checkout to tag
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: hazelcast/hazelcast-nodejs-client
           path: tag
@@ -326,11 +326,11 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
       - name: Checkout to scripts
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Set client matrix
         id: set-matrix
         run: echo "::set-output name=matrix::$( python get_client_matrix.py --client cs --option tag --use-latest-patch-versions )"
@@ -346,7 +346,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
 
@@ -374,7 +374,7 @@ jobs:
             8.0.x
             
       - name: Checkout to tag
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: hazelcast/hazelcast-csharp-client
           path: tag
@@ -529,11 +529,11 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
       - name: Checkout to scripts
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Set client matrix
         id: set-matrix
         run: echo "::set-output name=matrix::$( python get_client_matrix.py --client cpp --option tag --use-latest-patch-versions )"
@@ -549,7 +549,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
       - name: Read Java Config
@@ -560,12 +560,12 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
       - name: Checkout master
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: hazelcast/hazelcast-cpp-client
           path: master
       - name: Checkout to tag
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: hazelcast/hazelcast-cpp-client
           path: tag
@@ -648,11 +648,11 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
       - name: Checkout to scripts
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Set client matrix
         id: set-matrix
         run: echo "::set-output name=matrix::$( python get_client_matrix.py --client go --option tag --use-latest-patch-versions )"
@@ -677,7 +677,7 @@ jobs:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
             
       - name: Checkout the ${{ matrix.client_tag }}     
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: hazelcast/hazelcast-go-client
           path: client
