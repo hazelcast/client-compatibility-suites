@@ -13,6 +13,11 @@
 ## limitations under the License.
 
 ## Hazelcast.NET Build Script
+#
+# This script is a copy of the C# Client version
+# https://github.com/hazelcast/hazelcast-csharp-client/blob/master/hz.ps1
+# But with some minor changes
+# TODO remove this script and use the version from the C# client directly
 
 # constant
 $defaultServerVersion="5.3.0-SNAPSHOT"
