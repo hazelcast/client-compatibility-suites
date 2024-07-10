@@ -66,7 +66,11 @@ jobs:
           ref: ${{ github.event.inputs.branch_name }}
           token: ${{ secrets.GH_PAT }}
       - name: Build JARs
-        run: mvn clean install -DskipTests=True
+        run: |
+          # TODO Revert this
+          # To be raised separately - https://github.com/hazelcast/client-compatibility-suites/pull/114
+          # Only here to speed up build+debugging process until main issue is solved
+          ./mvnw clean install --activate-profiles quick
         working-directory: hazelcast-mono
       - name: Upload Hazelcast JAR
         uses: actions/upload-artifact@v2
