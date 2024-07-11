@@ -376,13 +376,22 @@ jobs:
             6.0.x
             7.0.x
             8.0.x
-            
+
       - name: Checkout to tag
         uses: actions/checkout@v2
         with:
           repository: hazelcast/hazelcast-csharp-client
           path: tag
           ref: ${{ matrix.client_tag }}
+            
+      - name: Checkout default branch
+        uses: actions/checkout@v4
+        with:
+          repository: hazelcast/hazelcast-csharp-client
+          path: hazelcast-csharp-client-master
+          sparse-checkout: |
+            README.md
+          sparse-checkout-cone-mode: false
 
       - name: Download Hazelcast tests JAR
         uses: actions/download-artifact@v2
@@ -447,7 +456,7 @@ jobs:
           # This is only currently required for <5.5.0 clients, where the location of the OS SNAPSHOT repo needs to be provided
           # However, for consistency they should always be used and therefore must be kept in sync, as there are guaranteed to be further future breaking changes
           cp ${{github.workspace}}\utils\net\hz-latest.ps1 ${{github.workspace}}\tag\hz.ps1
-          cp ${{github.workspace}}\utils\net\utils.ps1 ${{github.workspace}}\tag\build\utils.ps1
+          cp ${{github.workspace}}\hazelcast-csharp-client-master\build\utils.ps1 ${{github.workspace}}\tag\build\utils.ps1
 
       - name: Backport SSL Tests
         id: backport-tests
