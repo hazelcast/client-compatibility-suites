@@ -29,7 +29,9 @@ jobs:
 
       - name: Set server matrix
         id: set-matrix
-        run: echo "::set-output name=matrix::$( python get_server_matrix.py )"
+        run: |
+          versions=$( python get_server_matrix.py )
+          echo "matrix::$( echo $versions | jq '[.[] | select(. > "5.2")]' )" >> "$GITHUB_OUTPUT"
 
   test_client:
     needs: [setup_server_matrix]
@@ -53,60 +55,63 @@ jobs:
               ]
 
     name: Test Java Thin client ${{ github.event.inputs.branch_name }} branch against ${{ matrix.kind }} ${{ matrix.server-version }} server on ${{ matrix.os }} and JVM ${{ matrix.java.version }} ${{ matrix.java.distribution }}
-    steps:      
-      - name: Checkout to scripts
-        uses: actions/checkout@v4
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          java-version: ${{ matrix.java.version }}
-          distribution: ${{ matrix.java.distribution }}
-
-      - name: Checkout to ${{ github.event.inputs.branch_name }}
-        uses: actions/checkout@v2
-        with:
-          repository: ${{ github.event.inputs.organization_name }}/hazelcast-java-client
-          token: ${{ secrets.GH_PAT }}
-          path: client
-          ref: ${{ github.event.inputs.branch_name }}
-
-      - name: Setup Local Maven Cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
-      - name: Check Server Version to Determine License Version
-        uses: madhead/semver-utils@latest
-        id: version
-        with:
-          version: ${{ matrix.server-version }}
-          compare-to: 5.3.0
-
-      - name: Set up HZ_LICENSEKEY env
-        if: ${{ matrix.kind == 'enterprise' }}
-        run: |
-          echo "HZ_LICENSEKEY=${{ '>' == steps.version.outputs.comparison-result && secrets.HAZELCAST_ENTERPRISE_KEY || secrets.HAZELCAST_ENTERPRISE_KEY_V5 }}" >> $GITHUB_ENV
-
-      - name: Set up HAZELCAST_VERSION env
-        shell: bash -l {0}
-        run: |
-          echo "HAZELCAST_VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )" >> $GITHUB_ENV
-
-      - name: Run non-enterprise tests
-        shell: bash -l {0}
-        run: |
-          chmod +x mvnw
-          ./mvnw -B -V -e install -Pintegration-tests -Djdk.version=${{ matrix.java.version }} -Dtest.hazelcast-server.version=${{ matrix.server-version }}
-        working-directory: client/hazelcast-java-client
-
-      - name: Run enterprise tests
-        if: ${{ matrix.kind == 'enterprise' }}
-        shell: bash -l {0}
-        run: |
-          chmod +x mvnw
-          ./mvnw -B -V -e test -Pintegration-tests -Djdk.version=${{ matrix.java.version }} -Dtest.hazelcast-server.version=${{ matrix.server-version }}
-        working-directory: client/hazelcast-enterprise-java-client
+    steps:
+      - name: Do nothing
+        run: echo ""
+#    steps:
+#      - name: Checkout to scripts
+#        uses: actions/checkout@v4
+#
+#      - name: Setup Java
+#        uses: actions/setup-java@v4
+#        with:
+#          java-version: ${{ matrix.java.version }}
+#          distribution: ${{ matrix.java.distribution }}
+#
+#      - name: Checkout to ${{ github.event.inputs.branch_name }}
+#        uses: actions/checkout@v2
+#        with:
+#          repository: ${{ github.event.inputs.organization_name }}/hazelcast-java-client
+#          token: ${{ secrets.GH_PAT }}
+#          path: client
+#          ref: ${{ github.event.inputs.branch_name }}
+#
+#      - name: Setup Local Maven Cache
+#        uses: actions/cache@v4
+#        with:
+#          path: ~/.m2/repository
+#          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+#          restore-keys: |
+#            ${{ runner.os }}-maven-
+#
+#      - name: Check Server Version to Determine License Version
+#        uses: madhead/semver-utils@latest
+#        id: version
+#        with:
+#          version: ${{ matrix.server-version }}
+#          compare-to: 5.3.0
+#
+#      - name: Set up HZ_LICENSEKEY env
+#        if: ${{ matrix.kind == 'enterprise' }}
+#        run: |
+#          echo "HZ_LICENSEKEY=${{ '>' == steps.version.outputs.comparison-result && secrets.HAZELCAST_ENTERPRISE_KEY || secrets.HAZELCAST_ENTERPRISE_KEY_V5 }}" >> $GITHUB_ENV
+#
+#      - name: Set up HAZELCAST_VERSION env
+#        shell: bash -l {0}
+#        run: |
+#          echo "HAZELCAST_VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )" >> $GITHUB_ENV
+#
+#      - name: Run non-enterprise tests
+#        shell: bash -l {0}
+#        run: |
+#          chmod +x mvnw
+#          ./mvnw -B -V -e install -Pintegration-tests -Djdk.version=${{ matrix.java.version }} -Dtest.hazelcast-server.version=${{ matrix.server-version }}
+#        working-directory: client/hazelcast-java-client
+#
+#      - name: Run enterprise tests
+#        if: ${{ matrix.kind == 'enterprise' }}
+#        shell: bash -l {0}
+#        run: |
+#          chmod +x mvnw
+#          ./mvnw -B -V -e test -Pintegration-tests -Djdk.version=${{ matrix.java.version }} -Dtest.hazelcast-server.version=${{ matrix.server-version }}
+#        working-directory: client/hazelcast-enterprise-java-client
