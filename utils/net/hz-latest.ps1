@@ -728,7 +728,6 @@ function download-maven-artifact ( $repoUrl, $group, $artifact, $jversion, $clas
     }
     $url += ".jar"
     $response = invoke-web-request $url $dest $headers
-    $response = invoke-web-request $url $dest
     if ($response.StatusCode -ne 200) {
         Die "Failed to download $url ($($response.StatusCode))"
     }
