@@ -30,9 +30,11 @@ jobs:
       - name: Set server matrix
         id: set-matrix
         run: |
-          sudo apt-get install -y jq
-          versions='$( python get_server_matrix.py )'
-          echo "matrix=$( echo $versions | jq '[.[] | select(. > "5.2")]' )" >> "$GITHUB_OUTPUT"
+          versions=$( python get_server_matrix.py )
+          echo "Versions from Python script: $versions"
+          filtered_versions=$( echo "$versions" | jq '[.[] | select(. > "5.2")]' )
+          echo "Filtered versions: $filtered_versions"
+          echo "matrix=$filtered_versions" >> "$GITHUB_OUTPUT"
 
   test_client:
     needs: [setup_server_matrix]
