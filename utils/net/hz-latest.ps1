@@ -578,54 +578,7 @@ function determine-server-version {
         $script:serverVersion = $version
     }
 
-    $url = "$mvnOssSnapshotRepo/com/hazelcast/hazelcast/$version/maven-metadata.xml"
-    Write-Output "GET $url"
-    $response = invoke-web-request $url
-    if ($response.StatusCode -eq 200) {
-        Write-Output "Server: found version $version on Maven, using this version"
-        return
-    }
-
-    Write-Output "Server: could not find version $version on Maven ($($response.StatusCode))"
-
-    $url2 = "$mvnOssSnapshotRepo/com/hazelcast/hazelcast/maven-metadata.xml"
-    Write-Output "GET $url2"
-    $response2 = invoke-web-request $url2
-    if ($response2.StatusCode -ne 200) {
-        Die "Error: could not download metadata from Maven ($($response2.StatusCode))"
-    }
-
-    $metadata = [xml] $response2.Content
-
-    $version0 = $version
-    $version = $version.SubString(0, $version.Length - "-SNAPSHOT".Length)
-    $nodes = $metadata.SelectNodes("//version [starts-with(., '$version')]")
-
-    if ($nodes.Count -lt 1) {
-        Die "Server: could not find a version starting with '$version' on Maven"
-    }
-
-    foreach ($node in $nodes | sort-object -descending -property innerText) {
-        $nodeVersion = $node.innerText
-        if ($nodeVersion -eq $version0) {  # we 404ed on that one already (why is it listed?!)
-            Write-Output "Server: skip listed version $nodeVersion"
-            continue
-        }
-        Write-Output "Server: try listed version $nodeVersion"
-        $url = "$mvnOssSnapshotRepo/com/hazelcast/hazelcast/$nodeVersion/maven-metadata.xml"
-        Write-Output "Maven: $url"
-        $response = invoke-web-request $url
-        if ($response.StatusCode -eq 200) {
-            Write-Output "Server: found version $nodeVersion on Maven, using this version"
-            $script:serverVersion = $nodeVersion
-            return;
-        }
-        else {
-            Write-Output "Server: could not find version $nodeVersion on Maven ($($response.StatusCode))"
-        }
-    }
-
-    Die "Server: could not find a version."
+    return    
 }
 
 # get a Maven artifact
