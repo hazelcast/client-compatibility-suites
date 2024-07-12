@@ -387,9 +387,13 @@ jobs:
       - name: Checkout default branch
         uses: actions/checkout@v4
         with:
-          repository: hazelcast/hazelcast-csharp-client
+          # TODO Remove once PRs merged
+          #repository: hazelcast/hazelcast-csharp-client
+          repository: JackPGreen/hazelcast-csharp-client
+          ref: all-the-fixes
           path: hazelcast-csharp-client-master
           sparse-checkout: |
+            hz.ps1
             build/utils.ps1
           sparse-checkout-cone-mode: false
 
@@ -449,12 +453,12 @@ jobs:
         run: |
           echo "${{steps.version.outputs.major}}.${{steps.version.outputs.minor }}.${{steps.version.outputs.patch }}"
 
-      - name: Copy `hz-latest.ps1` to local workspace
+      - name: Copy latest build scripts to local workspace
         shell: pwsh
         run: |
           # This is only currently required for <5.5.0 clients, where the location of the OS SNAPSHOT repo needs to be provided
           # However, for consistency they should always be used and therefore must be kept in sync, as there are guaranteed to be further future breaking changes
-          cp ${{github.workspace}}\utils\net\hz-latest.ps1 ${{github.workspace}}\tag\hz.ps1
+          cp hazelcast-csharp-client-master\hz.ps1 ${{github.workspace}}\tag\hz.ps1
           cp hazelcast-csharp-client-master\build\utils.ps1 ${{github.workspace}}\tag\build\utils.ps1
 
       - name: Backport SSL Tests
