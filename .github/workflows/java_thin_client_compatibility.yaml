@@ -32,7 +32,7 @@ jobs:
         run: |
           versions=$( python get_server_matrix.py )
           echo "Versions from Python script: $versions"
-          filtered_versions=$( echo "$versions" | jq '[.[] | select(. > "5.2")]' )
+          filtered_versions=$(echo "$versions" | jq -c '[.[] | select(. > "5.2")]')
           echo "Filtered versions: $filtered_versions"
           echo "matrix=$filtered_versions" >> "$GITHUB_OUTPUT"
 
