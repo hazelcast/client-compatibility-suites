@@ -383,10 +383,7 @@ jobs:
       - name: Checkout default branch
         uses: actions/checkout@v4
         with:
-          # TODO Remove once PRs merged
-          #repository: hazelcast/hazelcast-csharp-client
-          repository: JackPGreen/hazelcast-csharp-client
-          ref: all-the-fixes
+          repository: hazelcast/hazelcast-csharp-client
           path: hazelcast-csharp-client-master
           sparse-checkout: |
             hz.ps1
