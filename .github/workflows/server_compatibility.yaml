@@ -492,6 +492,7 @@ jobs:
           ./hz.ps1 test -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
         working-directory: tag      
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}
           HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
           HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
@@ -503,6 +504,7 @@ jobs:
           ./hz.ps1 test -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
         working-directory: tag      
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}          
           HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
           HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
@@ -511,9 +513,10 @@ jobs:
         if: ${{ matrix.server_kind == 'enterprise' && steps.backport-tests.outcome == 'skipped'  }}
         shell: pwsh
         run: |
-           ./hz.ps1 -enterprise -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
+           ./hz.ps1 -enterprise -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test
         working-directory: tag
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}
           HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
@@ -523,9 +526,10 @@ jobs:
         if: ${{matrix.server_kind == 'enterprise' && steps.backport-tests.outcome == 'success'}}
         shell: pwsh
         run: |
-           ./hz.ps1 -enterprise -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
+           ./hz.ps1 -enterprise -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test
         working-directory: tag
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }} 
           HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
