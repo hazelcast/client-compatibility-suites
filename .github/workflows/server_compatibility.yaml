@@ -379,6 +379,16 @@ jobs:
           repository: hazelcast/hazelcast-csharp-client
           path: tag
           ref: ${{ matrix.client_tag }}
+            
+      - name: Checkout default branch
+        uses: actions/checkout@v4
+        with:
+          repository: hazelcast/hazelcast-csharp-client
+          path: hazelcast-csharp-client-master
+          sparse-checkout: |
+            hz.ps1
+            build/utils.ps1
+          sparse-checkout-cone-mode: false
 
       - name: Download Hazelcast tests JAR
         uses: actions/download-artifact@v2
@@ -436,24 +446,21 @@ jobs:
         run: |
           echo "${{steps.version.outputs.major}}.${{steps.version.outputs.minor }}.${{steps.version.outputs.patch }}"
 
-      - name: Backport SSL Tests and hz script for client < 5.2.0
+      - name: Copy latest build scripts to local workspace
+        shell: pwsh
+        run: |
+          # This is only currently required for <5.5.0 clients, where the location of the OS SNAPSHOT repo needs to be provided
+          # However, for consistency they should always be used and therefore must be kept in sync, as there are guaranteed to be further future breaking changes
+          cp hazelcast-csharp-client-master\hz.ps1 ${{github.workspace}}\tag\hz.ps1
+          cp hazelcast-csharp-client-master\build\utils.ps1 ${{github.workspace}}\tag\build\utils.ps1
+
+      - name: Backport SSL Tests
         id: backport-tests
         if: ${{  ((steps.version.outputs.major == '5' && steps.version.outputs.minor < '2') || ( steps.version.outputs.major == '5' && steps.version.outputs.minor == '2' && steps.version.outputs.patch < '2') || (steps.version.outputs.major == '4')) }}
         shell: pwsh
         working-directory: tag
         run: |
-          cp ${{github.workspace}}\utils\net\hz-latest.ps1 ${{github.workspace}}\tag\hz-latest.ps1
-          cp ${{github.workspace}}\utils\net\utils.ps1 ${{github.workspace}}\tag\build\utils.ps1
-          ./hz-latest.ps1 copy-files -copy-files-source  ${{github.workspace}}\utils\net\ssl 
-
-      - name: Use hz.ps1 with no Java Version Check Script for Client < 5.3.1
-        id: backport-no-java-check
-        if: ${{  ((steps.version.outputs.major == '5' && steps.version.outputs.minor < '4') || (steps.version.outputs.major == '4')) }}
-        shell: pwsh
-        working-directory: tag
-        run: |
-          cp ${{github.workspace}}\utils\net\no-java-check\hz.ps1 ${{github.workspace}}\tag\hz.ps1
-          cp ${{github.workspace}}\utils\net\utils.ps1 ${{github.workspace}}\tag\build\utils.ps1
+          ./hz.ps1 copy-files -copy-files-source  ${{github.workspace}}\utils\net\ssl 
 
       - name: Upgrade NUnit Adapter in Testing if Client v5.2.2 or v5.3.1
         id: upgrade-nunit-adapter
@@ -473,7 +480,7 @@ jobs:
         shell: pwsh
         working-directory: tag 
         run: |
-          ./hz-latest.ps1 clean, build
+          ./hz.ps1 clean, build
 
       - name: Run non-enterprise tests
         if: ${{ matrix.server_kind == 'os' && steps.backport-tests.outcome == 'skipped'  }}
@@ -483,15 +490,19 @@ jobs:
         working-directory: tag      
         env:
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}
+          HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
+          HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
 
       - name: Run non-enterprise tests with compatibility
         if: ${{ matrix.server_kind == 'os' && steps.backport-tests.outcome == 'success'  }}
         shell: pwsh
         run: |
-          ./hz-latest.ps1 test -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
+          ./hz.ps1 test -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
         working-directory: tag      
         env:
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}          
+          HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
+          HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
 
       - name: Run all tests
         if: ${{ matrix.server_kind == 'enterprise' && steps.backport-tests.outcome == 'skipped'  }}
@@ -502,16 +513,20 @@ jobs:
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}
+          HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
+          HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
 
       - name: Run all tests with compatibility
         if: ${{matrix.server_kind == 'enterprise' && steps.backport-tests.outcome == 'success'}}
         shell: pwsh
         run: |
-           ./hz-latest.ps1 -enterprise -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
+           ./hz.ps1 -enterprise -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
         working-directory: tag
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }} 
+          HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
+          HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
       
       # upload logs
       - name: Upload RC and Server logs
