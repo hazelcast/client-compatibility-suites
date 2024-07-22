@@ -20,11 +20,11 @@ on:
         required: true
         default: run
       run_nodejs:
-        description: Whether or not to run Node.js client tests. Set to something else to not run the tests. (not supported client)
+        description: Whether or not to run Node.js client tests (not supported client). Set to "run" to run the tests.
         required: true
         default: dontrun
       run_cpp:
-        description: Whether or not to run CPP client tests. Set to something else to not run the tests. (not supported client)
+        description: Whether or not to run CPP client tests (not supported client). Set to "run" to run the tests. 
         required: true
         default: dontrun
       run_csharp:
@@ -32,7 +32,7 @@ on:
         required: true
         default: run
       run_go:
-        description: Whether or not to run Go client tests. Set to something else to not run the tests. (not supported client)
+        description: Whether or not to run Go client tests (not supported client). Set to "run" to run the tests. 
         required: true
         default: dontrun
 jobs:
