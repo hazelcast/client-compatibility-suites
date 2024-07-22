@@ -20,21 +20,21 @@ on:
         required: true
         default: run
       run_nodejs:
-        description: Whether or not to run Node.js client tests. Set to something else to not run the tests.
+        description: Whether or not to run Node.js client tests (not supported client). Set to "run" to run the tests.
         required: true
-        default: run
+        default: dontrun
       run_cpp:
-        description: Whether or not to run CPP client tests. Set to something else to not run the tests.
+        description: Whether or not to run CPP client tests (not supported client). Set to "run" to run the tests. 
         required: true
-        default: run
+        default: dontrun
       run_csharp:
-        description: Whether or not to run Csharp client tests. Set to something else to not run the tests.
+        description: Whether or not to run Csharp client tests. Set to something else to not run the tests. 
         required: true
         default: run
       run_go:
-        description: Whether or not to run Go client tests. Set to something else to not run the tests.
+        description: Whether or not to run Go client tests (not supported client). Set to "run" to run the tests. 
         required: true
-        default: run
+        default: dontrun
 jobs:
   upload_jars:
     name: Create and upload JARs
