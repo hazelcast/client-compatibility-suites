@@ -91,6 +91,7 @@ jobs:
           name: hz-hazelcast
         spec:
           clusterSize: 3
+          licenseKeySecretName: ${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}
           exposeExternally:
             type: Smart
             discoveryServiceType: LoadBalancer
