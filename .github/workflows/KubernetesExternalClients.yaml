@@ -83,7 +83,8 @@ jobs:
       run: |-
         helm repo add hazelcast https://hazelcast-charts.s3.amazonaws.com/
         helm repo update
-        helm install operator hazelcast/hazelcast-platform-operator --set installCRDs=true       
+        helm install operator hazelcast/hazelcast-platform-operator --set installCRDs=true
+        kubectl create secret generic hazelcast-license-key --from-literal=license-key=${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}
         cat <<EOF | kubectl apply -f -
         apiVersion: hazelcast.com/v1alpha1
         kind: Hazelcast
@@ -91,7 +92,7 @@ jobs:
           name: hz-hazelcast
         spec:
           clusterSize: 3
-          licenseKeySecretName: ${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}
+          licenseKeySecretName: hazelcast-license-key
           exposeExternally:
             type: Smart
             discoveryServiceType: LoadBalancer
