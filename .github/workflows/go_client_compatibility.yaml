@@ -39,7 +39,9 @@ jobs:
         
     name: Test Go client against enterprise ${{ matrix.version }} server on ubuntu-latest
     steps:
-        
+      - name: Checkout to scripts
+        uses: actions/checkout@v4
+
       - name: Read Java Config
         run: cat ${{ github.workspace }}/.github/java-config.env >> $GITHUB_ENV
 
