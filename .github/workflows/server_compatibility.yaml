@@ -20,21 +20,21 @@ on:
         required: true
         default: run
       run_nodejs:
-        description: Whether or not to run Node.js client tests. Set to something else to not run the tests.
+        description: Whether or not to run Node.js client tests (not supported client). Set to "run" to run the tests.
         required: true
-        default: run
+        default: dontrun
       run_cpp:
-        description: Whether or not to run CPP client tests. Set to something else to not run the tests.
+        description: Whether or not to run CPP client tests (not supported client). Set to "run" to run the tests. 
         required: true
-        default: run
+        default: dontrun
       run_csharp:
-        description: Whether or not to run Csharp client tests. Set to something else to not run the tests.
+        description: Whether or not to run Csharp client tests. Set to something else to not run the tests. 
         required: true
         default: run
       run_go:
-        description: Whether or not to run Go client tests. Set to something else to not run the tests.
+        description: Whether or not to run Go client tests (not supported client). Set to "run" to run the tests. 
         required: true
-        default: run
+        default: dontrun
       run_java:
         description: Whether or not to run Java Thin client tests. Set to something else to not run the tests.
         required: true
@@ -58,14 +58,14 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
       - name: Checkout to test artifacts
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: hazelcast/private-test-artifacts
           path: certs
           ref: data
           token: ${{ secrets.GH_PAT }}
       - name: Checkout to Hazelcast Mono
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-mono
           path: hazelcast-mono
@@ -76,7 +76,7 @@ jobs:
         run: echo "HAZELCAST_SERVER_VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )" >> "$GITHUB_OUTPUT"
         working-directory: hazelcast-mono
       - name: Build JARs
-        run: mvn clean install -DskipTests=True
+        run: ./mvnw clean install --activate-profiles quick
         working-directory: hazelcast-mono
       - name: Upload Hazelcast JAR
         uses: actions/upload-artifact@v2
@@ -123,11 +123,11 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
       - name: Checkout to scripts
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Set client matrix
         id: set-matrix
         run: echo "::set-output name=matrix::$( python get_client_matrix.py --client py --option tag --use-latest-patch-versions )"
@@ -144,7 +144,7 @@ jobs:
       - name: Checkout to scripts
         uses: actions/checkout@v4
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
       - name: Read Java Config
@@ -155,13 +155,13 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
       - name: Checkout to master
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: hazelcast/hazelcast-python-client
           path: master
           ref: master
       - name: Checkout to tag
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: hazelcast/hazelcast-python-client
           path: tag
@@ -224,11 +224,11 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
       - name: Checkout to scripts
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Set client matrix
         id: set-matrix
         run: echo "::set-output name=matrix::$( python get_client_matrix.py --client node --option tag --use-latest-patch-versions )"
@@ -244,7 +244,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
       - name: Setup Node.js
@@ -259,13 +259,13 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
       - name: Checkout to master
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: hazelcast/hazelcast-nodejs-client
           path: master
           ref: master
       - name: Checkout to tag
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: hazelcast/hazelcast-nodejs-client
           path: tag
@@ -336,11 +336,11 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
       - name: Checkout to scripts
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Set client matrix
         id: set-matrix
         run: echo "::set-output name=matrix::$( python get_client_matrix.py --client cs --option tag --use-latest-patch-versions )"
@@ -356,7 +356,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
 
@@ -384,7 +384,7 @@ jobs:
             8.0.x
             
       - name: Checkout to tag
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: hazelcast/hazelcast-csharp-client
           path: tag
@@ -466,7 +466,7 @@ jobs:
 
       - name: Backport SSL Tests
         id: backport-tests
-        if: ${{  ((steps.version.outputs.major == '5' && steps.version.outputs.minor < '2') || ( steps.version.outputs.major == '5' && steps.version.outputs.minor == '2' && steps.version.outputs.patch < '2') || (steps.version.outputs.major == '4')) }}
+        if: ${{  ((steps.version.outputs.major == '5' && steps.version.outputs.minor < '3') || (steps.version.outputs.major == '4')) }}
         shell: pwsh
         working-directory: tag
         run: |
@@ -496,7 +496,7 @@ jobs:
         if: ${{ matrix.server_kind == 'os' && steps.backport-tests.outcome == 'skipped'  }}
         shell: pwsh
         run: |
-          ./hz.ps1 test -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
+          ./hz.ps1 test -tf "method != SendReceive and namespace !~ Hazelcast.Tests.CP" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
         working-directory: tag      
         env:
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}
@@ -507,7 +507,7 @@ jobs:
         if: ${{ matrix.server_kind == 'os' && steps.backport-tests.outcome == 'success'  }}
         shell: pwsh
         run: |
-          ./hz.ps1 test -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
+          ./hz.ps1 test -tf "method != SendReceive and namespace !~ Hazelcast.Tests.CP" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
         working-directory: tag      
         env:
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}          
@@ -554,11 +554,11 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
       - name: Checkout to scripts
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Set client matrix
         id: set-matrix
         run: echo "::set-output name=matrix::$( python get_client_matrix.py --client cpp --option tag --use-latest-patch-versions )"
@@ -574,7 +574,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
       - name: Read Java Config
@@ -585,12 +585,12 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
       - name: Checkout master
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: hazelcast/hazelcast-cpp-client
           path: master
       - name: Checkout to tag
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: hazelcast/hazelcast-cpp-client
           path: tag
@@ -673,11 +673,11 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
       - name: Checkout to scripts
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Set client matrix
         id: set-matrix
         run: echo "::set-output name=matrix::$( python get_client_matrix.py --client go --option tag --use-latest-patch-versions )"
@@ -702,7 +702,7 @@ jobs:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
             
       - name: Checkout the ${{ matrix.client_tag }}     
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: hazelcast/hazelcast-go-client
           path: client

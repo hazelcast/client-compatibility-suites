@@ -20,11 +20,11 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
       - name: Checkout to scripts
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Set server matrix
         id: set-matrix
         run: echo "::set-output name=matrix::$( python get_server_matrix.py )"
@@ -42,14 +42,14 @@ jobs:
         uses: actions/checkout@v4
       - name: Checkout to test artifacts
         if: ${{ matrix.kind == 'enterprise' }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: hazelcast/private-test-artifacts
           path: certs
           ref: data
           token: ${{ secrets.GH_PAT }}
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
       - name: Read Java Config
@@ -66,13 +66,13 @@ jobs:
         run: |
           cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/jars/hazelcast-enterprise-${{ matrix.version }}-tests.jar
       - name: Checkout to master
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
           path: master
           ref: master
       - name: Checkout to ${{ github.event.inputs.branch_name }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
           path: client
@@ -88,7 +88,7 @@ jobs:
         working-directory: master
       - name: Start RC
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}
         run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.kind }} --use-simple-server
       - name: Run non-enterprise tests
         if: ${{ matrix.kind == 'os' }}
