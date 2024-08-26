@@ -366,3 +366,5 @@ jobs:
     - name: Delete cluster
       run: |-
         gcloud container clusters delete ${{ needs.create-gke-cluster.outputs.cluster_name}} --zone=${{ needs.create-gke-cluster.outputs.gke_zone }} --quiet  
+        gcloud container clusters delete kubernetes-clients-compatibility-97 --zone=${{ needs.create-gke-cluster.outputs.gke_zone }} --quiet  
+        
