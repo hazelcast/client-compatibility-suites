@@ -205,7 +205,9 @@ jobs:
       run: |
         cd KubernetesExternalClients/java
         sed -i "s/<EXTERNAL-IP>/${{needs.create-gke-cluster.outputs.external-ip}}/g" src/main/java/KubernetesExternalTest.java
-        mvn exec:java &> output.txt && tail -n 20 output.txt &> last20lines.txt
+        mvn exec:java &> output.txt
+        cat output.txt
+        tail -n 20 output.txt &> last20lines.txt
         cat last20lines.txt
         if [ $(grep -o 'Current map size:' last20lines.txt | wc -l) != $"20" ]; then exit 1; fi
         
@@ -366,5 +368,4 @@ jobs:
     - name: Delete cluster
       run: |-
         gcloud container clusters delete ${{ needs.create-gke-cluster.outputs.cluster_name}} --zone=${{ needs.create-gke-cluster.outputs.gke_zone }} --quiet  
-        gcloud container clusters delete kubernetes-clients-compatibility-97 --zone=${{ needs.create-gke-cluster.outputs.gke_zone }} --quiet  
         
