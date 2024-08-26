@@ -181,6 +181,7 @@ jobs:
         repository: ${{ github.event.inputs.organization_name }}/hazelcast-java-client
         path: KubernetesExternalClients/java/clientSourceCode
         ref: ${{ github.event.inputs.java_client_run }}
+        token: ${{ secrets.GH_PAT }}
 
     - name: "Setup Local Maven Cache"
       uses: actions/cache@v4
