@@ -9,6 +9,10 @@ on:
         description: Default is hazelcast, but if you would like to run the workflow with your forked repo, set your github username
         required: true
         default: hazelcast
+      java_client_run:
+        description: Java Client (Standard), (old name is Java thin client) = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
+        required: true
+        default: develop
       python_run:
         description: PYTHON = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
         required: true
@@ -152,6 +156,53 @@ jobs:
         go get github.com/shirou/gopsutil/v3/mem@v3.21.5
         sed -i "s/<EXTERNAL-IP>/${{needs.create-gke-cluster.outputs.external-ip}}/g" main.go
         go run main.go &> output.txt && tail -n 20 output.txt &> last20lines.txt
+        cat last20lines.txt
+        if [ $(grep -o 'Current map size:' last20lines.txt | wc -l) != $"20" ]; then exit 1; fi
+
+  run_java:
+    name: Run Java Client (Standard) compatibility test
+    needs: [create-gke-cluster]
+    if: ${{ github.event.inputs.java_client_run != 'no' }}
+    runs-on: ubuntu-latest
+    
+    steps:  
+    - name: "Setup JRE"
+      uses: "actions/setup-java@v2"
+      with:
+        distribution: "zulu"
+        java-version: "17"
+
+    - name: Checkout to scripts
+      uses: actions/checkout@v4
+        
+    - name: Checkout the java client repo
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ github.event.inputs.organization_name }}/hazelcast-java-client
+        path: KubernetesExternalClients/java/clientSourceCode
+        ref: ${{ github.event.inputs.java_client_run }}
+
+    - name: "Setup Local Maven Cache"
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+
+    - name: "Build OS"
+      working-directory: KubernetesExternalClients/java/clientSourceCode
+      run: |
+        chmod +x mvnw
+        HAZELCAST_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+        echo "HAZELCAST_VERSION=${HAZELCAST_VERSION}" >> $GITHUB_ENV
+        ./mvnw -B -V -e clean install -DskipTests
+      
+    - name: Run test
+      run: |
+        cd KubernetesExternalClients/java
+        sed -i "s/<EXTERNAL-IP>/${{needs.create-gke-cluster.outputs.external-ip}}/g" src/main/java/KubernetesExternalTest.java
+        mvn exec:java &> output.txt && tail -n 20 output.txt &> last20lines.txt
         cat last20lines.txt
         if [ $(grep -o 'Current map size:' last20lines.txt | wc -l) != $"20" ]; then exit 1; fi
         
