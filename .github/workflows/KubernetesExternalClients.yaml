@@ -83,6 +83,10 @@ jobs:
         --network=${{env.GCP_NETWORK}} 
         sleep 30
 
+    - name: Set output of cluster_name  
+      id: cluster_name
+      run: echo "::set-output name=cluster_name::${{env.clusterName}}"
+
     - name: Deploy Hazelcast cluster
       run: |-
         helm repo add hazelcast https://hazelcast-charts.s3.amazonaws.com/
@@ -124,9 +128,6 @@ jobs:
     - name: Set output of gke_zone  
       id: gke_zone
       run: echo "::set-output name=gke_zone::${{env.GKE_ZONE}}"
-    - name: Set output of cluster_name  
-      id: cluster_name
-      run: echo "::set-output name=cluster_name::${{env.clusterName}}"
         
   run_go:
     name: Run Go compatibility test
