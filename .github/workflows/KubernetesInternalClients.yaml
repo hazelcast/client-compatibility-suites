@@ -44,7 +44,7 @@ jobs:
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-java-client
           path: KubernetesInternalClients/java/clientSourceCode
-          ref: ${{ github.event.inputs.nodejs_run }}
+          ref: ${{ github.event.inputs.java_client_run }}
           token: ${{ secrets.GH_PAT }}
           
       - name: "Build OS"
