@@ -204,8 +204,8 @@ jobs:
     - name: Run test
       working-directory: KubernetesExternalClients/java
       run: |
-        sed -i '' "s/<EXTERNAL-IP>/${{needs.create-gke-cluster.outputs.external-ip}}/g" src/main/java/KubernetesExternalTest.java
-        mvn exec:java &> output.txt
+        sed -i "s/<EXTERNAL-IP>/${{needs.create-gke-cluster.outputs.external-ip}}/g" src/main/java/KubernetesExternalTest.java
+        mvn exec:java 2>&1 | tee output.txt
         tail -n 20 output.txt &> last20lines.txt
         cat last20lines.txt
         if [ $(grep -o 'Current map size:' last20lines.txt | wc -l) != $"20" ]; then exit 1; fi
