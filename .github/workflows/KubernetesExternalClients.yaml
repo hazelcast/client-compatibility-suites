@@ -202,8 +202,8 @@ jobs:
         ./mvnw -B -V -e clean install -DskipTests
       
     - name: Run test
+      working-directory: KubernetesExternalClients/java
       run: |
-        cd KubernetesExternalClients/java
         sed -i '' "s/<EXTERNAL-IP>/${{needs.create-gke-cluster.outputs.external-ip}}/g" src/main/java/KubernetesExternalTest.java
         mvn exec:java &> output.txt
         tail -n 20 output.txt &> last20lines.txt
