@@ -39,6 +39,7 @@ public class KubernetesExternalTest {
                 LOGGER.info("Current map size: " + size);
                 Thread.sleep(1000);
             }
+            client.shutdown();
         } catch (Throwable e) {
             LOGGER.severe("Shutting down the client, an error occurred: " + e);
             client.shutdown();
