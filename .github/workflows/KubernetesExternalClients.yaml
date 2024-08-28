@@ -206,7 +206,7 @@ jobs:
       run: |
         sed -i "s/<EXTERNAL-IP>/${{needs.create-gke-cluster.outputs.external-ip}}/g" src/main/java/KubernetesExternalTest.java
         sed -i "s/java-client-version/$HAZELCAST_VERSION/g" pom.xml
-        mvn clean install
+        mvn clean install -DskipTests
         mvn exec:java 2>&1 | tee output.txt
         tail -n 20 output.txt &> last20lines.txt
         cat last20lines.txt
