@@ -13,11 +13,25 @@
     <maven.compiler.target>${jdk.version}</maven.compiler.target>
   </properties>
 
+  <repositories>
+    <repository>
+      <id>private-repository</id>
+      <name>Hazelcast Private Repository</name>
+      <url>https://repository.hazelcast.com/release/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
   <dependencies>
     <dependency>
       <groupId>com.hazelcast</groupId>
       <artifactId>hazelcast-enterprise-java-client</artifactId>
-      <version>java-client-version</version>
+      <version>5.5.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
