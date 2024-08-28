@@ -29,6 +29,17 @@
       </plugin>
     </plugins>
   </build>
+  <repositories>
+    <repository>
+      <releases />
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>private-repository</id>
+      <name>Hazelcast Private Repository</name>
+      <url>https://repository.hazelcast.com/release/</url>
+    </repository>
+  </repositories>
   <properties>
     <maven.compiler.release>${jdk.version}</maven.compiler.release>
     <maven.compiler.target>${jdk.version}</maven.compiler.target>

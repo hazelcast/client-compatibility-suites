@@ -11,14 +11,24 @@ import java.util.logging.Logger;
  * Kubernetes internal test for thin java client
  */
 public class KubernetesInternalTest {
+    private static final Logger LOGGER;
 
-    private static final Logger LOGGER = Logger.getLogger(KubernetesInternalTest.class.getName());
+    static {
+        // The following makes jdk logging appear in single lines instead of 2 lines:
+        // https://stackoverflow.com/a/10706033
+        System.setProperty("java.util.logging.SimpleFormatter.format",
+                "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$s %2$s %5$s%6$s%n");
+        LOGGER = Logger.getLogger(KubernetesInternalTest.class.getName());
+    }
+
 
     public static void main( String[] args ) {
         String internalIp = "hz-hazelcast";
 
         ClientConfig clientConfig = new ClientConfig();
         clientConfig.getNetworkConfig().addAddress(internalIp);
+        // disable client logging for test assertion to work properly
+        clientConfig.setProperty( "hazelcast.logging.type", "none" );
 
         HazelcastInstance client = HazelcastClient.newHazelcastClient(clientConfig);
 
