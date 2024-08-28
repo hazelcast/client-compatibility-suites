@@ -65,6 +65,7 @@ jobs:
         working-directory: KubernetesInternalClients/java
         run: |
             sed -i "s/java-client-version/$HAZELCAST_VERSION/g" pom.xml
+            mvn clean install -DskipTests
             docker build -t hazelcast-java-client:test .
     
       - name: Upload image
