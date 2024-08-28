@@ -24,7 +24,7 @@ public class KubernetesExternalTest {
     }
 
     public static void main( String[] args ) {
-        String externalIp = "127.0.0.1";
+        String externalIp = "<EXTERNAL-IP>";
 
         ClientConfig clientConfig = new ClientConfig();
         clientConfig.getNetworkConfig().addAddress(externalIp);
@@ -39,7 +39,7 @@ public class KubernetesExternalTest {
             LOGGER.info("Starting to fill the map with random entries.");
 
             Random random = ThreadLocalRandom.current();
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 120; i++) {
                 int randomKey = random.nextInt(100000);
                 try {
                     map.put("key" + randomKey, "value" + randomKey);
