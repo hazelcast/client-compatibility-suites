@@ -28,7 +28,7 @@ public class KubernetesExternalTest {
 
         ClientConfig clientConfig = new ClientConfig();
         clientConfig.getNetworkConfig().addAddress(externalIp);
-        // disable client logging
+        // disable client logging for test assertion to work properly
         clientConfig.setProperty( "hazelcast.logging.type", "none" );
 
         HazelcastInstance client = HazelcastClient.newHazelcastClient(clientConfig);
