@@ -7,7 +7,7 @@ on:
         required: true
         default: hazelcast
       java_client_run:
-        description: Java Client (Standard), (old name is Java thin client) = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
+        description: JAVA = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
         required: true
         default: master
       python_run:
