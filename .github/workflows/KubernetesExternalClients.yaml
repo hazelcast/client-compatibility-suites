@@ -208,9 +208,7 @@ jobs:
         sed -i "s/java-client-version/$HAZELCAST_VERSION/g" pom.xml
         mvn clean install -DskipTests
         mvn -q exec:java 2>&1 | tee output.txt
-        tail -n 20 output.txt &> last20lines.txt
-        cat last20lines.txt
-        if [ $(grep -o 'Current map size:' last20lines.txt | wc -l) != $"20" ]; then exit 1; fi
+        if [ $(grep -o 'KubernetesExternalTest is successful!' output.txt | wc -l) != $"1" ]; then exit 1; fi
         
 #TODO: More reliabe verification
         

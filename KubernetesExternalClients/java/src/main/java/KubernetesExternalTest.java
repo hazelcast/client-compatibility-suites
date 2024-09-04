@@ -28,8 +28,6 @@ public class KubernetesExternalTest {
 
         ClientConfig clientConfig = new ClientConfig();
         clientConfig.getNetworkConfig().addAddress(externalIp);
-        // disable client logging for test assertion to work properly
-        clientConfig.setProperty( "hazelcast.logging.type", "none" );
 
         HazelcastInstance client = HazelcastClient.newHazelcastClient(clientConfig);
         LOGGER.info("Successful connection!");
@@ -50,6 +48,7 @@ public class KubernetesExternalTest {
                 LOGGER.info("Current map size: " + size);
                 Thread.sleep(1000);
             }
+            LOGGER.info("KubernetesExternalTest is successful!");
             client.shutdown();
         } catch (Throwable e) {
             LOGGER.severe("Shutting down the client, an error occurred: " + e);
