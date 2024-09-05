@@ -27,8 +27,7 @@ public class KubernetesInternalTest {
 
         ClientConfig clientConfig = new ClientConfig();
         clientConfig.getNetworkConfig().addAddress(internalIp);
-        // disable client logging for test assertion to work properly
-        clientConfig.setProperty( "hazelcast.logging.type", "none" );
+        clientConfig.setProperty( "hazelcast.logging.type", "log4j2" );
 
         HazelcastInstance client = HazelcastClient.newHazelcastClient(clientConfig);
 

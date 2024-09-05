@@ -315,7 +315,14 @@ jobs:
             kubectl logs --tail=20 hazelcast-${{ matrix.client-language }}-client >> output-${{ matrix.client-language }}-deletepods.txt
             cat output-${{ matrix.client-language }}-deletepods.txt
             if [ $(grep -o 'Current map size:' output-${{ matrix.client-language }}-deletepods.txt | wc -l) != $"20" ]; then exit 1; fi
-            
+            kubectl cp /log/hazelcast.log .
+
+      - name: Upload hazelcast logs
+        uses: actions/upload-artifact@v4
+        with: 
+          name: hazelcast.log
+          path: hazelcast.log
+
       - name: Logs
         if: always()
         run: |
