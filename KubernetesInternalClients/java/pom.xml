@@ -31,7 +31,7 @@
     <dependency>
       <groupId>com.hazelcast</groupId>
       <artifactId>hazelcast-enterprise-java-client</artifactId>
-      <version>5.5.1-SNAPSHOT</version>
+      <version>java-client-version</version>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
