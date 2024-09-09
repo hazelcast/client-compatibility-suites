@@ -115,11 +115,11 @@ jobs:
           name: hazelcast-enterprise-tests
           path: certs/hazelcast-enterprise-*-tests.jar
           retention-days: 1
-      - name: Set up enterprise license key env
+      - name: Set up enterprise license key
         if: ${{ github.event.inputs.hz_version < '5.5' }}
         run: |
           echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY }}" >> $GITHUB_ENV
-      - name: Set up enterprise license key env
+      - name: Set up enterprise v7 license key
         if: ${{ github.event.inputs.hz_version >= '5.5' }}
         run: |
           echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}" >> $GITHUB_ENV
