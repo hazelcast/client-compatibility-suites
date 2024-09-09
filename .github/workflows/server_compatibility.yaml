@@ -115,6 +115,14 @@ jobs:
           name: hazelcast-enterprise-tests
           path: certs/hazelcast-enterprise-*-tests.jar
           retention-days: 1
+      - name: Set up enterprise license key env
+        if: ${{ github.event.inputs.hz_version < '5.5' }}
+        run: |
+          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY }}" >> $GITHUB_ENV
+      - name: Set up enterprise license key env
+        if: ${{ github.event.inputs.hz_version >= '5.5' }}
+        run: |
+          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}" >> $GITHUB_ENV
   setup_python_client_matrix:
     name: Setup the Python client test matrix
     if: ${{ github.event.inputs.run_python == 'run' }}
@@ -206,7 +214,7 @@ jobs:
           path: jars
       - name: Start RC
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ env.HAZELCAST_ENTERPRISE_KEY }}
         run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.server_kind }} --use-simple-server
       - name: Run non-enterprise tests
         if: ${{ matrix.server_kind == 'os' }}
@@ -316,7 +324,7 @@ jobs:
           path: jars
       - name: Start RC
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ env.HAZELCAST_ENTERPRISE_KEY }}
         run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.server_kind }}
       - name: Run non-enterprise tests
         if: ${{ matrix.server_kind == 'os' }}
@@ -327,7 +335,7 @@ jobs:
         run: node node_modules/mocha/bin/mocha --recursive test/integration/backward_compatible
         working-directory: master
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ env.HAZELCAST_ENTERPRISE_KEY }}
   setup_csharp_client_matrix:
     name: Setup the Csharp client test matrix
     if: ${{ github.event.inputs.run_csharp == 'run' }}
@@ -521,7 +529,7 @@ jobs:
            ./hz.ps1 -enterprise -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
         working-directory: tag
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ env.HAZELCAST_ENTERPRISE_KEY }}
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}
           HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
           HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
@@ -533,7 +541,7 @@ jobs:
            ./hz.ps1 -enterprise -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
         working-directory: tag
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ env.HAZELCAST_ENTERPRISE_KEY }}
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }} 
           HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
           HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
@@ -655,7 +663,7 @@ jobs:
       - name: Test
         env:
           BUILD_DIR: build
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ env.HAZELCAST_ENTERPRISE_KEY }}
           GTEST_FILTER: -*Aws*:*DescribeInstancesTest*
           HZ_VERSION: '${{ github.event.inputs.hz_version }}-SNAPSHOT'
         run: |
@@ -737,7 +745,7 @@ jobs:
           
       - name: Test
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ env.HAZELCAST_ENTERPRISE_KEY }}
           HZ_VERSION: '${{ github.event.inputs.hz_version }}-SNAPSHOT'
           SSL_ENABLED: 1
         run: |
@@ -762,7 +770,6 @@ jobs:
         id: set-matrix
         #run: echo "matrix=$( python get_client_matrix.py --client java --option tag --use-latest-patch-versions )" >> "$GITHUB_OUTPUT"
         run: echo 'matrix=["v5.5.0"]' >> "$GITHUB_OUTPUT"
-
   test_java_client:
     needs: [ upload_jars, setup_java_client_matrix ]
     runs-on: ubuntu-latest
@@ -825,14 +832,9 @@ jobs:
           path: ~/.m2/repository/com/hazelcast/hazelcast-enterprise/${{ needs.upload_jars.outputs.hz_server_version }}
 
       - name: Set up HZ_LICENSEKEY env
-        if: ${{ matrix.server_kind == 'enterprise' && github.event.inputs.hz_version < '5.5' }}
+        if: ${{ matrix.server_kind == 'enterprise' }}
         run: |
-          echo "HZ_LICENSEKEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY }}" >> $GITHUB_ENV
-
-      - name: Set up v7 HZ_LICENSEKEY env
-        if: ${{ matrix.server_kind == 'enterprise' && github.event.inputs.hz_version >= '5.5'  }} 
-        run: |
-          echo "HZ_LICENSEKEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}" >> $GITHUB_ENV
+          echo "HZ_LICENSEKEY=${{ env.HAZELCAST_ENTERPRISE_KEY }}" >> $GITHUB_ENV
 
       - name: Run non-enterprise tests
         run: |
