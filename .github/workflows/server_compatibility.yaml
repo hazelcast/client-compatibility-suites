@@ -79,26 +79,26 @@ jobs:
         run: ./mvnw clean install --activate-profiles quick
         working-directory: hazelcast-mono
       - name: Upload Hazelcast JAR
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: hazelcast
           path: hazelcast-mono/hazelcast/hazelcast/target/hazelcast-*[!s].jar
           retention-days: 1
       - name: Upload Hazelcast SQL JAR (if exists)
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: hazelcast-sql
           path: hazelcast-mono/hazelcast/hazelcast-sql/target/hazelcast-sql-*[!s].jar
           if-no-files-found: ignore
           retention-days: 1
       - name: Upload Hazelcast tests JAR
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: hazelcast-tests
           path: hazelcast-mono/hazelcast/hazelcast/target/hazelcast-*-tests.jar
           retention-days: 1
       - name: Upload Hazelcast Enterprise JAR
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: hazelcast-enterprise
           path: hazelcast-mono/hazelcast-enterprise/target/hazelcast-enterprise-*[!s].jar
@@ -110,7 +110,7 @@ jobs:
           mv certs.jar $HZ_ENTERPRISE_TESTS_JAR_NAME
         working-directory: certs
       - name: Upload certificates as Hazelcast Enterprise tests JAR
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: hazelcast-enterprise-tests
           path: certs/hazelcast-enterprise-*-tests.jar
@@ -184,31 +184,31 @@ jobs:
           pip install -r requirements-test.txt
         working-directory: master
       - name: Download Hazelcast tests JAR
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-tests
           path: jars
       - name: Download Hazelcast SQL JAR (if exists)
         continue-on-error: true
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-sql
           path: jars
       - name: Download Hazelcast JAR
         if: ${{ matrix.server_kind == 'os' }}
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast
           path: jars
       - name: Download Hazelcast Enterprise JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-enterprise
           path: jars
       - name: Download Hazelcast Enterprise tests JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-enterprise-tests
           path: jars
@@ -302,31 +302,31 @@ jobs:
           cp -a $GITHUB_WORKSPACE/tag/lib $GITHUB_WORKSPACE/master/lib
           cp -a $GITHUB_WORKSPACE/tag/package.json $GITHUB_WORKSPACE/master/package.json
       - name: Download Hazelcast tests JAR
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-tests
           path: jars
       - name: Download Hazelcast SQL JAR (if exists)
         continue-on-error: true
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-sql
           path: jars
       - name: Download Hazelcast JAR
         if: ${{ matrix.server_kind == 'os' }}
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast
           path: jars
       - name: Download Hazelcast Enterprise JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-enterprise
           path: jars
       - name: Download Hazelcast Enterprise tests JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-enterprise-tests
           path: jars
@@ -425,35 +425,35 @@ jobs:
           sparse-checkout-cone-mode: false
 
       - name: Download Hazelcast tests JAR
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-tests
           path: tag/temp/lib
 
       - name: Download Hazelcast SQL JAR (if exists)
         continue-on-error: true
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-sql
           path: tag/temp/lib
 
       - name: Download Hazelcast JAR
         if: ${{ matrix.server_kind == 'os' }}
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast
           path: tag/temp/lib
 
       - name: Download Hazelcast Enterprise JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-enterprise
           path: tag/temp/lib
 
       - name: Download Hazelcast Enterprise tests JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-enterprise-tests
           path: tag/temp/lib
@@ -564,7 +564,7 @@ jobs:
       
       # upload logs
       - name: Upload RC and Server logs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: Rc-Server-logs-${{ matrix.client_tag }}-${{ matrix.server_kind }}
@@ -644,31 +644,31 @@ jobs:
           sudo ./scripts/install-thrift.sh 0.13.0
         working-directory: tag
       - name: Download Hazelcast tests JAR
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-tests
           path: tag
       - name: Download Hazelcast SQL JAR (if exists)
         continue-on-error: true
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-sql
           path: tag
       - name: Download Hazelcast JAR
         if: ${{ matrix.server_kind == 'os' }}
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast
           path: tag
       - name: Download Hazelcast Enterprise JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-enterprise
           path: tag
       - name: Download Hazelcast Enterprise tests JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-enterprise-tests
           path: tag
@@ -746,28 +746,28 @@ jobs:
           ref: ${{ matrix.client_tag }}
           
       - name: Download Hazelcast tests JAR
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-tests
           path: client
       - name: Download Hazelcast JAR
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast
           path: client
       - name: Download Hazelcast SQL JAR (if exists)
         continue-on-error: true
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-sql
           path: client
       - name: Download Hazelcast Enterprise JAR
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-enterprise
           path: client
       - name: Download Hazelcast Enterprise tests JAR
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-enterprise-tests
           path: client
@@ -849,20 +849,20 @@ jobs:
           rm -rf ~/.m2/repository/com/hazelcast/hazelcast-enterprise/${{ needs.upload_jars.outputs.hz_server_version }}
 
       - name: Download Hazelcast JAR
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast
           path: ~/.m2/repository/com/hazelcast/hazelcast/${{ needs.upload_jars.outputs.hz_server_version }}
 
       - name: Download Hazelcast tests JAR
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-tests
           path: ~/.m2/repository/com/hazelcast/hazelcast/${{ needs.upload_jars.outputs.hz_server_version }}
 
       - name: Download Hazelcast Enterprise JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-enterprise
           path: ~/.m2/repository/com/hazelcast/hazelcast-enterprise/${{ needs.upload_jars.outputs.hz_server_version }}
