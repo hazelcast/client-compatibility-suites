@@ -841,6 +841,17 @@ jobs:
            -Dpackaging=jar\
            -DgeneratePom=true
 
+      - name: Install Hazelcast tests JAR to maven local
+        run: |
+          mvn -B install:install-file\
+           -Dfile=hazelcast-server-jars/hazelcast-${{ needs.upload_jars.outputs.hz_server_version }}-tests.jar\
+           -DgroupId=com.hazelcast\
+           -DartifactId=hazelcast\
+           -Dversion=${{ needs.upload_jars.outputs.hz_server_version }}\
+           -Dclassifier=tests
+           -Dpackaging=jar\
+           -DgeneratePom=true
+
       - name: Install Hazelcast Enterprise JAR to maven local
         run: |
           mvn -B install:install-file\
