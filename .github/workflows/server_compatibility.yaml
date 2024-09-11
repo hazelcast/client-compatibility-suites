@@ -848,7 +848,7 @@ jobs:
            -DgroupId=com.hazelcast\
            -DartifactId=hazelcast\
            -Dversion=${{ needs.upload_jars.outputs.hz_server_version }}\
-           -Dclassifier=tests
+           -Dclassifier=tests\
            -Dpackaging=jar\
            -DgeneratePom=true
 
