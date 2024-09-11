@@ -10,7 +10,7 @@ on:
       branch_name:
         description: Name of the branch to test client from
         required: true
-        default: develop
+        default: master
 
 jobs:
   setup_server_matrix:
