@@ -373,11 +373,11 @@ jobs:
       - name: Set up enterprise license key
         if: ${{ github.event.inputs.hz_version < '5.5' }}
         run: |
-          echo "GH_ACTIONS_HZ_LICENSE_KEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY }}" >> $GITHUB_ENV
+          echo "GH_ACTIONS_HZ_LICENSE_KEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY }}" >> $env:GITHUB_ENV
       - name: Set up enterprise v7 license key
         if: ${{ github.event.inputs.hz_version >= '5.5' }}
         run: |
-          echo "GH_ACTIONS_HZ_LICENSE_KEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}" >> $GITHUB_ENV
+          echo "GH_ACTIONS_HZ_LICENSE_KEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}" >> $env:GITHUB_ENV
       - uses: actions/checkout@v4
       - name: Setup Python
         uses: actions/setup-python@v5
