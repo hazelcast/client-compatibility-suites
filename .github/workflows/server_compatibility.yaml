@@ -75,7 +75,7 @@ jobs:
         id: set_up_hz_server_version
         run: echo "HAZELCAST_SERVER_VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )" >> "$GITHUB_OUTPUT"
         working-directory: hazelcast-mono
-      - name: Build JARs Maven Version ${{ steps.set_up_hz_server_version.outputs.HAZELCAST_SERVER_VERSION }}
+      - name: Build JARs Hazelcast Server Version ${{ steps.set_up_hz_server_version.outputs.HAZELCAST_SERVER_VERSION }}
         run: ./mvnw clean install --activate-profiles quick
         working-directory: hazelcast-mono
       - name: Upload Hazelcast JAR
