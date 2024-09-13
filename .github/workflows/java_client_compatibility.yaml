@@ -1,4 +1,4 @@
-name: Test Java Thin client against the released IMDG servers
+name: Test Java client against the released IMDG servers
 
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ on:
       branch_name:
         description: Name of the branch to test client from
         required: true
-        default: develop
+        default: master
 
 jobs:
   setup_server_matrix:
@@ -54,7 +54,7 @@ jobs:
                 { version: 21, distribution: adopt-openj9 }
         ]
 
-    name: Test Java Thin client ${{ github.event.inputs.branch_name }} branch against ${{ matrix.kind }} ${{ matrix.server-version }} server on ${{ matrix.os }} and JVM ${{ matrix.java.version }} ${{ matrix.java.distribution }}
+    name: Test Java client ${{ github.event.inputs.branch_name }} branch against ${{ matrix.kind }} ${{ matrix.server-version }} server on ${{ matrix.os }} and JVM ${{ matrix.java.version }} ${{ matrix.java.distribution }}
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v4

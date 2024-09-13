@@ -64,41 +64,41 @@ jobs:
           path: certs
           ref: data
           token: ${{ secrets.GH_PAT }}
-      - name: Checkout to Hazelcast Mono
+      - name: Checkout to Hazelcast Mono ${{ github.event.inputs.branch_name }}
         uses: actions/checkout@v4
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-mono
           path: hazelcast-mono
           ref: ${{ github.event.inputs.branch_name }}
           token: ${{ secrets.GH_PAT }}
-      - name: Set up HAZELCAST_SERVER_VERSION env
+      - name: Set up HAZELCAST_SERVER_VERSION output variable
         id: set_up_hz_server_version
         run: echo "HAZELCAST_SERVER_VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )" >> "$GITHUB_OUTPUT"
         working-directory: hazelcast-mono
-      - name: Build JARs
+      - name: Build JARs Hazelcast Server Version ${{ steps.set_up_hz_server_version.outputs.HAZELCAST_SERVER_VERSION }}
         run: ./mvnw clean install --activate-profiles quick
         working-directory: hazelcast-mono
       - name: Upload Hazelcast JAR
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: hazelcast
           path: hazelcast-mono/hazelcast/hazelcast/target/hazelcast-*[!s].jar
           retention-days: 1
       - name: Upload Hazelcast SQL JAR (if exists)
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: hazelcast-sql
           path: hazelcast-mono/hazelcast/hazelcast-sql/target/hazelcast-sql-*[!s].jar
           if-no-files-found: ignore
           retention-days: 1
       - name: Upload Hazelcast tests JAR
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: hazelcast-tests
           path: hazelcast-mono/hazelcast/hazelcast/target/hazelcast-*-tests.jar
           retention-days: 1
       - name: Upload Hazelcast Enterprise JAR
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: hazelcast-enterprise
           path: hazelcast-mono/hazelcast-enterprise/target/hazelcast-enterprise-*[!s].jar
@@ -110,7 +110,7 @@ jobs:
           mv certs.jar $HZ_ENTERPRISE_TESTS_JAR_NAME
         working-directory: certs
       - name: Upload certificates as Hazelcast Enterprise tests JAR
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: hazelcast-enterprise-tests
           path: certs/hazelcast-enterprise-*-tests.jar
@@ -184,31 +184,31 @@ jobs:
           pip install -r requirements-test.txt
         working-directory: master
       - name: Download Hazelcast tests JAR
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-tests
           path: jars
       - name: Download Hazelcast SQL JAR (if exists)
         continue-on-error: true
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-sql
           path: jars
       - name: Download Hazelcast JAR
         if: ${{ matrix.server_kind == 'os' }}
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast
           path: jars
       - name: Download Hazelcast Enterprise JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-enterprise
           path: jars
       - name: Download Hazelcast Enterprise tests JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-enterprise-tests
           path: jars
@@ -548,7 +548,7 @@ jobs:
       
       # upload logs
       - name: Upload RC and Server logs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: Rc-Server-logs-${{ matrix.client_tag }}-${{ matrix.server_kind }}
@@ -778,7 +778,7 @@ jobs:
       fail-fast: false
       matrix:
         client_tag: ${{ fromJson(needs.setup_java_client_matrix.outputs.matrix) }}
-        server_kind: [ enterprise, os ]
+        server_kind: [ os, enterprise ]
 
     name: Test Java Thin client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
@@ -814,31 +814,61 @@ jobs:
           rm -rf ~/.m2/repository/com/hazelcast/hazelcast-enterprise/${{ needs.upload_jars.outputs.hz_server_version }}
 
       - name: Download Hazelcast JAR
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast
-          path: ~/.m2/repository/com/hazelcast/hazelcast/${{ needs.upload_jars.outputs.hz_server_version }}
+          path: hazelcast-server-jars
 
       - name: Download Hazelcast tests JAR
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-tests
-          path: ~/.m2/repository/com/hazelcast/hazelcast/${{ needs.upload_jars.outputs.hz_server_version }}
+          path: hazelcast-server-jars
 
       - name: Download Hazelcast Enterprise JAR
-        if: ${{ matrix.server_kind == 'enterprise' }}
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: hazelcast-enterprise
-          path: ~/.m2/repository/com/hazelcast/hazelcast-enterprise/${{ needs.upload_jars.outputs.hz_server_version }}
+          path: hazelcast-server-jars
+
+      - name: Install Hazelcast JAR to maven local
+        run: |
+          mvn -B install:install-file\
+           -Dfile=hazelcast-server-jars/hazelcast-${{ needs.upload_jars.outputs.hz_server_version }}.jar\
+           -DgroupId=com.hazelcast\
+           -DartifactId=hazelcast\
+           -Dversion=${{ needs.upload_jars.outputs.hz_server_version }}\
+           -Dpackaging=jar\
+           -DgeneratePom=true
+
+      - name: Install Hazelcast tests JAR to maven local
+        run: |
+          mvn -B install:install-file\
+           -Dfile=hazelcast-server-jars/hazelcast-${{ needs.upload_jars.outputs.hz_server_version }}-tests.jar\
+           -DgroupId=com.hazelcast\
+           -DartifactId=hazelcast\
+           -Dversion=${{ needs.upload_jars.outputs.hz_server_version }}\
+           -Dclassifier=tests\
+           -Dpackaging=jar\
+           -DgeneratePom=true
+
+      - name: Install Hazelcast Enterprise JAR to maven local
+        run: |
+          mvn -B install:install-file\
+           -Dfile=hazelcast-server-jars/hazelcast-enterprise-${{ needs.upload_jars.outputs.hz_server_version }}.jar\
+           -DgroupId=com.hazelcast\
+           -DartifactId=hazelcast-enterprise\
+           -Dversion=${{ needs.upload_jars.outputs.hz_server_version }}\
+           -Dpackaging=jar\
+           -DgeneratePom=true
 
       - name: Set up HZ_LICENSEKEY env
-        if: ${{ matrix.server_kind == 'enterprise' && github.event.inputs.hz_version < '5.5' }}
+        if: ${{ matrix.server_kind == 'enterprise' && needs.upload_jars.outputs.hz_server_version < '5.5' }}
         run: |
-          echo "HZ_LICENSEKEY=${{ env.HAZELCAST_ENTERPRISE_KEY }}" >> $GITHUB_ENV
+          echo "HZ_LICENSEKEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY }}" >> $GITHUB_ENV
 
       - name: Set up v7 HZ_LICENSEKEY env
-        if: ${{ matrix.server_kind == 'enterprise' && github.event.inputs.hz_version >= '5.5'  }} 
+        if: ${{ matrix.server_kind == 'enterprise' && needs.upload_jars.outputs.hz_server_version >= '5.5'  }}
         run: |
           echo "HZ_LICENSEKEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}" >> $GITHUB_ENV
 
