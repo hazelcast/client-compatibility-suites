@@ -40,7 +40,10 @@ jobs:
         server-version: ${{ fromJson(needs.setup_server_matrix.outputs.matrix) }}
         kind: [ os, enterprise ]
         os: [ ubuntu-latest ]
-        java: [
+        java: [ { version: 17, distribution: corretto },
+                { version: 21, distribution: corretto },
+                { version: 17, distribution: zulu },
+                { version: 21, distribution: zulu },
                 { version: 17, distribution: semeru },
                 { version: 21, distribution: semeru },
                 { version: 17, distribution: adopt-openj9 },
