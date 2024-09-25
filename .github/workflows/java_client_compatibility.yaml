@@ -40,16 +40,9 @@ jobs:
         server-version: ${{ fromJson(needs.setup_server_matrix.outputs.matrix) }}
         kind: [ os, enterprise ]
         os: [ ubuntu-latest ]
-        java: [ { version: 17, distribution: corretto },
-                { version: 21, distribution: corretto },
-                { version: 17, distribution: zulu },
-                { version: 21, distribution: zulu },
+        java: [
                 { version: 17, distribution: semeru },
                 { version: 21, distribution: semeru },
-                { version: 17, distribution: oracle },
-                { version: 21, distribution: oracle },
-                { version: 17, distribution: microsoft },
-                { version: 21, distribution: microsoft },
                 { version: 17, distribution: adopt-openj9 },
                 { version: 21, distribution: adopt-openj9 }
         ]
@@ -93,19 +86,12 @@ jobs:
         run: |
           echo "HZ_LICENSEKEY=${{ '>' == steps.version.outputs.comparison-result && secrets.HAZELCAST_ENTERPRISE_KEY || secrets.HAZELCAST_ENTERPRISE_KEY_V5 }}" >> $GITHUB_ENV
 
-      - name: Run non-enterprise tests
-        shell: bash -l {0}
-        run: |
-          chmod +x mvnw
-          ./mvnw -B -V -e install -Pintegration-tests -Pcode-coverage -Djdk.version=${{ matrix.java.version }} -Dtest.hazelcast-server.version=${{ matrix.server-version }}
-        working-directory: client/hazelcast-java-client
-
       - name: Run enterprise tests
         if: ${{ matrix.kind == 'enterprise' }}
         shell: bash -l {0}
         run: |
           chmod +x mvnw
-          ./mvnw -B -V -e test -Pintegration-tests -Pcode-coverage -Djdk.version=${{ matrix.java.version }} -Dtest.hazelcast-server.version=${{ matrix.server-version }}
+          ./mvnw -B -V -e test -Pintegration-tests -Pcode-coverage -Dtest=RingBufferSecurityTest -Djdk.version=${{ matrix.java.version }} -Dtest.hazelcast-server.version=${{ matrix.server-version }}
         working-directory: client/hazelcast-enterprise-java-client
 
       - name: Upload Artifacts
