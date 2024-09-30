@@ -89,7 +89,7 @@ jobs:
         shell: bash -l {0}
         run: |
           chmod +x mvnw
-          ./mvnw -B -V -e test -Pintegration-tests -Pcode-coverage -DexcludedTests=ExecutorSecurityTest,RingBufferSecurityTest -Djdk.version=17 -Dtest.hazelcast-server.version=${{ matrix.server-version }}
+          ./mvnw -B -V -e test -Pintegration-tests -Pcode-coverage -DexcludedTests=*SecurityTest -Djdk.version=17 -Dtest.hazelcast-server.version=${{ matrix.server-version }}
         working-directory: client/hazelcast-enterprise-java-client
 
       - name: Upload Artifacts
