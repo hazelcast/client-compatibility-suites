@@ -107,3 +107,17 @@ jobs:
           chmod +x mvnw
           ./mvnw -B -V -e test -Pintegration-tests -Pcode-coverage -Djdk.version=${{ matrix.java.version }} -Dtest.hazelcast-server.version=${{ matrix.server-version }}
         working-directory: client/hazelcast-enterprise-java-client
+      
+      - name: "Archive os server logs"
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: server-os-logs_${{ matrix.kind }}_${{ matrix.os }}_${{ matrix.java-distribution }}_${{ matrix.java-version }}_${{ matrix.server-version }}
+          path: client/hazelcast-java-client/target/server_log.txt
+
+      - name: "Archive ent server logs"
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: server-ent-logs_${{ matrix.kind }}_${{ matrix.os }}_${{ matrix.java-distribution }}_${{ matrix.java-version }}_${{ matrix.server-version }}
+          path: client/hazelcast-enterprise-java-client/target/server_log.txt
