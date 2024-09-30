@@ -84,12 +84,19 @@ jobs:
         run: |
           echo "HZ_LICENSEKEY=${{ '>' == steps.version.outputs.comparison-result && secrets.HAZELCAST_ENTERPRISE_KEY || secrets.HAZELCAST_ENTERPRISE_KEY_V5 }}" >> $GITHUB_ENV
 
+      - name: Run non-enterprise tests
+        shell: bash -l {0}
+        run: |
+          chmod +x mvnw
+          ./mvnw -B -V -e install -Pintegration-tests -Pcode-coverage -Djdk.version=17 -Dtest.hazelcast-server.version=${{ matrix.server-version }}
+        working-directory: client/hazelcast-java-client
+
       - name: Run enterprise tests
         if: ${{ matrix.kind == 'enterprise' }}
         shell: bash -l {0}
         run: |
           chmod +x mvnw
-          ./mvnw -B -V -e test -Pintegration-tests -Pcode-coverage -Dtest=EnterpriseClientExtensionTest,EnterpriseClientTimeoutTest -Djdk.version=17 -Dtest.hazelcast-server.version=${{ matrix.server-version }}
+          ./mvnw -B -V -e test -Pintegration-tests -Pcode-coverage -Djdk.version=17 -Dtest.hazelcast-server.version=${{ matrix.server-version }}
         working-directory: client/hazelcast-enterprise-java-client
 
       - name: Upload Artifacts
