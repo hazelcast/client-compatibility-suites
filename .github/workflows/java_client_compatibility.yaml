@@ -97,5 +97,19 @@ jobs:
         shell: bash -l {0}
         run: |
           chmod +x mvnw
-          ./mvnw -B -V -e install -Pintegration-tests -Pcode-coverage -Dtest=ClientDisconnectTest -Djdk.version=${{ matrix.java.version }} -Dtest.hazelcast-server.version=${{ matrix.server-version }}
+          ./mvnw -B -V -e install -Pintegration-tests -Pcode-coverage -Djdk.version=${{ matrix.java.version }} -Dtest.hazelcast-server.version=${{ matrix.server-version }}
         working-directory: client/hazelcast-java-client
+
+      - name: Run enterprise tests
+        if: ${{ matrix.kind == 'enterprise' }}
+        shell: bash -l {0}
+        run: |
+          chmod +x mvnw
+          ./mvnw -B -V -e test -Pintegration-tests -Pcode-coverage -Djdk.version=${{ matrix.java.version }} -Dtest.hazelcast-server.version=${{ matrix.server-version }}
+        working-directory: client/hazelcast-enterprise-java-client
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: csv-result
+          path: client-compatibility-suites/client/hazelcast-enterprise-java-client
