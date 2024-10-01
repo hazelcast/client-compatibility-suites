@@ -38,7 +38,7 @@ jobs:
       fail-fast: false
       matrix:
         server-version: ["5.4.0"]
-        kind: [ enterprise ]
+        kind: [ os, enterprise ]
         os: [ ubuntu-latest ]
         java: [
                 { version: 17.0.9, distribution: semeru },
@@ -89,7 +89,7 @@ jobs:
         shell: bash -l {0}
         run: |
           chmod +x mvnw
-          ./mvnw -B -V -e test -Pintegration-tests -Pcode-coverage -Dtest=EnterpriseClientExtensionTest,EnterpriseClientTimeoutTest -Djdk.version=17 -Dtest.hazelcast-server.version=${{ matrix.server-version }}
+          ./mvnw -B -V -e test -Pintegration-tests -Pcode-coverage -Dtest=EnterpriseClientExtensionTest,EnterpriseClientTimeoutTest -Djdk.version=${{ matrix.java.version }} -Dtest.hazelcast-server.version=${{ matrix.server-version }}
         working-directory: client/hazelcast-enterprise-java-client
 
       - name: Upload Artifacts
