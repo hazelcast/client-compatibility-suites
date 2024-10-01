@@ -104,4 +104,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jvm-logs
-          path: home/runner/work/client-compatibility-suites/client-compatibility-suites/client/hazelcast-enterprise-java-client/
+          path: client-compatibility-suites/client/hazelcast-enterprise-java-client/
