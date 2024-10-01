@@ -41,8 +41,8 @@ jobs:
         kind: [ enterprise ]
         os: [ ubuntu-latest ]
         java: [
-                { version: 17.0.9, distribution: semeru },
-                { version: 17.0.9+9, distribution: adopt-openj9 },
+                { version: 17.0.10, distribution: semeru },
+                { version: 17.0.10, distribution: adopt-openj9 },
         ]
 
     name: Test Java client ${{ github.event.inputs.branch_name }} branch against ${{ matrix.kind }} ${{ matrix.server-version }} server on ${{ matrix.os }} and JVM ${{ matrix.java.version }} ${{ matrix.java.distribution }}
