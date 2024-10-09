@@ -545,7 +545,7 @@ jobs:
            ./hz.ps1 -enterprise -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
         working-directory: tag
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ env.HAZELCAST_ENTERPRISE_KEY }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}
           HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
           HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
@@ -557,7 +557,7 @@ jobs:
            ./hz.ps1 -enterprise -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
         working-directory: tag
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ env.HAZELCAST_ENTERPRISE_KEY }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }} 
           HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
           HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
