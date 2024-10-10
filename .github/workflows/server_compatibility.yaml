@@ -371,13 +371,15 @@ jobs:
     name: Test Csharp client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
       - name: Set up enterprise license key
+        shell: pwsh
         if: ${{ github.event.inputs.hz_version < '5.5' }}
         run: |
-          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY }}" >> $GITHUB_ENV
+          "HAZELCAST_ENTERPRISE_KEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY }}" >> $env:GITHUB_ENV
       - name: Set up enterprise v7 license key
+        shell: pwsh
         if: ${{ github.event.inputs.hz_version >= '5.5' }}
         run: |
-          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}" >> $GITHUB_ENV
+          "HAZELCAST_ENTERPRISE_KEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}" >> $env:GITHUB_ENV
       - uses: actions/checkout@v4
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -545,7 +547,7 @@ jobs:
            ./hz.ps1 -enterprise -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
         working-directory: tag
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ env.GH_ACTION_HAZELCAST_ENTERPRISE_KEY }}
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}
           HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
           HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
@@ -557,7 +559,7 @@ jobs:
            ./hz.ps1 -enterprise -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
         working-directory: tag
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ env.GH_ACTION_HAZELCAST_ENTERPRISE_KEY }}
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }} 
           HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
           HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
