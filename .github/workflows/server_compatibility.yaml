@@ -909,11 +909,28 @@ jobs:
         run: |
           echo "HZ_LICENSEKEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}" >> $GITHUB_ENV
 
-      - name: Run non-enterprise tests
+      - name: Build modules
+        shell: bash -l {0}
         run: |
           chmod +x mvnw
-          ./mvnw -B -V -e install -Pintegration-tests -Pcode-coverage -Djdk.version=${{ env.JAVA_VERSION }} -Dtest.hazelcast-server.version=${{ needs.upload_jars.outputs.hz_server_version }}
+          ./mvnw -B -V -e clean install -DskipTests
+        working-directory: client
+
+      - name: Run non-enterprise tests
+        if: ${{ matrix.server_kind == 'os' }}
+        shell: bash -l {0}
+        run: |
+          chmod +x mvnw
+          ./mvnw -B -V -e test -Pintegration-tests -Pcode-coverage -Djdk.version=${{ env.JAVA_VERSION }} -Dtest.hazelcast-server.version=${{ needs.upload_jars.outputs.hz_server_version }}
         working-directory: java-client/hazelcast-java-client
+
+      - name: Run enterprise Vector tests
+        if: ${{ matrix.kind == 'enterprise' }}
+        shell: bash -l {0}
+        run: |
+          chmod +x mvnw
+          ./mvnw -B -V -e test -Pintegration-tests -Pcode-coverage -Djdk.version=${{ env.JAVA_VERSION }} -Dtest.hazelcast-server.version=${{ matrix.server-version }}
+        working-directory: client/hazelcast-enterprise-java-client-vector
 
       - name: Run enterprise tests
         if: ${{ matrix.server_kind == 'enterprise' }}
