@@ -807,13 +807,12 @@ jobs:
       fail-fast: false
       matrix:
         client_tag: ${{ fromJson(needs.setup_java_client_matrix.outputs.matrix) }}
-        server_kind: [ os, enterprise, os_tests_on_enterprise ]
-    name: >-
-      Test Java client ${{ matrix.client_tag }} branch
-      ${{ contains(fromJson('["os_tests_on_enterprise"]'), matrix.server_kind) 
-        && 'running os tests against enterprise server'
-        || format('against {0} server', matrix.server_kind) 
-      }}
+        server_kind: [ os, enterprise ]
+        tests_type: [ os, enterprise ]
+        exclude:
+          - server_kind: os
+            tests_type: enterprise
+    name: Test Java client ${{ matrix.client_tag }} branch running ${{ matrix.tests_type }} tests against ${{ matrix.server_kind }} server
     steps:
       - name: Set up enterprise license key
         if: ${{ github.event.inputs.hz_version < '5.5' }}
@@ -904,12 +903,12 @@ jobs:
            -DgeneratePom=true
 
       - name: Set up HZ_LICENSEKEY env
-        if: ${{ contains(fromJson('["enterprise", "os_tests_on_enterprise"]'), matrix.kind) && needs.upload_jars.outputs.hz_server_version < '5.5' }}
+        if: ${{ matrix.server_kind == 'enterprise' && needs.upload_jars.outputs.hz_server_version < '5.5' }}
         run: |
           echo "HZ_LICENSEKEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY }}" >> $GITHUB_ENV
 
       - name: Set up v7 HZ_LICENSEKEY env
-        if: ${{ contains(fromJson('["enterprise", "os_tests_on_enterprise"]'), matrix.kind) && needs.upload_jars.outputs.hz_server_version >= '5.5'  }}
+        if: ${{ matrix.server_kind == 'enterprise' && needs.upload_jars.outputs.hz_server_version >= '5.5'  }}
         run: |
           echo "HZ_LICENSEKEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}" >> $GITHUB_ENV
 
@@ -921,7 +920,7 @@ jobs:
         working-directory: client
 
       - name: Run non-enterprise tests
-        if: ${{ contains(fromJson('["os", "os_tests_on_enterprise"]'), matrix.kind) }}
+        if: ${{ matrix.tests_type == 'os' }}
         shell: bash -l {0}
         run: |
           chmod +x mvnw
@@ -929,7 +928,7 @@ jobs:
         working-directory: java-client/hazelcast-java-client
 
       - name: Run enterprise Vector tests
-        if: ${{ matrix.kind == 'enterprise' }}
+        if: ${{ matrix.server_kind == 'enterprise' && matrix.tests_type == 'enterprise' }}
         shell: bash -l {0}
         run: |
           chmod +x mvnw
@@ -937,7 +936,7 @@ jobs:
         working-directory: client/hazelcast-enterprise-java-client-vector
 
       - name: Run enterprise tests
-        if: ${{ matrix.server_kind == 'enterprise' }}
+        if: ${{ matrix.server_kind == 'enterprise' && matrix.tests_type == 'enterprise' }}
         shell: bash -l {0}
         run: |
           chmod +x mvnw
