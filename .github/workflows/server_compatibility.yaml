@@ -932,7 +932,7 @@ jobs:
         shell: bash -l {0}
         run: |
           chmod +x mvnw
-          ./mvnw -B -V -e test -Pintegration-tests -Pcode-coverage -Djdk.version=${{ env.JAVA_VERSION }} -Dtest.hazelcast-server.version=${{ matrix.server-version }}
+          ./mvnw -B -V -e test -Pintegration-tests -Pcode-coverage -Djdk.version=${{ env.JAVA_VERSION }} -Dtest.hazelcast-server.version=${{ needs.upload_jars.outputs.hz_server_version }}
         working-directory: client/hazelcast-enterprise-java-client-vector
 
       - name: Run enterprise tests
