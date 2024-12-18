@@ -38,8 +38,13 @@ jobs:
       fail-fast: false
       matrix:
         server-version: ${{ fromJson(needs.setup_server_matrix.outputs.matrix) }}
-        kind: [ os, enterprise ]
-    name: Test Java client ${{ github.event.inputs.branch_name }} branch against ${{ matrix.kind }} ${{ matrix.server-version }} server
+        kind: [ os, enterprise, os_tests_on_enterprise ]
+    name: >-
+      Test Java client ${{ github.event.inputs.branch_name }} branch
+      ${{ contains(fromJson('["os_tests_on_enterprise"]'), matrix.kind) 
+        && format('running os tests against enterprise {0} server', matrix.server-version) 
+        || format('against {0} {1} server', matrix.kind, matrix.server-version) 
+      }}
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v4
@@ -77,7 +82,7 @@ jobs:
           compare-to: 5.3.0
 
       - name: Set up HZ_LICENSEKEY env
-        if: ${{ matrix.kind == 'enterprise' }}
+        if: ${{ contains(fromJson('["enterprise", "os_tests_on_enterprise"]'), matrix.kind) }}
         run: |
           echo "HZ_LICENSEKEY=${{ '>' == steps.version.outputs.comparison-result && secrets.HAZELCAST_ENTERPRISE_KEY || secrets.HAZELCAST_ENTERPRISE_KEY_V5 }}" >> $GITHUB_ENV
 
@@ -89,7 +94,7 @@ jobs:
         working-directory: client
 
       - name: Run non-enterprise tests
-        if: ${{ matrix.kind == 'os' }}
+        if: ${{ contains(fromJson('["os", "os_tests_on_enterprise"]'), matrix.kind) }}
         shell: bash -l {0}
         run: |
           chmod +x mvnw
