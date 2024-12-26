@@ -802,7 +802,7 @@ jobs:
         run: echo 'matrix=["v5.5.0"]' >> "$GITHUB_OUTPUT"
   test_java_client:
     needs: [ upload_jars, setup_java_client_matrix ]
-    runs-on: ubuntu-latest
+    runs-on: ubicloud-standard-8
     strategy:
       fail-fast: false
       matrix:
