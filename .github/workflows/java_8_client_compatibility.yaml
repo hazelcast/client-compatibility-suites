@@ -1,0 +1,141 @@
+name: Test Java 8 client against the released IMDG servers
+
+on:
+  workflow_dispatch:
+    inputs:
+      organization_name:
+        description: Default is hazelcast, but if you would like to run the workflow with your forked repo, set your github username
+        required: true
+        default: hazelcast
+      branch_name:
+        description: Name of the branch to test client from
+        required: true
+        default: master
+
+jobs:
+  setup_server_matrix:
+    name: Setup the server test matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Checkout to scripts
+        uses: actions/checkout@v4
+
+      - name: Set server matrix
+        id: set-matrix
+        run: echo "matrix=$( python get_server_matrix.py )" >> "$GITHUB_OUTPUT"
+
+  test_client:
+    needs: [setup_server_matrix]
+    runs-on: ubicloud-standard-8
+    strategy:
+      fail-fast: false
+      matrix:
+        server_version: ${{ fromJson(needs.setup_server_matrix.outputs.matrix) }}
+        server_kind: [ os, enterprise ]
+        tests_type: [ os, enterprise ]
+        exclude:
+          - server_kind: os
+            tests_type: enterprise
+    name: Test Java client ${{ github.event.inputs.branch_name }} branch running ${{ matrix.tests_type }} tests against ${{ matrix.server_kind }} ${{ matrix.server_version }} server
+    steps:
+      - name: Checkout to scripts
+        uses: actions/checkout@v4
+
+      - name: "Setup JDK17"
+        uses: "actions/setup-java@v4"
+        with:
+          distribution: "zulu"
+          java-version: "17"
+
+      - name: "Set JDK17 home"
+        run: echo "JAVA_17=$JAVA_HOME" >> $GITHUB_ENV
+
+      - name: "Setup JDK8"
+        uses: "actions/setup-java@v4"
+        with:
+          distribution: "zulu"
+          java-version: "8"
+
+      - name: Checkout to ${{ github.event.inputs.branch_name }}
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.inputs.organization_name }}/hazelcast-java-client
+          token: ${{ secrets.GH_PAT }}
+          path: client
+          ref: ${{ github.event.inputs.branch_name }}
+
+      - name: Setup Local Maven Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Check Server Version to Determine License Version
+        uses: madhead/semver-utils@latest
+        id: version
+        with:
+          version: ${{ matrix.server_version }}
+          compare-to: 5.3.0
+
+      - name: Set up HZ_LICENSEKEY env
+        if: ${{ matrix.server_kind == 'enterprise' }}
+        run: |
+          echo "HZ_LICENSEKEY=${{ '>' == steps.version.outputs.comparison-result && secrets.HAZELCAST_ENTERPRISE_KEY || secrets.HAZELCAST_ENTERPRISE_KEY_V5 }}" >> $GITHUB_ENV
+
+      - name: Build modules
+        shell: bash -l {0}
+        run: |
+          chmod +x mvnw
+          ./mvnw -B -V -e clean install -DskipTests
+        working-directory: client
+
+      - name: Run remote controller for non-enterprise tests
+        if: ${{ matrix.tests_type == 'os' }}
+        working-directory: client/hazelcast-java-client/target/test-artifacts
+        run: |
+          ${{env.JAVA_17}}/bin/java -cp additional-libs/*:hazelcast-remote-controller.jar:hazelcast.jar:test-artifacts.jar:../test-classes/jars/testsubjects.jar:../test-classes/jars/test.jar: -Djava.security.krb5.conf=/home/runner/work/hazelcast-java-client/hazelcast-java-client/hazelcast-java-client/src/test/resources/krb5.conf -Dhazelcast.phone.home.enabled=false -Dhazelcast.logging.details.enabled=true --add-opens=java.base/java.lang=ALL-UNNAMED com.hazelcast.remotecontroller.Main --use-simple-server 2> server_log.txt &
+
+      - name: Run non-enterprise tests
+        if: ${{ matrix.tests_type == 'os' }}
+        shell: bash -l {0}
+        run: |
+          chmod +x mvnw
+          ./mvnw -B -V -e test -Pintegration-tests -Pcode-coverage -Dtest.hazelcast-server.version=${{ matrix.server_version }}
+        working-directory: client/hazelcast-java-client
+
+      - name: Copy vector libs
+        if: ${{ matrix.server_kind == 'enterprise' && matrix.tests_type == 'enterprise' }}
+        run: |
+          cp client/hazelcast-enterprise-java-client-vector/target/test-artifacts/os-test-vector-artifacts.jar client/hazelcast-enterprise-java-client/target/test-artifacts/os-test-vector-artifacts.jar
+          cp client/hazelcast-enterprise-java-client-vector/target/test-artifacts/test-vector-artifacts.jar client/hazelcast-enterprise-java-client/target/test-artifacts/test-vector-artifacts.jar
+
+      - name: Run remote controller for enterprise tests
+        if: ${{ matrix.server_kind == 'enterprise' && matrix.tests_type == 'enterprise' }}
+        working-directory: client/hazelcast-enterprise-java-client/target/test-artifacts
+        run: |
+          ${{env.JAVA_17}}/bin/java -cp additional-libs/*:hazelcast-remote-controller.jar:../test-artifacts:hazelcast-enterprise.jar:hazelcast.jar:test-artifacts.jar:os-test-artifacts.jar:test-vector-artifacts.jar:test-os-vector-artifacts.jar:../test-classes/jars/testsubjects.jar:../test-classes/jars/test.jar: -Djava.security.krb5.conf=/home/runner/work/hazelcast-java-client/hazelcast-java-client/hazelcast-enterprise-java-client/src/test/resources/krb5.conf -Dhazelcast.logging.details.enabled=true -Dhazelcast.hidensity.check.freememory=false --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-exports jdk.management/com.ibm.lang.management.internal=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED com.hazelcast.remotecontroller.Main --use-simple-server 2> server_log.txt &
+
+      - name: Run enterprise Vector tests
+        if: ${{ matrix.server_kind == 'enterprise' && matrix.tests_type == 'enterprise' }}
+        shell: bash -l {0}
+        run: |
+          chmod +x mvnw
+          ./mvnw -B -V -e test -Pintegration-tests -Pcode-coverage -Dtest.hazelcast-server.version=${{ matrix.server_version }}
+        working-directory: client/hazelcast-enterprise-java-client-vector
+
+      - name: Run enterprise tests
+        if: ${{ matrix.server_kind == 'enterprise' && matrix.tests_type == 'enterprise' }}
+        shell: bash -l {0}
+        run: |
+          chmod +x mvnw
+          ./mvnw -B -V -e test -Pintegration-tests -Pcode-coverage -Dtest.hazelcast-server.version=${{ matrix.server_version }}
+        working-directory: client/hazelcast-enterprise-java-client
