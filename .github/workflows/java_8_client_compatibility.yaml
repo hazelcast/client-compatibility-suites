@@ -139,3 +139,12 @@ jobs:
           chmod +x mvnw
           ./mvnw -B -V -e test -Pintegration-tests -Pcode-coverage -Dtest.hazelcast-server.version=${{ matrix.server_version }}
         working-directory: client/hazelcast-enterprise-java-client
+
+      - name: Archive server logs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: server-${{ matrix.server_version }}-${{ matrix.server_kind }}-logs-${{ matrix.tests_type }}-tests
+          path: |
+            client/hazelcast-java-client/target/test-artifacts/server_log.txt
+            client/hazelcast-enterprise-java-client/target/test-artifacts/server_log.txt
