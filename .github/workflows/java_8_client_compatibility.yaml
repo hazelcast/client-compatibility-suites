@@ -95,7 +95,7 @@ jobs:
         shell: bash -l {0}
         run: |
           chmod +x mvnw
-          ./mvnw -B -V -e clean install -DskipTests
+          ./mvnw -B -V -e clean install -DskipTests -Dtest.hazelcast-server.version=${{ matrix.server_version }}
         working-directory: client
 
       - name: Run remote controller for non-enterprise tests
