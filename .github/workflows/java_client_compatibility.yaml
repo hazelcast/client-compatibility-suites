@@ -38,11 +38,8 @@ jobs:
       fail-fast: false
       matrix:
         server_version: ${{ fromJson(needs.setup_server_matrix.outputs.matrix) }}
-        server_kind: [ os, enterprise ]
+        server_kind: [ enterprise ]
         tests_type: [ os, enterprise ]
-        exclude:
-          - server_kind: os
-            tests_type: enterprise
     name: Test Java client ${{ github.event.inputs.branch_name }} branch running ${{ matrix.tests_type }} tests against ${{ matrix.server_kind }} ${{ matrix.server_version }} server
     steps:
       - name: Checkout to scripts
