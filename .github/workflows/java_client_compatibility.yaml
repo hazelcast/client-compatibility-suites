@@ -34,6 +34,7 @@ jobs:
   test_client:
     needs: [setup_server_matrix]
     runs-on: ubicloud-standard-8
+    timeout-minutes: 720 # 12 hours
     strategy:
       fail-fast: false
       matrix:
