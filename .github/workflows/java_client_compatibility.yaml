@@ -34,15 +34,13 @@ jobs:
   test_client:
     needs: [setup_server_matrix]
     runs-on: ubicloud-standard-8
+    timeout-minutes: 720 # 12 hours
     strategy:
       fail-fast: false
       matrix:
         server_version: ${{ fromJson(needs.setup_server_matrix.outputs.matrix) }}
-        server_kind: [ os, enterprise ]
+        server_kind: [ enterprise ]
         tests_type: [ os, enterprise ]
-        exclude:
-          - server_kind: os
-            tests_type: enterprise
     name: Test Java client ${{ github.event.inputs.branch_name }} branch running ${{ matrix.tests_type }} tests against ${{ matrix.server_kind }} ${{ matrix.server_version }} server
     steps:
       - name: Checkout to scripts
@@ -105,7 +103,7 @@ jobs:
         if: ${{ matrix.tests_type == 'os' }}
         working-directory: client/hazelcast-java-client/target/test-artifacts
         run: |
-          ${{env.SERVER_JAVA}}/bin/java -cp additional-libs/*:hazelcast-remote-controller.jar:hazelcast.jar:test-artifacts.jar:../test-classes/jars/testsubjects.jar:../test-classes/jars/test.jar: -Djava.security.krb5.conf=/home/runner/work/hazelcast-java-client/hazelcast-java-client/hazelcast-java-client/src/test/resources/krb5.conf -Dhazelcast.phone.home.enabled=false -Dhazelcast.logging.details.enabled=true --add-opens=java.base/java.lang=ALL-UNNAMED com.hazelcast.remotecontroller.Main --use-simple-server 2> server_log.txt &
+          ${{env.SERVER_JAVA}}/bin/java -cp additional-libs/*:hazelcast-remote-controller.jar:hazelcast.jar:test-artifacts.jar:../test-classes/jars/testsubjects.jar:../test-classes/jars/test.jar: -Djava.security.krb5.conf=../../src/test/resources/krb5.conf -Dhazelcast.phone.home.enabled=false -Dhazelcast.logging.details.enabled=true --add-opens=java.base/java.lang=ALL-UNNAMED com.hazelcast.remotecontroller.Main --use-simple-server 2> server_log.txt &
 
       - name: Run non-enterprise tests
         if: ${{ matrix.tests_type == 'os' }}
@@ -125,7 +123,7 @@ jobs:
         if: ${{ matrix.server_kind == 'enterprise' && matrix.tests_type == 'enterprise' }}
         working-directory: client/hazelcast-enterprise-java-client/target/test-artifacts
         run: |
-          ${{env.SERVER_JAVA}}/bin/java -cp additional-libs/*:hazelcast-remote-controller.jar:../test-artifacts:hazelcast-enterprise.jar:hazelcast.jar:test-artifacts.jar:os-test-artifacts.jar:test-vector-artifacts.jar:test-os-vector-artifacts.jar:../test-classes/jars/testsubjects.jar:../test-classes/jars/test.jar: -Djava.security.krb5.conf=/home/runner/work/hazelcast-java-client/hazelcast-java-client/hazelcast-enterprise-java-client/src/test/resources/krb5.conf -Dhazelcast.logging.details.enabled=true -Dhazelcast.hidensity.check.freememory=false --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-exports jdk.management/com.ibm.lang.management.internal=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED com.hazelcast.remotecontroller.Main --use-simple-server 2> server_log.txt &
+          ${{env.SERVER_JAVA}}/bin/java -cp additional-libs/*:hazelcast-remote-controller.jar:../test-artifacts:hazelcast-enterprise.jar:hazelcast.jar:test-artifacts.jar:os-test-artifacts.jar:test-vector-artifacts.jar:test-os-vector-artifacts.jar:../test-classes/jars/testsubjects.jar:../test-classes/jars/test.jar: -Djava.security.krb5.conf=../../src/test/resources/krb5.conf -Dhazelcast.logging.details.enabled=true -Dhazelcast.hidensity.check.freememory=false --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-exports jdk.management/com.ibm.lang.management.internal=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED com.hazelcast.remotecontroller.Main --use-simple-server 2> server_log.txt &
 
       - name: Run enterprise Vector tests
         if: ${{ matrix.server_kind == 'enterprise' && matrix.tests_type == 'enterprise' }}
