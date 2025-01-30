@@ -11,10 +11,18 @@ on:
         description: Name of the branch to test client from
         required: true
         default: master
+      tests_type:
+        description: Type of tests to run.
+        required: true
+        default: '["os", "enterprise"]'
+      test_filter:
+        description: Value for the -Dtest Maven parameter (e.g., com.mycompany.myproject.* to run all tests in a package). Leave empty to run all tests.
+        required: false
+        default: ""
 
 jobs:
   setup_server_matrix:
-    name: Setup the server test matrix
+    name: Setup the server test matrix§
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -40,7 +48,7 @@ jobs:
       matrix:
         server_version: ${{ fromJson(needs.setup_server_matrix.outputs.matrix) }}
         server_kind: [ enterprise ]
-        tests_type: [ os, enterprise ]
+        tests_type: ${{ fromJson(github.event.inputs.server_kind) }}
     name: Test Java client ${{ github.event.inputs.branch_name }} branch running ${{ matrix.tests_type }} tests against ${{ matrix.server_kind }} ${{ matrix.server_version }} server
     steps:
       - name: Checkout to scripts
@@ -110,7 +118,7 @@ jobs:
         shell: bash -l {0}
         run: |
           chmod +x mvnw
-          JAVA_HOME=${{env.JAVA_HOME}} ./mvnw -B -V -e test -Pintegration-tests -Dtest.hazelcast-server.version=${{ matrix.server_version }}
+          JAVA_HOME=${{env.JAVA_HOME}} ./mvnw -B -V -e test -Pintegration-tests -Dtest.hazelcast-server.version=${{ matrix.server_version }} -Dtest="${{ github.event.inputs.test_filter }}" -Dsurefire.failIfNoSpecifiedTests=false
         working-directory: client/hazelcast-java-client
 
       - name: Copy vector libs
@@ -130,7 +138,7 @@ jobs:
         shell: bash -l {0}
         run: |
           chmod +x mvnw
-          JAVA_HOME=${{env.JAVA_HOME}} ./mvnw -B -V -e test -Pintegration-tests -Dtest.hazelcast-server.version=${{ matrix.server_version }}
+          JAVA_HOME=${{env.JAVA_HOME}} ./mvnw -B -V -e test -Pintegration-tests -Dtest.hazelcast-server.version=${{ matrix.server_version }} -Dtest="${{ github.event.inputs.test_filter }}" -Dsurefire.failIfNoSpecifiedTests=false
         working-directory: client/hazelcast-enterprise-java-client-vector
 
       - name: Run enterprise tests
@@ -138,7 +146,7 @@ jobs:
         shell: bash -l {0}
         run: |
           chmod +x mvnw
-          JAVA_HOME=${{env.JAVA_HOME}} ./mvnw -B -V -e test -Pintegration-tests -Dtest.hazelcast-server.version=${{ matrix.server_version }}
+          JAVA_HOME=${{env.JAVA_HOME}} ./mvnw -B -V -e test -Pintegration-tests -Dtest.hazelcast-server.version=${{ matrix.server_version }} -Dtest="${{ github.event.inputs.test_filter }}" -Dsurefire.failIfNoSpecifiedTests=false
         working-directory: client/hazelcast-enterprise-java-client
 
       - name: Archive server logs
