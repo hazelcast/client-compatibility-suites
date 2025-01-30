@@ -353,9 +353,9 @@ def download_via_maven(
     args = [
         "mvn",
         "-q",
-        "dependency:get",
+        "org.apache.maven.plugins:maven-dependency-plugin:2.10:get",
         "-Dtransitive=false",
-        "-DrepoUrl=" + repo,
+        "-DremoteRepositories=" + repo,
         "-Dartifact=" + artifact,
         "-Ddest=" + dst,
     ]
