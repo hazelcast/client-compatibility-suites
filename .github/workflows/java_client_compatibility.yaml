@@ -48,7 +48,7 @@ jobs:
       matrix:
         server_version: ${{ fromJson(needs.setup_server_matrix.outputs.matrix) }}
         server_kind: [ enterprise ]
-        tests_type: ${{ fromJson(github.event.inputs.server_kind) }}
+        tests_type: ${{ fromJson(github.event.inputs.tests_type) }}
     name: Test Java client ${{ github.event.inputs.branch_name }} branch running ${{ matrix.tests_type }} tests against ${{ matrix.server_kind }} ${{ matrix.server_version }} server
     steps:
       - name: Checkout to scripts
