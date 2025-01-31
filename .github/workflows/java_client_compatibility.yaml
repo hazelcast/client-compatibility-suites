@@ -1,4 +1,4 @@
-name: OS Java client tests against the released IMDG servers
+name: Test Java client against the released IMDG servers
 
 on:
   workflow_dispatch:
