@@ -247,7 +247,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: server-${{ matrix.server_version }}-${{ matrix.server_kind }}-logs-tests-${{ github.run_id }}
+          name: server-${{ matrix.server_version }}-${{ matrix.server_kind }}-logs-tests-${{ github.job }}
           path: |
             client/hazelcast-java-client/target/test-artifacts/server_log.txt
             client/hazelcast-enterprise-java-client/target/test-artifacts/server_log.txt
