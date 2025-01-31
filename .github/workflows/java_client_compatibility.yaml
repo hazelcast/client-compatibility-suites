@@ -243,19 +243,15 @@ jobs:
           JAVA_HOME=${{env.JAVA_HOME}} ./mvnw -B -V -e test -Pintegration-tests -Dtest.hazelcast-server.version=${{ matrix.server_version }} -Dtest="${{ matrix.test_filter }}" -Dsurefire.failIfNoSpecifiedTests=false
         working-directory: client/hazelcast-java-client
 
-      - name: Get Job ID from API
+      - name: Extract package name
         if: always()
-        run: |
-          JOB_ID=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs" | \
-            jq -r '.jobs[] | select(.name=="${{ github.job }}") | .id')
-          echo "JOB_ID=$JOB_ID" >> $GITHUB_ENV
+        run: echo "PACKAGE_NAME=$(echo '${{ matrix.test_filter }}' | sed -E 's/com\.hazelcast\.([^*]+)\.[*]+/\1/; s/\./-/g')" >> $GITHUB_ENV
 
       - name: Archive server logs
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: server-${{ matrix.server_version }}-${{ matrix.server_kind }}-logs-tests-${{ env.JOB_ID }}
+          name: server-${{ matrix.server_version }}-${{ matrix.server_kind }}-logs-tests-${{ env.PACKAGE_NAME }}
           path: |
             client/hazelcast-java-client/target/test-artifacts/server_log.txt
             client/hazelcast-enterprise-java-client/target/test-artifacts/server_log.txt
