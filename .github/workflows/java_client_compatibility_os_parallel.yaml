@@ -1,0 +1,242 @@
+name: OS Java client tests against the released IMDG servers
+
+on:
+  workflow_dispatch:
+    inputs:
+      organization_name:
+        description: Default is hazelcast, but if you would like to run the workflow with your forked repo, set your github username
+        required: true
+        default: hazelcast
+      branch_name:
+        description: Name of the branch to test client from
+        required: true
+        default: master
+      server_version:
+        description: Version of the server to test against
+        required: true
+        default: 5.5.0
+
+jobs:
+  setup_server_matrix:
+    name: Setup the server test matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Checkout to scripts
+        uses: actions/checkout@v4
+
+      - name: Set server matrix
+        id: set-matrix
+        run: echo "matrix=$( python get_server_matrix.py )" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build Java Client Modules
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout to scripts
+        uses: actions/checkout@v4
+
+      - name: Setup JDK8
+        uses: actions/setup-java@v4
+        with:
+          distribution: "zulu"
+          java-version: "8"
+
+      - name: Checkout to ${{ github.event.inputs.branch_name }}
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.inputs.organization_name }}/hazelcast-java-client
+          token: ${{ secrets.GH_PAT }}
+          path: client
+          ref: ${{ github.event.inputs.branch_name }}
+
+      - name: Setup Local Maven Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Build modules
+        shell: bash -l {0}
+        run: |
+          chmod +x mvnw
+          JAVA_HOME=${{env.JAVA_HOME}} ./mvnw -B -V -e clean install -DskipTests -Dtest.hazelcast-server.version=${{ github.event.inputs.server_version }}
+        working-directory: client
+
+      - name: Upload built artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: java-client-modules
+          path: client
+
+  test_client:
+    needs: [setup_server_matrix]
+    runs-on: ubicloud-standard-8
+    strategy:
+      fail-fast: false
+      matrix:
+        server_version: ${{ github.event.inputs.server_version }}
+        server_kind: [ enterprise ]
+        test_filter:
+          - "com.hazelcast.aggregation.**"
+#          - "com.hazelcast.aws.**"
+#          - "com.hazelcast.azure.**"
+#          - "com.hazelcast.cache.**"
+#          - "com.hazelcast.client.*"
+#          - "com.hazelcast.client.aggregation.**"
+#          - "com.hazelcast.client.bluegreen.**"
+#          - "com.hazelcast.client.cache.**"
+#          - "com.hazelcast.client.cardinality.**"
+#          - "com.hazelcast.client.cluster.**"
+#          - "com.hazelcast.client.collections.**"
+#          - "com.hazelcast.client.config.**"
+#          - "com.hazelcast.client.connectionstrategy.**"
+#          - "com.hazelcast.client.console.**"
+#          - "com.hazelcast.client.executor.**"
+#          - "com.hazelcast.client.flakeidgen.**"
+#          - "com.hazelcast.client.genericrecord.**"
+#          - "com.hazelcast.client.heartbeat.**"
+#          - "com.hazelcast.client.impl.**"
+#          - "com.hazelcast.client.internal.**"
+#          - "com.hazelcast.client.io.**"
+#          - "com.hazelcast.client.listeners.**"
+#          - "com.hazelcast.client.loadBalancer.**"
+#          - "com.hazelcast.client.logging.**"
+#          - "com.hazelcast.client.map.**"
+#          - "com.hazelcast.client.multimap.**"
+#          - "com.hazelcast.client.partitionservice.**"
+#          - "com.hazelcast.client.pncounter.**"
+#          - "com.hazelcast.client.projection.**"
+#          - "com.hazelcast.client.properties.**"
+#          - "com.hazelcast.client.protocol.**"
+#          - "com.hazelcast.client.queue.**"
+#          - "com.hazelcast.client.replicatedmap.**"
+#          - "com.hazelcast.client.ringbuffer.**"
+#          - "com.hazelcast.client.scheduledexecutor.**"
+#          - "com.hazelcast.client.serialization.**"
+#          - "com.hazelcast.client.standalone.**"
+#          - "com.hazelcast.client.statistics.**"
+#          - "com.hazelcast.client.stress.**"
+#          - "com.hazelcast.client.test.**"
+#          - "com.hazelcast.client.topic.**"
+#          - "com.hazelcast.client.tpc.**"
+#          - "com.hazelcast.client.txn.**"
+#          - "com.hazelcast.client.usercodedeployment.**"
+#          - "com.hazelcast.client.util.**"
+#          - "com.hazelcast.cluster.**"
+#          - "com.hazelcast.collection.**"
+#          - "com.hazelcast.config.**"
+#          - "com.hazelcast.core.**"
+#          - "com.hazelcast.cp.**"
+#          - "com.hazelcast.dataconnection.**"
+#          - "com.hazelcast.executor.**"
+#          - "com.hazelcast.flakeidgen.impl.**"
+#          - "com.hazelcast.function.**"
+#          - "com.hazelcast.gcp.**"
+#          - "com.hazelcast.instance.**"
+#          - "com.hazelcast.internal.**"
+#          - "com.hazelcast.it.hibernate.**"
+#          - "com.hazelcast.jet.**"
+#          - "com.hazelcast.journal.**"
+#          - "com.hazelcast.json.**"
+#          - "com.hazelcast.kubernetes.**"
+#          - "com.hazelcast.listeners.**"
+#          - "com.hazelcast.logging.**"
+#          - "com.hazelcast.map.**"
+#          - "com.hazelcast.memory.**"
+#          - "com.hazelcast.mock.**"
+#          - "com.hazelcast.multimap.**"
+#          - "com.hazelcast.nio.**"
+#          - "com.hazelcast.partition.**"
+#          - "com.hazelcast.projection.**"
+#          - "com.hazelcast.query.**"
+#          - "com.hazelcast.replicatedmap.**"
+#          - "com.hazelcast.ringbuffer.**"
+#          - "com.hazelcast.scheduledexecutor.impl.**"
+#          - "com.hazelcast.security.**"
+#          - "com.hazelcast.spi.**"
+#          - "com.hazelcast.sql.**"
+#          - "com.hazelcast.test.**"
+#          - "com.hazelcast.topic.impl.reliable.**"
+#          - "com.hazelcast.version.**"
+    name: Test Java client ${{ github.event.inputs.branch_name }} branch (package ${{ matrix.test_filter }}) running OS tests against ${{ matrix.server_kind }} ${{ matrix.server_version }} server
+    steps:
+      - name: Checkout to scripts
+        uses: actions/checkout@v4
+
+      - name: Read Java Config
+        run: cat ${{ github.workspace }}/.github/java-config.env >> $GITHUB_ENV
+
+      - name: Setup Server Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+
+      - name: Set Server JDK home
+        run: echo "SERVER_JAVA=$JAVA_HOME" >> $GITHUB_ENV
+
+      - name: Setup JDK8
+        uses: actions/setup-java@v4
+        with:
+          distribution: "zulu"
+          java-version: "8"
+
+      - name: Setup Local Maven Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Check Server Version to Determine License Version
+        uses: madhead/semver-utils@latest
+        id: version
+        with:
+          version: ${{ matrix.server_version }}
+          compare-to: 5.3.0
+
+      - name: Set up HZ_LICENSEKEY env
+        if: ${{ matrix.server_kind == 'enterprise' }}
+        run: |
+          echo "HZ_LICENSEKEY=${{ '>' == steps.version.outputs.comparison-result && secrets.HAZELCAST_ENTERPRISE_KEY || secrets.HAZELCAST_ENTERPRISE_KEY_V5 }}" >> $GITHUB_ENV
+
+      - name: Download built modules
+        uses: actions/download-artifact@v4
+        with:
+          name: java-client-modules
+          path: client
+
+      - name: Run remote controller for non-enterprise tests
+        working-directory: client/hazelcast-java-client/target/test-artifacts
+        run: |
+          ${{env.SERVER_JAVA}}/bin/java -cp additional-libs/*:hazelcast-remote-controller.jar:hazelcast.jar:test-artifacts.jar:../test-classes/jars/testsubjects.jar:../test-classes/jars/test.jar: -Djava.security.krb5.conf=../../src/test/resources/krb5.conf -Dhazelcast.phone.home.enabled=false -Dhazelcast.logging.details.enabled=true --add-opens=java.base/java.lang=ALL-UNNAMED com.hazelcast.remotecontroller.Main --use-simple-server 2> server_log.txt &
+
+      - name: Run non-enterprise tests
+        shell: bash -l {0}
+        run: |
+          chmod +x mvnw
+          JAVA_HOME=${{env.JAVA_HOME}} ./mvnw -B -V -e test -Pintegration-tests -Dtest.hazelcast-server.version=${{ matrix.server_version }} -Dtest="${{ github.event.inputs.test_filter }}" -Dsurefire.failIfNoSpecifiedTests=false
+        working-directory: client/hazelcast-java-client
+
+      - name: Extract package name
+        if: always()
+        run: echo "PACKAGE_NAME=$(echo ${{ matrix.test_filter }} | sed -E 's/com\.hazelcast\.([^*]+)\.[*]+/\1/; s/\./-/g')" >> $GITHUB_ENV
+
+      - name: Archive server logs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: server-${{ matrix.server_version }}-${{ matrix.server_kind }}-logs-${{ matrix.tests_type }}-tests
+          path: |
+            client/hazelcast-java-client/target/test-artifacts/server_log.txt
+            client/hazelcast-enterprise-java-client/target/test-artifacts/server_log.txt
