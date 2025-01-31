@@ -84,7 +84,7 @@ jobs:
           path: client/hazelcast-enterprise-java-client
 
   test_client:
-    needs: [setup_server_matrix]
+    needs: [setup_server_matrix, build]
     runs-on: ubicloud-standard-8
     strategy:
       fail-fast: false
