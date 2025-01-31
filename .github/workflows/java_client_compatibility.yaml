@@ -71,11 +71,17 @@ jobs:
           JAVA_HOME=${{env.JAVA_HOME}} ./mvnw -B -V -e clean install -DskipTests -Dtest.hazelcast-server.version=${{ github.event.inputs.server_version }}
         working-directory: client
 
-      - name: Upload built artifacts
+      - name: Upload hazelcast-java-client module
         uses: actions/upload-artifact@v4
         with:
-          name: java-client-modules
-          path: client
+          name: java-client-module
+          path: client/hazelcast-java-client
+
+      - name: Upload hazelcast-enterprise-java-client module
+        uses: actions/upload-artifact@v4
+        with:
+          name: enterprise-java-client-module
+          path: client/hazelcast-enterprise-java-client
 
   test_client:
     needs: [setup_server_matrix]
@@ -83,7 +89,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        server_version: ${{ github.event.inputs.server_version }}
+        server_version:
+          - ${{ github.event.inputs.server_version }}
         server_kind: [ enterprise ]
         test_filter:
           - "com.hazelcast.aggregation.**"
@@ -210,11 +217,23 @@ jobs:
         run: |
           echo "HZ_LICENSEKEY=${{ '>' == steps.version.outputs.comparison-result && secrets.HAZELCAST_ENTERPRISE_KEY || secrets.HAZELCAST_ENTERPRISE_KEY_V5 }}" >> $GITHUB_ENV
 
-      - name: Download built modules
+      - name: Download hazelcast-java-client module
         uses: actions/download-artifact@v4
         with:
-          name: java-client-modules
-          path: client
+          name: java-client-module
+          path: client/hazelcast-java-client
+
+      - name: Download hazelcast-java-client module
+        uses: actions/download-artifact@v4
+        with:
+          name: java-client-module
+          path: client/hazelcast-java-client
+
+      - name: Download hazelcast-enterprise-java-client module
+        uses: actions/download-artifact@v4
+        with:
+          name: enterprise-java-client-module
+          path: client/hazelcast-enterprise-java-client
 
       - name: Run remote controller for non-enterprise tests
         working-directory: client/hazelcast-java-client/target/test-artifacts
