@@ -84,6 +84,14 @@ jobs:
           name: enterprise-java-client-module
           include-hidden-files: true
           path: client/hazelcast-enterprise-java-client
+      
+      - name: Upload kubernetes-rbac.yaml
+        uses: actions/upload-artifact@v4
+        with:
+          name: kubernetes-rbac.yaml
+          include-hidden-files: true
+          path: client/kubernetes-rbac.yaml
+
 
   test_client:
     needs: [setup_server_matrix, build]
@@ -242,6 +250,12 @@ jobs:
         with:
           name: enterprise-java-client-module
           path: client/hazelcast-enterprise-java-client
+
+      - name: Download root files
+        uses: actions/download-artifact@v4
+        with:
+          name: kubernetes-rbac.yaml
+          path: client
 
       - name: Run remote controller for non-enterprise tests
         working-directory: client/hazelcast-java-client/target/test-artifacts
