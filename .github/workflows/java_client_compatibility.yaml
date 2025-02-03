@@ -35,66 +35,8 @@ jobs:
         id: set-matrix
         run: echo "matrix=$( python get_server_matrix.py )" >> "$GITHUB_OUTPUT"
 
-  build:
-    name: Build Java Client Modules
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout to scripts
-        uses: actions/checkout@v4
-
-      - name: Setup JDK8
-        uses: actions/setup-java@v4
-        with:
-          distribution: "zulu"
-          java-version: "8"
-
-      - name: Checkout to ${{ github.event.inputs.branch_name }}
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ github.event.inputs.organization_name }}/hazelcast-java-client
-          token: ${{ secrets.GH_PAT }}
-          path: client
-          ref: ${{ github.event.inputs.branch_name }}
-
-      - name: Setup Local Maven Cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
-      - name: Build modules
-        shell: bash -l {0}
-        run: |
-          chmod +x mvnw
-          JAVA_HOME=${{env.JAVA_HOME}} ./mvnw -B -V -e clean install -DskipTests -Dtest.hazelcast-server.version=${{ github.event.inputs.server_version }}
-        working-directory: client
-
-      - name: Upload hazelcast-java-client module
-        uses: actions/upload-artifact@v4
-        with:
-          name: java-client-module
-          include-hidden-files: true
-          path: client/hazelcast-java-client
-
-      - name: Upload hazelcast-enterprise-java-client module
-        uses: actions/upload-artifact@v4
-        with:
-          name: enterprise-java-client-module
-          include-hidden-files: true
-          path: client/hazelcast-enterprise-java-client
-      
-      - name: Upload kubernetes-rbac.yaml
-        uses: actions/upload-artifact@v4
-        with:
-          name: kubernetes-rbac.yaml
-          include-hidden-files: true
-          path: client/kubernetes-rbac.yaml
-
-
   test_client:
-    needs: [setup_server_matrix, build]
+    needs: [setup_server_matrix]
     runs-on: ubicloud-standard-8
     strategy:
       fail-fast: false
@@ -238,30 +180,12 @@ jobs:
         run: |
           echo "HZ_LICENSEKEY=${{ '>' == steps.version.outputs.comparison-result && secrets.HAZELCAST_ENTERPRISE_KEY || secrets.HAZELCAST_ENTERPRISE_KEY_V5 }}" >> $GITHUB_ENV
 
-      - name: Download hazelcast-java-client module
-        uses: actions/download-artifact@v4
-        with:
-          name: java-client-module
-          path: client/hazelcast-java-client
-
-      - name: Download hazelcast-enterprise-java-client module
-        uses: actions/download-artifact@v4
-        with:
-          name: enterprise-java-client-module
-          path: client/hazelcast-enterprise-java-client
-
-      - name: Download root files
-        uses: actions/download-artifact@v4
-        with:
-          name: kubernetes-rbac.yaml
-          path: client
-
-      - name: Upload hazelcast-java-client module
-        uses: actions/upload-artifact@v4
-        with:
-          name: java-client-module-job
-          include-hidden-files: true
-          path: client/hazelcast-java-client
+      - name: Build modules
+        shell: bash -l {0}
+        run: |
+          chmod +x mvnw
+          JAVA_HOME=${{env.JAVA_HOME}} ./mvnw -B -V -e clean install -DskipTests -Dtest.hazelcast-server.version=${{ matrix.server_version }}
+        working-directory: client
 
       - name: Run remote controller for non-enterprise tests
         working-directory: client/hazelcast-java-client/target/test-artifacts
