@@ -202,7 +202,7 @@ jobs:
         if: ${{ matrix.tests_type == 'OS' }}
         working-directory: client/hazelcast-java-client/target/test-artifacts
         run: |
-          ${{env.SERVER_JAVA}}/bin/java -cp additional-libs/*:hazelcast-remote-controller.jar:hazelcast.jar:test-artifacts.jar:../test-classes/jars/testsubjects.jar:../test-classes/jars/test.jar: -Djava.security.krb5.conf=../../src/test/resources/krb5.conf -Dhazelcast.phone.home.enabled=false -Dhazelcast.logging.details.enabled=true --add-opens=java.base/java.lang=ALL-UNNAMED com.hazelcast.remotecontroller.Main --use-simple-server 2> server_log.txt &
+          ${{env.SERVER_JAVA}}/bin/java -cp additional-libs/*:hazelcast-remote-controller.jar:hazelcast.jar:test-artifacts.jar:../test-classes/jars/testsubjects.jar:../test-classes/jars/test.jar: -Djava.security.krb5.conf=../../src/test/resources/krb5.conf -Dhazelcast.phone.home.enabled=false -Dhazelcast.logging.details.enabled=true --add-opens=java.base/java.lang=ALL-UNNAMED com.hazelcast.remotecontroller.Main --use-simple-server > server_log.txt &
 
       - name: Run remote controller for enterprise tests
         if: ${{ matrix.tests_type == 'ENTERPRISE' }}
