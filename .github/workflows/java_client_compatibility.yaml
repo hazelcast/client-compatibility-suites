@@ -223,7 +223,7 @@ jobs:
         shell: bash -l {0}
         run: |
           chmod +x mvnw
-          JAVA_HOME=${{env.JAVA_HOME}} ./mvnw -B -V -e test -Pintegration-tests -Dtest.hazelcast-server.version=${{ matrix.server_version }} -Dtest="${{ github.event.inputs.test_filter }}" -Dsurefire.failIfNoSpecifiedTests=false
+          JAVA_HOME=${{env.JAVA_HOME}} ./mvnw -B -V -e test -Pintegration-tests -Dtest.hazelcast-server.version=${{ matrix.server_version }} -Dtest="${{ matrix.test_filter }}" -Dsurefire.failIfNoSpecifiedTests=false
         working-directory: client/hazelcast-enterprise-java-client
 
       - name: Extract package name
