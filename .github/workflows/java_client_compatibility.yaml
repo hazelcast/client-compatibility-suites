@@ -15,10 +15,18 @@ on:
         description: Version of the server to test against
         required: true
         default: 5.5.0
+      tests_type:
+        description: Type of tests to run
+        required: true
+        default: 'OS'
+        type: choice
+        options:
+          - OS
+          - ENTERPRISE
 
 jobs:
-  setup_server_matrix:
-    name: Setup the server test matrix
+  setup_test_filters_matrix:
+    name: Setup the test filters matrix
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -31,21 +39,24 @@ jobs:
       - name: Checkout to scripts
         uses: actions/checkout@v4
 
-      - name: Set server matrix
-        id: set-matrix
-        run: echo "matrix=$( python get_server_matrix.py )" >> "$GITHUB_OUTPUT"
+      - name: Set test filters matrix
+        id: set-test-filters-matrix
+        #run: echo "matrix=$( python get_java_client_filters_matrix.py "${{ github.event.inputs.tests_type }}")" >> "$GITHUB_OUTPUT"
+        run: echo "matrix='$(python get_java_client_filters_matrix.py "${{ github.event.inputs.tests_type }}")'" >> "$GITHUB_OUTPUT"
 
   test_client:
-    needs: [setup_server_matrix]
+    needs: [setup_test_filters_matrix]
     runs-on: ubicloud-standard-8
     strategy:
       fail-fast: false
       matrix:
         server_version:
           - ${{ github.event.inputs.server_version }}
-        server_kind: [ enterprise ]
-        test_filter:
-          - "com.hazelcast.client.map.SimpleClientMapInterceptorTest"
+        server_kind: [ ENTERPRISE ]
+        test_filter: ${{ fromJson(needs.setup_test_filters_matrix.outputs.matrix) }}
+        test_type:
+          - ${{ github.event.inputs.tests_type }}
+#          - "com.hazelcast.client.map.SimpleClientMapInterceptorTest"
 #          - "com.hazelcast.aggregation.**"
 #          - "com.hazelcast.aws.**"
 #          - "com.hazelcast.azure.**"
@@ -137,7 +148,7 @@ jobs:
 #          - "com.hazelcast.test.**"
 #          - "com.hazelcast.topic.impl.reliable.**"
 #          - "com.hazelcast.version.**"
-    name: Test Java client ${{ github.event.inputs.branch_name }} branch (package ${{ matrix.test_filter }}) running OS tests against ${{ matrix.server_kind }} ${{ matrix.server_version }} server
+    name: Test Java client ${{ github.event.inputs.branch_name }} branch (package ${{ matrix.test_filter }}) running ${{ matrix.test_type}} tests against ${{ matrix.server_kind }} ${{ matrix.server_version }} server
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v4
@@ -184,7 +195,7 @@ jobs:
           compare-to: 5.3.0
 
       - name: Set up HZ_LICENSEKEY env
-        if: ${{ matrix.server_kind == 'enterprise' }}
+        if: ${{ matrix.server_kind == 'ENTERPRISE' }}
         run: |
           echo "HZ_LICENSEKEY=${{ '>' == steps.version.outputs.comparison-result && secrets.HAZELCAST_ENTERPRISE_KEY || secrets.HAZELCAST_ENTERPRISE_KEY_V5 }}" >> $GITHUB_ENV
 
@@ -196,16 +207,46 @@ jobs:
         working-directory: client
 
       - name: Run remote controller for non-enterprise tests
+        if: ${{ matrix.tests_type == 'OS' }}
         working-directory: client/hazelcast-java-client/target/test-artifacts
         run: |
           ${{env.SERVER_JAVA}}/bin/java -cp additional-libs/*:hazelcast-remote-controller.jar:hazelcast.jar:test-artifacts.jar:../test-classes/jars/testsubjects.jar:../test-classes/jars/test.jar: -Djava.security.krb5.conf=../../src/test/resources/krb5.conf -Dhazelcast.phone.home.enabled=false -Dhazelcast.logging.details.enabled=true --add-opens=java.base/java.lang=ALL-UNNAMED com.hazelcast.remotecontroller.Main --use-simple-server 2> server_log.txt &
 
+      - name: Run remote controller for enterprise tests
+        if: ${{ matrix.tests_type == 'ENTERPRISE' }}
+        working-directory: client/hazelcast-enterprise-java-client/target/test-artifacts
+        run: |
+          ${{env.SERVER_JAVA}}/bin/java -cp additional-libs/*:hazelcast-remote-controller.jar:../test-artifacts:hazelcast-enterprise.jar:hazelcast.jar:test-artifacts.jar:os-test-artifacts.jar:test-vector-artifacts.jar:test-os-vector-artifacts.jar:../test-classes/jars/testsubjects.jar:../test-classes/jars/test.jar: -Djava.security.krb5.conf=../../src/test/resources/krb5.conf -Dhazelcast.logging.details.enabled=true -Dhazelcast.hidensity.check.freememory=false --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-exports jdk.management/com.ibm.lang.management.internal=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED com.hazelcast.remotecontroller.Main --use-simple-server 2> server_log.txt &
+
       - name: Run non-enterprise tests
+        if: ${{ matrix.tests_type == 'OS' }}
         shell: bash -l {0}
         run: |
           chmod +x mvnw
           JAVA_HOME=${{env.JAVA_HOME}} ./mvnw -B -V -e test -Pintegration-tests -Dtest.hazelcast-server.version=${{ matrix.server_version }} -Dtest="${{ matrix.test_filter }}" -Dsurefire.failIfNoSpecifiedTests=false
         working-directory: client/hazelcast-java-client
+
+      - name: Copy vector libs
+        if: ${{ matrix.tests_type == 'ENTERPRISE' }}
+        run: |
+          cp client/hazelcast-enterprise-java-client-vector/target/test-artifacts/os-test-vector-artifacts.jar client/hazelcast-enterprise-java-client/target/test-artifacts/os-test-vector-artifacts.jar
+          cp client/hazelcast-enterprise-java-client-vector/target/test-artifacts/test-vector-artifacts.jar client/hazelcast-enterprise-java-client/target/test-artifacts/test-vector-artifacts.jar
+
+      - name: Run enterprise Vector tests
+        if: ${{ matrix.tests_type == 'ENTERPRISE' }}
+        shell: bash -l {0}
+        run: |
+          chmod +x mvnw
+          JAVA_HOME=${{env.JAVA_HOME}} ./mvnw -B -V -e test -Pintegration-tests -Dtest.hazelcast-server.version=${{ matrix.server_version }} -Dtest="${{ github.event.inputs.test_filter }}" -Dsurefire.failIfNoSpecifiedTests=false
+        working-directory: client/hazelcast-enterprise-java-client-vector
+
+      - name: Run enterprise tests
+        if: ${{ matrix.tests_type == 'ENTERPRISE' }}
+        shell: bash -l {0}
+        run: |
+          chmod +x mvnw
+          JAVA_HOME=${{env.JAVA_HOME}} ./mvnw -B -V -e test -Pintegration-tests -Dtest.hazelcast-server.version=${{ matrix.server_version }} -Dtest="${{ github.event.inputs.test_filter }}" -Dsurefire.failIfNoSpecifiedTests=false
+        working-directory: client/hazelcast-enterprise-java-client
 
       - name: Extract package name
         if: always()
