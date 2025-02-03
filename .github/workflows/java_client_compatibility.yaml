@@ -42,7 +42,7 @@ jobs:
       - name: Set test filters matrix
         id: set-test-filters-matrix
         #run: echo "matrix=$( python get_java_client_filters_matrix.py "${{ github.event.inputs.tests_type }}")" >> "$GITHUB_OUTPUT"
-        run: echo "matrix='$(python get_java_client_filters_matrix.py "${{ github.event.inputs.tests_type }}")'" >> "$GITHUB_OUTPUT"
+        run: echo "matrix=$( python get_java_client_test_filters_matrix.py --server-kind ${{ github.event.inputs.tests_type }} )" >> "$GITHUB_OUTPUT"
 
   test_client:
     needs: [setup_test_filters_matrix]
