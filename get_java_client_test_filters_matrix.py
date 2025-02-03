@@ -162,8 +162,8 @@ if __name__ == "__main__":
     args = parse_args()
     server_kind = ServerKind[args.server_kind.upper()]
     if args.server_kind == ServerKind.ENTERPRISE:
-        test_filters = os_test_filters
-    else:
         test_filters = enterprise_test_filters
+    else:
+        test_filters = os_test_filters
 
     print(json.dumps(test_filters))
