@@ -151,7 +151,7 @@ def parse_args() -> argparse.Namespace:
         action="store",
         type=str,
         required=True,
-        choices=[kind.name.lower() for kind in ServerKind],
+        choices=[kind.name.upper() for kind in ServerKind],
         help="The Hazelcast server type that the tests should be running against",
     )
 
