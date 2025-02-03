@@ -45,7 +45,7 @@ jobs:
 
   vector_tests:
     if: ${{ github.event.inputs.tests_type == 'ENTERPRISE' }}
-    name: Test Java client ${{ github.event.inputs.branch_name }} branch running ${{ github.event.inputs.tests_type }} Vector tests against ENTERPRiSE ${{ github.event.inputs.server_version }} server
+    name: Test Java client ${{ github.event.inputs.branch_name }} branch running ${{ github.event.inputs.tests_type }} Vector tests against ENTERPRISE ${{ github.event.inputs.server_version }} server
     runs-on: ubicloud-standard-8
     steps:
       - name: Checkout to scripts
@@ -100,7 +100,7 @@ jobs:
         shell: bash -l {0}
         run: |
           chmod +x mvnw
-          JAVA_HOME=${{env.JAVA_HOME}} ./mvnw -B -V -e clean install -DskipTests -Dtest.hazelcast-server.version=${{ matrix.server_version }}
+          JAVA_HOME=${{env.JAVA_HOME}} ./mvnw -B -V -e clean install -DskipTests -Dtest.hazelcast-server.version=${{ github.event.inputs.server_version }}
         working-directory: client
 
       - name: Run remote controller for enterprise tests
@@ -117,7 +117,7 @@ jobs:
         shell: bash -l {0}
         run: |
           chmod +x mvnw
-          JAVA_HOME=${{env.JAVA_HOME}} ./mvnw -B -V -e test -Pintegration-tests -Dtest.hazelcast-server.version=${{ matrix.server_version }} -Dtest="${{ github.event.inputs.test_filter }}" -Dsurefire.failIfNoSpecifiedTests=false
+          JAVA_HOME=${{env.JAVA_HOME}} ./mvnw -B -V -e test -Pintegration-tests -Dtest.hazelcast-server.version=${{ github.event.inputs.server_version }}
         working-directory: client/hazelcast-enterprise-java-client-vector
 
       - name: Archive server logs
