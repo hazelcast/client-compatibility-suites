@@ -54,7 +54,7 @@ jobs:
           - ${{ github.event.inputs.server_version }}
         server_kind: [ ENTERPRISE ]
         test_filter: ${{ fromJson(needs.setup_test_filters_matrix.outputs.matrix) }}
-        test_type:
+        tests_type:
           - ${{ github.event.inputs.tests_type }}
 #          - "com.hazelcast.client.map.SimpleClientMapInterceptorTest"
 #          - "com.hazelcast.aggregation.**"
