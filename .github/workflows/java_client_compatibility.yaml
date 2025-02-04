@@ -236,11 +236,19 @@ jobs:
             sed -E 's/\./-/g')
           echo "PACKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_ENV
 
+      - name: Truncate log name
+        uses: 2428392/gh-truncate-string-action@v1
+        id: trancate_package
+        with:
+          stringToTruncate: ${{ env.PACKAGE_NAME }}
+          maxLength: 200
+          
+      
       - name: Archive server logs
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: server-${{ matrix.server_version }}-${{ matrix.server_kind }}-logs-tests-${{ env.PACKAGE_NAME }}
+          name: server-${{ matrix.server_version }}-${{ matrix.server_kind }}-logs-tests-${{ steps.trancate_package.outputs.string  }}
           path: |
             client/hazelcast-java-client/target/test-artifacts/server_log.txt
             client/hazelcast-enterprise-java-client/target/test-artifacts/server_log.txt
