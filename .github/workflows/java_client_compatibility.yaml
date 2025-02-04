@@ -238,6 +238,7 @@ jobs:
 
       - name: Truncate log name
         uses: 2428392/gh-truncate-string-action@v1
+        if: always()
         id: trancate_package
         with:
           stringToTruncate: ${{ env.PACKAGE_NAME }}
