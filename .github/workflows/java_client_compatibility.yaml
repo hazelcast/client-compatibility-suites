@@ -204,7 +204,7 @@ jobs:
         with:
           name: end-additional-libs
           path: |
-            client/hazelcast-enterprise-java-client/additional-libs
+             client/hazelcast-enterprise-java-client/target/test-artifacts/additional-libs
 
       - name: Run remote controller for non-enterprise tests
         if: ${{ matrix.tests_type == 'OS' }}
