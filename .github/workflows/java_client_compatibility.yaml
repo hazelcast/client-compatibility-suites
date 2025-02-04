@@ -228,7 +228,13 @@ jobs:
 
       - name: Extract package name
         if: always()
-        run: echo "PACKAGE_NAME=$(echo '${{ matrix.test_filter }}' | sed -E 's/com\.hazelcast\.([^*]+)\.[*]+/\1/; s/\./-/g')" >> $GITHUB_ENV
+        run: |
+          PACKAGE_NAME=$(echo '${{ matrix.test_filter }}' | awk -F',' '{print $1}' | \
+            sed -E 's/^com\.hazelcast\.//' | \
+            sed -E 's/\.\*\*$//' | \
+            sed -E 's/\.\*Test$/-Test/' | \
+            sed -E 's/\./-/g')
+          echo "PACKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_ENV
 
       - name: Archive server logs
         uses: actions/upload-artifact@v4
