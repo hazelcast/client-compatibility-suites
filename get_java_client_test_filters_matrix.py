@@ -48,7 +48,7 @@ os_test_filters = [
     "com.hazelcast.client.map.*Test",
     "com.hazelcast.client.map.helpers.**",
     "com.hazelcast.client.map.impl.listener.**",
-    "com.hazelcast.client.map.impl.nearcache.invalidation**",
+    "com.hazelcast.client.map.impl.nearcache.invalidation.**",
     "com.hazelcast.client.map.impl.nearcache.ClientMapNearCacheBasicSlowTest",
     "com.hazelcast.client.map.impl.nearcache.ClientMapNearCacheBasicTest,com.hazelcast.client.map.impl.nearcache.ClientMapNearCacheEvictionTest",
     "com.hazelcast.client.map.impl.nearcache.ClientMapNearCacheInvalidationTest,com.hazelcast.client.map.impl.nearcache.ClientMapNearCacheLeakTest",
