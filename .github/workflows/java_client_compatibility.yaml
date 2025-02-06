@@ -228,13 +228,7 @@ jobs:
 
       - name: Extract package name
         if: always()
-        run: |
-          PACKAGE_NAME=$(echo '${{ matrix.test_filter }}' | awk -F',' '{print $1}' | \
-            sed -E 's/^com\.hazelcast\.//' | \
-            sed -E 's/\.\*\*$//' | \
-            sed -E 's/\.\*Test$/-Test/' | \
-            sed -E 's/\./-/g')
-          echo "PACKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_ENV
+        run: echo "PACKAGE_NAME=$(echo '${{ matrix.test_filter }}' | sed -E 's/com\.hazelcast\.([^*]+)\.[*]+/\1/; s/\./-/g')" >> $GITHUB_ENV
 
       - name: Truncate log name
         uses: 2428392/gh-truncate-string-action@v1
