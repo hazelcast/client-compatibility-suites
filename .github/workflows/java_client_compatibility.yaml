@@ -232,12 +232,12 @@ jobs:
 
       - name: Truncate log name
         uses: 2428392/gh-truncate-string-action@v1
+        if: always()
         id: trancate_package
         with:
           stringToTruncate: ${{ env.PACKAGE_NAME }}
           maxLength: 200
-          
-      
+
       - name: Archive server logs
         uses: actions/upload-artifact@v4
         if: always()
