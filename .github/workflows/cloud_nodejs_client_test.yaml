@@ -78,7 +78,7 @@ jobs:
           npx mocha cloud_tests.js --exit
         working-directory: HazelcastCloudTests/nodejshazelcastcloudtests
         
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: rc

@@ -88,13 +88,13 @@ jobs:
           ./hz.ps1 -server ${{ github.event.inputs.hzVersion }} test -tf "test == /Hazelcast.Tests.Cloud.ServerlessCloudTests/" -enterprise ${{ secrets.GH_PAT }}
         working-directory: client
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: rc
           path: HazelcastCloudTests/dotnethazelcastcloudtests/rc.log
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-results
