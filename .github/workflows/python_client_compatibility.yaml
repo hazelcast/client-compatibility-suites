@@ -65,6 +65,7 @@ jobs:
         if: ${{ matrix.kind == 'enterprise' }}
         run: |
           cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/jars/hazelcast-enterprise-${{ matrix.version }}-tests.jar
+          unzip -p $GITHUB_WORKSPACE/certs/certs.jar com/hazelcast/nio/ssl/letsencrypt.jks > tests/integration/backward_compatible/ssl_tests/keystore.jks
       - name: Checkout to master
         uses: actions/checkout@v4
         with:
