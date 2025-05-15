@@ -86,6 +86,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-test.txt
         working-directory: master
+      - name: Check Server Version to Determine License Version
+        uses: madhead/semver-utils@v4.3.0
+        id: version
+        with:
+          version: ${{ matrix.version }}
+          compare-to: 5.3.0
       - name: Start RC
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ '>' == steps.version.outputs.comparison-result && secrets.HAZELCAST_ENTERPRISE_KEY || secrets.HAZELCAST_ENTERPRISE_KEY_V5 }}
