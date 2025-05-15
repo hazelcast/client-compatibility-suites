@@ -74,9 +74,14 @@ jobs:
         run: |
           cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/client/hazelcast-enterprise-${{ matrix.version }}-tests.jar
 
+      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license
+        id: get-enterprise-license
+        with:
+          hazelcast-version: ${{ matrix.version }}
+
       - name: Test
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY] }}
           HZ_VERSION: ${{ matrix.version }}
           SSL_ENABLED: 1
         run: |

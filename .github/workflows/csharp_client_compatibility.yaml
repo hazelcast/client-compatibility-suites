@@ -57,13 +57,6 @@ jobs:
           dotnet-version: |
             8.0.x
 
-      - uses: madhead/semver-utils@latest
-        name: Check Server Version to Determine License Version
-        id: version
-        with:
-          version: ${{ matrix.version }}
-          compare-to: 5.3.0
-            
       - name: Read Java Config
         uses: pietrobolcato/action-read-yaml@9f13718d61111b69f30ab4ac683e67a56d254e1d
         id: java-config
@@ -101,13 +94,18 @@ jobs:
         env:
           HAZELCAST_SERVER_VERSION: ${{ matrix.version }}      
         
+      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license
+        id: get-enterprise-license
+        with:
+          hazelcast-version: ${{ matrix.version }}
+
       - name: Run all tests        
         shell: pwsh
         if: ${{ matrix.kind == 'enterprise' }}
         run: ./hz.ps1 -enterprise -noRestore -localRestore -server ${{ matrix.version }} test ${{ secrets.GH_PAT }}
         working-directory: client        
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ '>' == steps.version.outputs.comparison-result && secrets.HAZELCAST_ENTERPRISE_KEY || secrets.HAZELCAST_ENTERPRISE_KEY_V5 }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY] }}
           HAZELCAST_SERVER_VERSION: ${{ matrix.version }}
 
           

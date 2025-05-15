@@ -96,9 +96,13 @@ jobs:
           rm $GITHUB_WORKSPACE/master/package.json
           cp -a $GITHUB_WORKSPACE/client/lib $GITHUB_WORKSPACE/master/lib
           cp -a $GITHUB_WORKSPACE/client/package.json $GITHUB_WORKSPACE/master/package.json
+      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license
+        id: get-enterprise-license
+        with:
+          hazelcast-version: ${{ matrix.version }}
       - name: Start RC
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY] }}
         run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.kind }}
       - name: Run non-enterprise tests
         if: ${{ matrix.kind == 'os' }}
@@ -109,4 +113,4 @@ jobs:
         run: node node_modules/mocha/bin/mocha --recursive test/integration/backward_compatible
         working-directory: master
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY] }}
