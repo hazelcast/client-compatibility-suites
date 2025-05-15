@@ -55,16 +55,25 @@ def parse_args() -> argparse.Namespace:
         help="Use the RC in simple server mode",
     )
 
+    parser.add_argument(
+        "--version",
+        required=True,
+        help="Server version",
+    )
+
     return parser.parse_args()
 
 
 def start_rc(
-    rc_version: str, dst_folder: str, use_simple_server: bool, server_kind: ServerKind
+    rc_version: str, dst_folder: str, use_simple_server: bool, server_kind: ServerKind, server_version,
 ) -> None:
     if rc_version.upper().endswith("-SNAPSHOT"):
         rc_repo = SNAPSHOT_REPO
     else:
         rc_repo = RELEASE_REPO
+
+    env_key = get_env_key_for_version(server_version)
+    print(f"Checking the {env_key} environment variable for the license.")
 
     download_via_maven(rc_repo, "hazelcast-remote-controller", rc_version, dst_folder)
     class_path = path.join(dst_folder, "*")
@@ -79,7 +88,7 @@ def start_rc(
     if use_simple_server:
         args.append("--use-simple-server")
 
-    enterprise_key = os.environ.get("HAZELCAST_ENTERPRISE_KEY", None)
+    enterprise_key = os.environ.get(env_key, None)
     if server_kind == ServerKind.ENTERPRISE and enterprise_key:
         args.insert(1, "-Dhazelcast.enterprise.license.key=" + enterprise_key)
 
@@ -101,11 +110,37 @@ def wait_until_rc_is_ready() -> None:
     raise Exception("Remote controller failed to start.")
 
 
+V5_KEY = "HAZELCAST_ENTERPRISE_KEY_V5"
+V6_KEY = "HAZELCAST_ENTERPRISE_KEY_V6"
+V7_KEY = "HAZELCAST_ENTERPRISE_KEY_V7"
+
+
+def get_env_key_for_version(version: str) -> str:
+    dash_index = version.rfind("-")
+    if dash_index >= 0:
+        version = version[:dash_index]
+    vs = version.split(".")
+    if len(vs) != 3:
+        raise Exception(f"Invalid version: {version}")
+    major, minor, patch = tuple(int(p) for p in vs)
+    if major >= 6:
+        return V7_KEY
+    if major == 5:
+        if minor < 3:
+            return V5_KEY
+        if minor < 5:
+            return V6_KEY
+        return V7_KEY
+
+    raise Exception(f"Unsupported version: {version}")
+
+
 if __name__ == "__main__":
     args = parse_args()
     rc_version = args.rc_version
     jars = args.jars
     server_kind = ServerKind[args.server_kind.upper()]
     use_simple_server = args.use_simple_server
-    start_rc(rc_version, jars, use_simple_server, server_kind)
+    server_version = args.version
+    start_rc(rc_version, jars, use_simple_server, server_kind, server_version)
     wait_until_rc_is_ready()
