@@ -88,7 +88,9 @@ jobs:
         working-directory: master
       - name: Start RC
         env:
+          HAZELCAST_ENTERPRISE_KEY_V5: ${{ secrets.HAZELCAST_ENTERPRISE_KEY_V5 }}
           HAZELCAST_ENTERPRISE_KEY_V6: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+          HAZELCAST_ENTERPRISE_KEY_V7: ${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}
         run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.kind }} --use-simple-server --version ${{ matrix.version }}
       - name: Run non-enterprise tests
         if: ${{ matrix.kind == 'os' }}

@@ -214,8 +214,10 @@ jobs:
           path: jars
       - name: Start RC
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ env.HAZELCAST_ENTERPRISE_KEY }}
-        run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.server_kind }} --use-simple-server
+          HAZELCAST_ENTERPRISE_KEY_V5: ${{ secrets.HAZELCAST_ENTERPRISE_KEY_V5 }}
+          HAZELCAST_ENTERPRISE_KEY_V6: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+          HAZELCAST_ENTERPRISE_KEY_V7: ${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}
+        run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.server_kind }} --use-simple-server --version ${{ matrix.version }}
       - name: Run non-enterprise tests
         if: ${{ matrix.server_kind == 'os' }}
         run: pytest -m 'not enterprise' tests/integration/backward_compatible
@@ -332,8 +334,10 @@ jobs:
           path: jars
       - name: Start RC
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ env.HAZELCAST_ENTERPRISE_KEY }}
-        run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.server_kind }}
+          HAZELCAST_ENTERPRISE_KEY_V5: ${{ secrets.HAZELCAST_ENTERPRISE_KEY_V5 }}
+          HAZELCAST_ENTERPRISE_KEY_V6: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+          HAZELCAST_ENTERPRISE_KEY_V7: ${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}
+        run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.server_kind }} ${{ matrix.version }}
       - name: Run non-enterprise tests
         if: ${{ matrix.server_kind == 'os' }}
         run: node node_modules/mocha/bin/mocha --recursive test/integration/backward_compatible
