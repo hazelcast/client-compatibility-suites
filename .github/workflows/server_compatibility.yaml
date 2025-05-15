@@ -147,7 +147,7 @@ jobs:
           hazelcast-version: ${{ github.event.inputs.hz_version }}
       - name: Set up enterprise license key
         run: |
-          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY] }}" >> ${GITHUB_ENV}
+          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
       - name: Checkout to scripts
         uses: actions/checkout@v4
       - name: Setup Python
@@ -253,7 +253,7 @@ jobs:
           hazelcast-version: ${{ github.event.inputs.hz_version }}
       - name: Set up enterprise license key
         run: |
-          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY] }}" >> ${GITHUB_ENV}
+          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
 
       - uses: actions/checkout@v4
       - name: Setup Python
@@ -370,7 +370,7 @@ jobs:
       - name: Set up enterprise license key
         shell: pwsh
         run: |
-          "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY] }}" >> $env:GITHUB_ENV
+          "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> $env:GITHUB_ENV
       - uses: actions/checkout@v4
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -591,7 +591,7 @@ jobs:
           hazelcast-version: ${{ github.event.inputs.hz_version }}
       - name: Set up enterprise license key
         run: |
-          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY] }}" >> ${GITHUB_ENV}
+          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
       - uses: actions/checkout@v4
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -715,7 +715,7 @@ jobs:
           hazelcast-version: ${{ github.event.inputs.hz_version }}
       - name: Set up enterprise license key
         run: |
-          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY] }}" >> ${GITHUB_ENV}
+          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
       - uses: actions/checkout@v4
       - name: Read Java Config
         run: cat ${{ github.workspace }}/.github/java-config.env >> $GITHUB_ENV
@@ -804,7 +804,7 @@ jobs:
           hazelcast-version: ${{ github.event.inputs.hz_version }}
       - name: Set up enterprise license key
         run: |
-          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY] }}" >> ${GITHUB_ENV}
+          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
       - uses: actions/checkout@v4
       - name: Read Java Config
         run: cat ${{ github.workspace }}/.github/java-config.env >> $GITHUB_ENV
@@ -888,7 +888,7 @@ jobs:
       - name: Set up HZ_LICENSEKEY env
         if: ${{ matrix.server_kind == 'enterprise' }}
         run: |
-          echo "HZ_LICENSEKEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY] }}" >> ${GITHUB_ENV}
+          echo "HZ_LICENSEKEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
 
       - name: Build modules
         shell: bash -l {0}

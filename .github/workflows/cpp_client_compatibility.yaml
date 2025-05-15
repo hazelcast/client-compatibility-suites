@@ -108,7 +108,7 @@ jobs:
       - name: Test
         env:
           BUILD_DIR: build
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY] }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
           GTEST_FILTER: -*Aws*:*DescribeInstancesTest*
           HZ_VERSION: ${{ matrix.version }}
         run: |

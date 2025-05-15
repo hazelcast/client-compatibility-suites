@@ -92,7 +92,7 @@ jobs:
           hazelcast-version: ${{ matrix.version }}
       - name: Start RC
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY] }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
         run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.kind }} --use-simple-server
       - name: Run non-enterprise tests
         if: ${{ matrix.kind == 'os' }}

@@ -81,7 +81,7 @@ jobs:
 
       - name: Test
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY] }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
           HZ_VERSION: ${{ matrix.version }}
           SSL_ENABLED: 1
         run: |

@@ -96,7 +96,7 @@ jobs:
       - name: Set up HZ_LICENSEKEY env
         if: ${{ matrix.server_kind == 'enterprise' }}
         run: |
-          echo "HZ_LICENSEKEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY] }}" >> ${GITHUB_ENV}
+          echo "HZ_LICENSEKEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
 
       - name: Build modules
         shell: bash -l {0}

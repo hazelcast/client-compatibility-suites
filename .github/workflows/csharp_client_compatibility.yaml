@@ -105,7 +105,7 @@ jobs:
         run: ./hz.ps1 -enterprise -noRestore -localRestore -server ${{ matrix.version }} test ${{ secrets.GH_PAT }}
         working-directory: client        
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY] }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
           HAZELCAST_SERVER_VERSION: ${{ matrix.version }}
 
           
