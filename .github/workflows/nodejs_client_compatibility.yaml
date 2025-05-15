@@ -98,8 +98,10 @@ jobs:
           cp -a $GITHUB_WORKSPACE/client/package.json $GITHUB_WORKSPACE/master/package.json
       - name: Start RC
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
-        run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.kind }}
+          HAZELCAST_ENTERPRISE_KEY_V5: ${{ secrets.HAZELCAST_ENTERPRISE_KEY_V5 }}
+          HAZELCAST_ENTERPRISE_KEY_V6: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+          HAZELCAST_ENTERPRISE_KEY_V7: ${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}
+        run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.kind }} --version ${{ matrix.version }}
       - name: Run non-enterprise tests
         if: ${{ matrix.kind == 'os' }}
         run: node node_modules/mocha/bin/mocha --recursive test/integration/backward_compatible
