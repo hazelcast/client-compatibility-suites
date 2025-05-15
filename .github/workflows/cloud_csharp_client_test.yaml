@@ -88,7 +88,7 @@ jobs:
           HZ_VERSION: ${{ github.event.inputs.hzVersion }}
           HZ_CLOUD_COORDINATOR_BASE_URL: ${{ github.event.inputs.base_url }}
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hzVersion }}
-          HAZELCAST_ENTERPRISE_KEY: ${{ steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
         run: |
           ./hz.ps1 -server ${{ github.event.inputs.hzVersion }} test -tf "test == /Hazelcast.Tests.Cloud.ServerlessCloudTests/" -enterprise ${{ secrets.GH_PAT }}
         working-directory: client
