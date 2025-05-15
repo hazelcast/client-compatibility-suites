@@ -74,7 +74,7 @@ jobs:
           sleep 30
         working-directory: HazelcastCloudTests/dotnethazelcastcloudtests
        
-      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license
+      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license@master
         id: get-enterprise-license
         with:
           hazelcast-version: ${{ github.event.inputs.hzVersion }}

@@ -88,7 +88,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license
+      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license@master
         id: get-enterprise-license
         with:
           hazelcast-version: ${{ matrix.version }}

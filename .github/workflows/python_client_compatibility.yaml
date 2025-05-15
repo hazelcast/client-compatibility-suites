@@ -86,7 +86,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-test.txt
         working-directory: master
-      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license
+      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license@master
         id: get-enterprise-license
         with:
           hazelcast-version: ${{ matrix.version }}

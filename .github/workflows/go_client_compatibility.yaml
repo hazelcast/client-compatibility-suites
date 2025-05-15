@@ -74,7 +74,7 @@ jobs:
         run: |
           cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/client/hazelcast-enterprise-${{ matrix.version }}-tests.jar
 
-      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license
+      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license@master
         id: get-enterprise-license
         with:
           hazelcast-version: ${{ matrix.version }}

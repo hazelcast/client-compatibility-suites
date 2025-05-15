@@ -141,7 +141,7 @@ jobs:
         server_kind: [ os, enterprise ]
     name: Test Python client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
-      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license
+      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license@master
         id: get-enterprise-license
         with:
           hazelcast-version: ${{ github.event.inputs.hz_version }}
@@ -247,7 +247,7 @@ jobs:
         server_kind: [ os, enterprise ]
     name: Test Node.js client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
-      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license
+      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license@master
         id: get-enterprise-license
         with:
           hazelcast-version: ${{ github.event.inputs.hz_version }}
@@ -363,7 +363,7 @@ jobs:
         server_kind: [ os, enterprise ]
     name: Test Csharp client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
-      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license
+      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license@master
         id: get-enterprise-license
         with:
           hazelcast-version: ${{ github.event.inputs.hz_version }}
@@ -585,7 +585,7 @@ jobs:
         server_kind: [ enterprise ] #TODO When tests are divided as OS, ENTERPRISE, OS matrix will be added
     name: Test CPP client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
-      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license
+      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license@master
         id: get-enterprise-license
         with:
           hazelcast-version: ${{ github.event.inputs.hz_version }}
@@ -709,7 +709,7 @@ jobs:
         
     name: Test Go client ${{ matrix.client_tag }} with enterprise server on ubuntu-latest
     steps:
-      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license
+      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license@master
         id: get-enterprise-license
         with:
           hazelcast-version: ${{ github.event.inputs.hz_version }}
@@ -798,7 +798,7 @@ jobs:
             tests_type: enterprise
     name: Test Java client (standalone) ${{ matrix.client_tag }} branch running ${{ matrix.tests_type }} tests against ${{ matrix.server_kind }} server
     steps:
-      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license
+      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license@master
         id: get-enterprise-license
         with:
           hazelcast-version: ${{ github.event.inputs.hz_version }}
