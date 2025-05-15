@@ -94,7 +94,7 @@ jobs:
           compare-to: 5.3.0
       - name: Start RC
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ '>' == steps.version.outputs.comparison-result && secrets.HAZELCAST_ENTERPRISE_KEY || secrets.HAZELCAST_ENTERPRISE_KEY_V5 }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ '>' == steps.version.outputs.comparison-result && secrets.HAZELCAST_ENTERPRISE_KEY_V7 || secrets.HAZELCAST_ENTERPRISE_KEY_V5 }}
         run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.kind }} --use-simple-server
       - name: Run non-enterprise tests
         if: ${{ matrix.kind == 'os' }}
