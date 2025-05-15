@@ -141,15 +141,15 @@ jobs:
         server_kind: [ os, enterprise ]
     name: Test Python client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
-      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license@master
+      - name: Checkout to scripts
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/get-enterprise-license
         id: get-enterprise-license
         with:
           hazelcast-version: ${{ github.event.inputs.hz_version }}
       - name: Set up enterprise license key
         run: |
           echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
-      - name: Checkout to scripts
-        uses: actions/checkout@v4
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -247,15 +247,14 @@ jobs:
         server_kind: [ os, enterprise ]
     name: Test Node.js client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
-      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license@master
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/get-enterprise-license
         id: get-enterprise-license
         with:
           hazelcast-version: ${{ github.event.inputs.hz_version }}
       - name: Set up enterprise license key
         run: |
           echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
-
-      - uses: actions/checkout@v4
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -363,7 +362,8 @@ jobs:
         server_kind: [ os, enterprise ]
     name: Test Csharp client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
-      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license@master
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/get-enterprise-license
         id: get-enterprise-license
         with:
           hazelcast-version: ${{ github.event.inputs.hz_version }}
@@ -371,7 +371,6 @@ jobs:
         shell: pwsh
         run: |
           "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> $env:GITHUB_ENV
-      - uses: actions/checkout@v4
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -585,14 +584,14 @@ jobs:
         server_kind: [ enterprise ] #TODO When tests are divided as OS, ENTERPRISE, OS matrix will be added
     name: Test CPP client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
-      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license@master
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/get-enterprise-license
         id: get-enterprise-license
         with:
           hazelcast-version: ${{ github.event.inputs.hz_version }}
       - name: Set up enterprise license key
         run: |
           echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
-      - uses: actions/checkout@v4
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -709,14 +708,14 @@ jobs:
         
     name: Test Go client ${{ matrix.client_tag }} with enterprise server on ubuntu-latest
     steps:
-      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license@master
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/get-enterprise-license
         id: get-enterprise-license
         with:
           hazelcast-version: ${{ github.event.inputs.hz_version }}
       - name: Set up enterprise license key
         run: |
           echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
-      - uses: actions/checkout@v4
       - name: Read Java Config
         run: cat ${{ github.workspace }}/.github/java-config.env >> $GITHUB_ENV
       - name: Setup Java
@@ -798,14 +797,14 @@ jobs:
             tests_type: enterprise
     name: Test Java client (standalone) ${{ matrix.client_tag }} branch running ${{ matrix.tests_type }} tests against ${{ matrix.server_kind }} server
     steps:
-      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license@master
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/get-enterprise-license
         id: get-enterprise-license
         with:
           hazelcast-version: ${{ github.event.inputs.hz_version }}
       - name: Set up enterprise license key
         run: |
           echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
-      - uses: actions/checkout@v4
       - name: Read Java Config
         run: cat ${{ github.workspace }}/.github/java-config.env >> $GITHUB_ENV
 

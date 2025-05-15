@@ -96,7 +96,7 @@ jobs:
           rm $GITHUB_WORKSPACE/master/package.json
           cp -a $GITHUB_WORKSPACE/client/lib $GITHUB_WORKSPACE/master/lib
           cp -a $GITHUB_WORKSPACE/client/package.json $GITHUB_WORKSPACE/master/package.json
-      - uses: hazelcast/client-compatibility-suites/.github/actions/get-enterprise-license@master
+      - uses: ./.github/actions/get-enterprise-license
         id: get-enterprise-license
         with:
           hazelcast-version: ${{ matrix.version }}
