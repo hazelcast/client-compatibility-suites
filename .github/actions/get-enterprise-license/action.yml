@@ -1,0 +1,44 @@
+name: Get the name/key of a secret to use to lookup an appropriate Hazelcast Enterprise license for a specified version
+inputs:
+  hazelcast-version:
+    description: Hazelcast version to get a license for
+    required: true
+outputs:
+  HAZELCAST_ENTERPRISE_KEY_SECRET:
+    value: ${{ steps.get-license.outputs.secret-key }}
+    description: The name of the secret key to use to lookup the license (not the license itself as not accessible to composite action)
+runs:
+  using: "composite"
+  steps:
+    # https://github.com/madhead/semver-utils/releases/tag/v4.3.0
+    - uses: madhead/semver-utils@36d1e0ed361bd7b4b77665de8093092eaeabe6ba
+      id: version-5-3
+      with:
+        version: ${{ inputs.hazelcast-version }}
+        compare-to: 5.3.0
+
+    # https://github.com/madhead/semver-utils/releases/tag/v4.3.0
+    - uses: madhead/semver-utils@36d1e0ed361bd7b4b77665de8093092eaeabe6ba
+      id: version-5-5
+      with:
+        version: ${{ inputs.hazelcast-version }}
+        compare-to: 5.5.0
+
+    - name: Determine best license version
+      shell: bash
+      id: get-license
+      run: |
+        # < 5.3           -> HAZELCAST_ENTERPRISE_KEY_V5
+        # >= 5.3 && < 5.5 -> HAZELCAST_ENTERPRISE_KEY
+        # >= 5.5          -> HAZELCAST_ENTERPRISE_KEY_V7
+
+        if [[ "${{ steps.version-5-3.outputs.comparison-result }}" = "<" ]]; then
+          echo "::debug::< 5.3"
+          echo "secret-key=HAZELCAST_ENTERPRISE_KEY_V5" >> ${GITHUB_OUTPUT}
+        elif [[ "${{ steps.version-5-5.outputs.comparison-result }}" == "<" ]]; then
+          echo "::debug::>= 5.3 && < 5.5"
+          echo "secret-key=HAZELCAST_ENTERPRISE_KEY" >> ${GITHUB_OUTPUT}
+        else
+          echo "::debug::>= 5.5"
+          echo "secret-key=HAZELCAST_ENTERPRISE_KEY_V7" >> ${GITHUB_OUTPUT}
+        fi
