@@ -1,4 +1,4 @@
-name: Get an the key of a secret for a appropriate Hazelcast Enterprise license for specified version
+name: Get the name/key of a secret to use to lookup an appropriate Hazelcast Enterprise license for a specified version
 inputs:
   hazelcast-version:
     description: Hazelcast version to get a license for
