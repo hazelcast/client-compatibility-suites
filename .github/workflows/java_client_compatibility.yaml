@@ -33,13 +33,28 @@ jobs:
 
   test_client:
     needs: [setup_server_matrix]
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         server-version: ${{ fromJson(needs.setup_server_matrix.outputs.matrix) }}
         kind: [ os, enterprise ]
-    name: Test Java client ${{ github.event.inputs.branch_name }} branch against ${{ matrix.kind }} ${{ matrix.server-version }} server
+        os: [ ubuntu-latest ]
+        java: [ { version: 17, distribution: corretto },
+                { version: 21, distribution: corretto },
+                { version: 17, distribution: zulu },
+                { version: 21, distribution: zulu },
+                { version: 17, distribution: semeru },
+                { version: 21, distribution: semeru },
+                { version: 17, distribution: oracle },
+                { version: 21, distribution: oracle },
+                { version: 17, distribution: microsoft },
+                { version: 21, distribution: microsoft },
+                { version: 17, distribution: adopt-openj9 },
+                { version: 21, distribution: adopt-openj9 }
+        ]
+
+    name: Test Java client ${{ github.event.inputs.branch_name }} branch against ${{ matrix.kind }} ${{ matrix.server-version }} server on ${{ matrix.os }} and JVM ${{ matrix.java.version }} ${{ matrix.java.distribution }}
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v4
@@ -47,8 +62,8 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-version: ${{ matrix.java.version }}
+          distribution: ${{ matrix.java.distribution }}
 
       - name: Checkout to ${{ github.event.inputs.branch_name }}
         uses: actions/checkout@v4
