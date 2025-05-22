@@ -6,10 +6,6 @@ on:
         description: Default is hazelcast, but if you would like to run the workflow with your forked repo, set your github username
         required: true
         default: hazelcast
-      java_client_run:
-        description: JAVA = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
-        required: true
-        default: master
       python_run:
         description: PYTHON = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
         required: true
@@ -32,46 +28,6 @@ on:
         default: master
 
 jobs:
-  create-java-image:
-   runs-on: ubuntu-latest
-   if: ${{ github.event.inputs.java_client_run != 'no' }}
-   steps:
-      - name: "Setup JRE"
-        uses: "actions/setup-java@v2"
-        with:
-          distribution: "zulu"
-          java-version: "17"
-
-      - name: Checkout
-        uses: actions/checkout@v4
-        
-      - name: Checkout the client repo
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ github.event.inputs.organization_name }}/hazelcast-java-client
-          path: KubernetesInternalClients/java/clientSourceCode
-          ref: ${{ github.event.inputs.java_client_run }}
-          token: ${{ secrets.GH_PAT }}
-          
-      - name: "Build OS"
-        working-directory: KubernetesInternalClients/java/clientSourceCode
-        run: |
-          chmod +x mvnw
-          HAZELCAST_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          echo "HAZELCAST_VERSION=${HAZELCAST_VERSION}" >> $GITHUB_ENV
-          ./mvnw -B -V -e clean install -DskipTests
-    
-      - name: Build client application
-        working-directory: KubernetesInternalClients/java
-        run: |
-            sed -i "s/java-client-version/$HAZELCAST_VERSION/g" pom.xml
-            mvn clean install -DskipTests
-            docker build -t hazelcast-java-client:test .
-    
-      - name: Upload image
-        uses: ishworkh/docker-image-artifact-upload@v1
-        with:
-         image: "hazelcast-java-client:test"
 
   create-csharp-image:
    runs-on: ubuntu-latest
@@ -209,7 +165,7 @@ jobs:
          
   wait-for-images:
     name: Waits for image creation and create json for which clients run
-    needs: [create-python-image, create-nodejs-image, create-go-image, create-csharp-image, create-cpp-image, create-java-image]
+    needs: [create-python-image, create-nodejs-image, create-go-image, create-csharp-image, create-cpp-image]
     if: always()
     runs-on: ubuntu-latest
     outputs:
@@ -222,7 +178,6 @@ jobs:
     - name: Set which client will be run
       id: set-matrix
       run: echo "::set-output name=matrix::$( python set_which_client_run.py
-       --java ${{ github.event.inputs.java_client_run }} 
        --nodejs ${{ github.event.inputs.nodejs_run }}
        --go ${{ github.event.inputs.go_run }}
        --cpp ${{ github.event.inputs.cpp_run }}
@@ -315,14 +270,7 @@ jobs:
             kubectl logs --tail=20 hazelcast-${{ matrix.client-language }}-client >> output-${{ matrix.client-language }}-deletepods.txt
             cat output-${{ matrix.client-language }}-deletepods.txt
             if [ $(grep -o 'Current map size:' output-${{ matrix.client-language }}-deletepods.txt | wc -l) != $"20" ]; then exit 1; fi
-            kubectl cp hazelcast-java-client:/log/hazelcast.log hazelcast.log
-
-      - name: Upload hazelcast logs
-        uses: actions/upload-artifact@v4
-        with: 
-          name: hazelcast.log
-          path: hazelcast.log
-
+            
       - name: Logs
         if: always()
         run: |
