@@ -37,13 +37,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        server_version: ${{ fromJson(needs.setup_server_matrix.outputs.matrix) }}
-        server_kind: [ os, enterprise ]
-        tests_type: [ os, enterprise ]
-        exclude:
-          - server_kind: os
-            tests_type: enterprise
-    name: Test Java client ${{ github.event.inputs.branch_name }} branch running ${{ matrix.tests_type }} tests against ${{ matrix.server_kind }} ${{ matrix.server_version }} server
+        server-version: ${{ fromJson(needs.setup_server_matrix.outputs.matrix) }}
+        kind: [ os, enterprise ]
+    name: Test Java client ${{ github.event.inputs.branch_name }} branch against ${{ matrix.kind }} ${{ matrix.server-version }} server
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v4
@@ -77,41 +73,25 @@ jobs:
         uses: madhead/semver-utils@latest
         id: version
         with:
-          version: ${{ matrix.server_version }}
+          version: ${{ matrix.server-version }}
           compare-to: 5.3.0
 
       - name: Set up HZ_LICENSEKEY env
-        if: ${{ matrix.server_kind == 'enterprise' }}
+        if: ${{ matrix.kind == 'enterprise' }}
         run: |
           echo "HZ_LICENSEKEY=${{ '>' == steps.version.outputs.comparison-result && secrets.HAZELCAST_ENTERPRISE_KEY || secrets.HAZELCAST_ENTERPRISE_KEY_V5 }}" >> $GITHUB_ENV
 
-      - name: Build modules
-        shell: bash -l {0}
-        run: |
-          chmod +x mvnw
-          ./mvnw -B -V -e clean install -DskipTests
-        working-directory: client
-
       - name: Run non-enterprise tests
-        if: ${{ matrix.tests_type == 'os' }}
         shell: bash -l {0}
         run: |
           chmod +x mvnw
-          ./mvnw -B -V -e test -Pintegration-tests -Pcode-coverage -Djdk.version=${{ env.JAVA_VERSION }} -Dtest.hazelcast-server.version=${{ matrix.server_version }}
+          ./mvnw -B -V -e install -Pintegration-tests -Pcode-coverage -Djdk.version=${{ env.JAVA_VERSION }} -Dtest.hazelcast-server.version=${{ matrix.server-version }}
         working-directory: client/hazelcast-java-client
 
-      - name: Run enterprise Vector tests
-        if: ${{ matrix.server_kind == 'enterprise' && matrix.tests_type == 'enterprise' }}
-        shell: bash -l {0}
-        run: |
-          chmod +x mvnw
-          ./mvnw -B -V -e test -Pintegration-tests -Pcode-coverage -Djdk.version=${{ env.JAVA_VERSION }} -Dtest.hazelcast-server.version=${{ matrix.server_version }}
-        working-directory: client/hazelcast-enterprise-java-client-vector
-
       - name: Run enterprise tests
-        if: ${{ matrix.server_kind == 'enterprise' && matrix.tests_type == 'enterprise' }}
+        if: ${{ matrix.kind == 'enterprise' }}
         shell: bash -l {0}
         run: |
           chmod +x mvnw
-          ./mvnw -B -V -e test -Pintegration-tests -Pcode-coverage -Djdk.version=${{ env.JAVA_VERSION }} -Dtest.hazelcast-server.version=${{ matrix.server_version }}
+          ./mvnw -B -V -e test -Pintegration-tests -Pcode-coverage -Djdk.version=${{ env.JAVA_VERSION }} -Dtest.hazelcast-server.version=${{ matrix.server-version }}
         working-directory: client/hazelcast-enterprise-java-client
