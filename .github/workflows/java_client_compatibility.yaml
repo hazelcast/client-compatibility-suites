@@ -44,9 +44,6 @@ jobs:
       - name: Checkout to scripts
         uses: actions/checkout@v4
 
-      - name: Read Java Config
-        run: cat ${{ github.workspace }}/master/.github/java-config.env >> $GITHUB_ENV
-
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
