@@ -8,11 +8,6 @@ def parse_arg() -> argparse.Namespace:
     )
 
     parser.add_argument(
-        "--java",
-        dest="java",
-        type=str,
-    )
-    parser.add_argument(
         "--csharp",
         dest="csharp",
         type=str,
@@ -43,8 +38,6 @@ def parse_arg() -> argparse.Namespace:
 if __name__ == "__main__":
     args = parse_arg()
     options = []
-    if args.java != "no":
-        options.append("java")
     if args.csharp != "no":
         options.append("csharp")
     if args.go != "no":

@@ -72,7 +72,6 @@ class ClientKind(Enum):
     PY = "Python"
     NODE = "NodeJS"
     GO = "Go"
-    JAVA = "Java"
 
 
 class MatrixOptionKind(Enum):
