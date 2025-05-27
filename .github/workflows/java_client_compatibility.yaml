@@ -88,17 +88,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Check Server Version to Determine License Version
-        uses: madhead/semver-utils@latest
-        id: version
+      - uses: ./.github/actions/get-enterprise-license
+        id: get-enterprise-license
         with:
-          version: ${{ matrix.server_version }}
-          compare-to: 5.3.0
+          hazelcast-version: ${{ matrix.version }}
 
       - name: Set up HZ_LICENSEKEY env
         if: ${{ matrix.server_kind == 'enterprise' }}
         run: |
-          echo "HZ_LICENSEKEY=${{ '>' == steps.version.outputs.comparison-result && secrets.HAZELCAST_ENTERPRISE_KEY || secrets.HAZELCAST_ENTERPRISE_KEY_V5 }}" >> $GITHUB_ENV
+          echo "HZ_LICENSEKEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
 
       - name: Build modules
         shell: bash -l {0}
