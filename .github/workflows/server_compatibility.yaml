@@ -131,16 +131,15 @@ jobs:
         server_kind: [ os, enterprise ]
     name: Test Python client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
-      - name: Set up enterprise license key
-        if: ${{ github.event.inputs.hz_version < '5.5' }}
-        run: |
-          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY }}" >> $GITHUB_ENV
-      - name: Set up enterprise v7 license key
-        if: ${{ github.event.inputs.hz_version >= '5.5' }}
-        run: |
-          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}" >> $GITHUB_ENV
       - name: Checkout to scripts
         uses: actions/checkout@v4
+      - uses: ./.github/actions/get-enterprise-license
+        id: get-enterprise-license
+        with:
+          hazelcast-version: ${{ github.event.inputs.hz_version }}
+      - name: Set up enterprise license key
+        run: |
+          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -203,8 +202,6 @@ jobs:
           name: hazelcast-enterprise-tests
           path: jars
       - name: Start RC
-        env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ env.HAZELCAST_ENTERPRISE_KEY }}
         run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.server_kind }} --use-simple-server
       - name: Run non-enterprise tests
         if: ${{ matrix.server_kind == 'os' }}
@@ -240,15 +237,14 @@ jobs:
         server_kind: [ os, enterprise ]
     name: Test Node.js client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
-      - name: Set up enterprise license key
-        if: ${{ github.event.inputs.hz_version < '5.5' }}
-        run: |
-          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY }}" >> $GITHUB_ENV
-      - name: Set up enterprise v7 license key
-        if: ${{ github.event.inputs.hz_version >= '5.5' }}
-        run: |
-          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}" >> $GITHUB_ENV
       - uses: actions/checkout@v4
+      - uses: ./.github/actions/get-enterprise-license
+        id: get-enterprise-license
+        with:
+          hazelcast-version: ${{ github.event.inputs.hz_version }}
+      - name: Set up enterprise license key
+        run: |
+          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -321,8 +317,6 @@ jobs:
           name: hazelcast-enterprise-tests
           path: jars
       - name: Start RC
-        env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ env.HAZELCAST_ENTERPRISE_KEY }}
         run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.server_kind }}
       - name: Run non-enterprise tests
         if: ${{ matrix.server_kind == 'os' }}
@@ -332,8 +326,6 @@ jobs:
         if: ${{ matrix.server_kind == 'enterprise' }}
         run: node node_modules/mocha/bin/mocha --recursive test/integration/backward_compatible
         working-directory: master
-        env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ env.HAZELCAST_ENTERPRISE_KEY }}
   setup_csharp_client_matrix:
     name: Setup the Csharp client test matrix
     if: ${{ github.event.inputs.run_csharp == 'run' }}
@@ -360,17 +352,15 @@ jobs:
         server_kind: [ os, enterprise ]
     name: Test Csharp client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/get-enterprise-license
+        id: get-enterprise-license
+        with:
+          hazelcast-version: ${{ github.event.inputs.hz_version }}
       - name: Set up enterprise license key
         shell: pwsh
-        if: ${{ github.event.inputs.hz_version < '5.5' }}
         run: |
-          "HAZELCAST_ENTERPRISE_KEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY }}" >> $env:GITHUB_ENV
-      - name: Set up enterprise v7 license key
-        shell: pwsh
-        if: ${{ github.event.inputs.hz_version >= '5.5' }}
-        run: |
-          "HAZELCAST_ENTERPRISE_KEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}" >> $env:GITHUB_ENV
-      - uses: actions/checkout@v4
+          "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> $env:GITHUB_ENV
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -461,16 +451,15 @@ jobs:
           $client = "${{matrix.client_tag}}".replace("v","")
           "CLIENT_VERSION=$client" >> $env:GITHUB_ENV
 
-      - uses: madhead/semver-utils@latest
-        id: version
+      # https://github.com/madhead/semver-utils/releases/tag/v4.3.0
+      - uses: madhead/semver-utils@36d1e0ed361bd7b4b77665de8093092eaeabe6ba
+        id: client-version
         with:
           version: ${{ env.CLIENT_VERSION }}
-          compare-to: 5.2.x
-          satisfies: x
       
       - name: Client Version
         run: |
-          echo "${{steps.version.outputs.major}}.${{steps.version.outputs.minor }}.${{steps.version.outputs.patch }}"
+          echo "${{steps.client-version.outputs.major}}.${{steps.client-version.outputs.minor }}.${{steps.client-version.outputs.patch }}"
 
       - name: Copy latest build scripts to local workspace
         shell: pwsh
@@ -482,7 +471,7 @@ jobs:
 
       - name: Backport SSL Tests
         id: backport-tests
-        if: ${{  ((steps.version.outputs.major == '5' && steps.version.outputs.minor < '3') || (steps.version.outputs.major == '4')) }}
+        if: ${{  ((steps.client-version.outputs.major == '5' && steps.client-version.outputs.minor < '3') || (steps.client-version.outputs.major == '4')) }}
         shell: pwsh
         working-directory: tag
         run: |
@@ -490,7 +479,7 @@ jobs:
 
       - name: Upgrade NUnit Adapter in Testing if Client v5.2.2 or v5.3.1
         id: upgrade-nunit-adapter
-        if: ${{  ((steps.version.outputs.major == '5' && steps.version.outputs.minor == '3' &&  steps.version.outputs.patch == '1') || (steps.version.outputs.major == '5' && steps.version.outputs.minor == '2' &&  steps.version.outputs.patch == '2')) }}
+        if: ${{  ((steps.client-version.outputs.major == '5' && steps.client-version.outputs.minor == '3' &&  steps.client-version.outputs.patch == '1') || (steps.client-version.outputs.major == '5' && steps.client-version.outputs.minor == '2' &&  steps.client-version.outputs.patch == '2')) }}
         working-directory: tag
         run: |
           sed -i 's/<PackageReference Include="NUnit3TestAdapter" Version="4.3.1">/<PackageReference Include="NUnit3TestAdapter" Version="4.5.0">/g' src/Hazelcast.Net.Tests/Hazelcast.Net.Tests.csproj
@@ -502,7 +491,7 @@ jobs:
           ./hz.ps1 clean, build
 
       - name: Build Client 4.0.2 with compatibility
-        if: ${{ steps.version.outputs.major == '4' && steps.version.outputs.minor == '0'  }}
+        if: ${{ steps.client-version.outputs.major == '4' && steps.client-version.outputs.minor == '0'  }}
         shell: pwsh
         working-directory: tag 
         run: |
@@ -537,7 +526,6 @@ jobs:
            ./hz.ps1 -enterprise -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
         working-directory: tag
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ env.HAZELCAST_ENTERPRISE_KEY }}
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}
           HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
           HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
@@ -549,7 +537,6 @@ jobs:
            ./hz.ps1 -enterprise -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
         working-directory: tag
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ env.HAZELCAST_ENTERPRISE_KEY }}
           HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }} 
           HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
           HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
@@ -587,15 +574,14 @@ jobs:
         server_kind: [ enterprise ] #TODO When tests are divided as OS, ENTERPRISE, OS matrix will be added
     name: Test CPP client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
-      - name: Set up enterprise license key
-        if: ${{ github.event.inputs.hz_version < '5.5' }}
-        run: |
-          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY }}" >> $GITHUB_ENV
-      - name: Set up enterprise v7 license key
-        if: ${{ github.event.inputs.hz_version >= '5.5' }}
-        run: |
-          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}" >> $GITHUB_ENV
       - uses: actions/checkout@v4
+      - uses: ./.github/actions/get-enterprise-license
+        id: get-enterprise-license
+        with:
+          hazelcast-version: ${{ github.event.inputs.hz_version }}
+      - name: Set up enterprise license key
+        run: |
+          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -678,7 +664,6 @@ jobs:
       - name: Test
         env:
           BUILD_DIR: build
-          HAZELCAST_ENTERPRISE_KEY: ${{ env.HAZELCAST_ENTERPRISE_KEY }}
           GTEST_FILTER: -*Aws*:*DescribeInstancesTest*
           HZ_VERSION: '${{ github.event.inputs.hz_version }}-SNAPSHOT'
         run: |
@@ -713,15 +698,14 @@ jobs:
         
     name: Test Go client ${{ matrix.client_tag }} with enterprise server on ubuntu-latest
     steps:
-      - name: Set up enterprise license key
-        if: ${{ github.event.inputs.hz_version < '5.5' }}
-        run: |
-          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY }}" >> $GITHUB_ENV
-      - name: Set up enterprise v7 license key
-        if: ${{ github.event.inputs.hz_version >= '5.5' }}
-        run: |
-          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets.HAZELCAST_ENTERPRISE_KEY_V7 }}" >> $GITHUB_ENV
       - uses: actions/checkout@v4
+      - uses: ./.github/actions/get-enterprise-license
+        id: get-enterprise-license
+        with:
+          hazelcast-version: ${{ github.event.inputs.hz_version }}
+      - name: Set up enterprise license key
+        run: |
+          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
       - name: Read Java Config
         run: cat ${{ github.workspace }}/.github/java-config.env >> $GITHUB_ENV
       - name: Setup Java
@@ -766,7 +750,6 @@ jobs:
           
       - name: Test
         env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ env.HAZELCAST_ENTERPRISE_KEY }}
           HZ_VERSION: '${{ github.event.inputs.hz_version }}-SNAPSHOT'
           SSL_ENABLED: 1
         run: |
