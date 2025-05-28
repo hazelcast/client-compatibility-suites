@@ -29,7 +29,7 @@ jobs:
 
       - name: Set server matrix
         id: set-matrix
-        run: echo "::set-output name=matrix::$( python get_server_matrix.py )"
+        run: echo "{name}={matrix::$( python get_server_matrix.py )}" >> $GITHUB_OUTPUT
 
   test_client:
     needs: [setup_server_matrix]
