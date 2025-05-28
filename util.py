@@ -44,8 +44,8 @@ TAG_ATTRIBUTE = "Github"
 IMDG_CLIENTS = (
     "https://raw.githubusercontent.com/hazelcast/rel-scripts/master/imdg-clients.txt"
 )
-IMDG_SERVERS = "https://raw.githubusercontent.com/hazelcast/rel-scripts/master/imdg-open-source.txt"
-HAZELCAST_SERVERS = "https://raw.githubusercontent.com/hazelcast/rel-scripts/master/hazelcast-open-source.txt"
+IMDG_SERVERS = "https://raw.githubusercontent.com/hazelcast/rel-scripts/master/imdg-enterprise.txt"
+HAZELCAST_SERVERS = "https://raw.githubusercontent.com/hazelcast/rel-scripts/master/hazelcast-enterprise.txt"
 
 CLIENT_HEADER = "======= %s Client\n---\n(.*?)\n---\n==="
 
@@ -146,11 +146,15 @@ class MajorVersionFilter(ReleaseFilter):
     def filter(self, release: Release) -> bool:
         return release.version.major in self._versions
 
+    def __repr__(self) -> str:
+        return "MajorVersionFilter(versions=%s)" % self._versions
 
 class StableReleaseFilter(ReleaseFilter):
     def filter(self, release: Release) -> bool:
         return release.version.stable
-    
+
+    def __repr__(self) -> str:
+        return "StableReleaseFilter()"
 
 class SupportedReleaseFilter(ReleaseFilter):
     def __init__(self, unsupported_versions: List[Version]):
@@ -163,6 +167,8 @@ class SupportedReleaseFilter(ReleaseFilter):
                 return False
         return True
 
+    def __repr__(self) -> str:
+        return "SupportedReleaseFilter(unsupported_versions=%s)" % self._unsupported_versions
 
 class AbstractReleaseParser(ABC):
     def __init__(self, filters: List[ReleaseFilter]):
