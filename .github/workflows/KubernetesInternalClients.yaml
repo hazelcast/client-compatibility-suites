@@ -184,7 +184,7 @@ jobs:
       - name: Upload image
         uses: ishworkh/container-image-artifact-upload@v2.0.0
         with:
-          image: "hazelcast-cpp-client:test"
+         image: "hazelcast-cpp-client:test"
          
   create-go-image:
    runs-on: ubuntu-latest
