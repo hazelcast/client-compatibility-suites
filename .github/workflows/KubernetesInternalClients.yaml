@@ -182,9 +182,9 @@ jobs:
           docker build -t hazelcast-cpp-client:test KubernetesInternalClients/cpp
           
       - name: Upload image
-        uses: ishworkh/docker-image-artifact-upload@v1
+        uses: ishworkh/container-image-artifact-upload@v2.0.0
         with:
-         image: "hazelcast-cpp-client:test"
+          image: "hazelcast-cpp-client:test"
          
   create-go-image:
    runs-on: ubuntu-latest
