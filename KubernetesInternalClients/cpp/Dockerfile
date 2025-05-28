@@ -1,4 +1,4 @@
-FROM fedora:22
+FROM fedora:34
 
 RUN dnf groups install -y "Development Tools"
 RUN dnf install -y gcc-c++ tar wget bzip2 unzip cmake which
