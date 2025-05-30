@@ -35,16 +35,10 @@ on:
         description: Whether or not to run Go client tests (not supported client). Set to "run" to run the tests. 
         required: true
         default: dontrun
-      run_java:
-        description: Whether or not to run Java Thin client tests. Set to something else to not run the tests.
-        required: true
-        default: run
 jobs:
   upload_jars:
     name: Create and upload JARs
     runs-on: ubuntu-latest
-    outputs:
-      hz_server_version: ${{ steps.set_up_hz_server_version.outputs.HAZELCAST_SERVER_VERSION }}
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v4
@@ -71,11 +65,7 @@ jobs:
           path: hazelcast-mono
           ref: ${{ github.event.inputs.branch_name }}
           token: ${{ secrets.GH_PAT }}
-      - name: Set up HAZELCAST_SERVER_VERSION output variable
-        id: set_up_hz_server_version
-        run: echo "HAZELCAST_SERVER_VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )" >> "$GITHUB_OUTPUT"
-        working-directory: hazelcast-mono
-      - name: Build JARs Hazelcast Server Version ${{ steps.set_up_hz_server_version.outputs.HAZELCAST_SERVER_VERSION }}
+      - name: Build JARs
         run: ./mvnw clean install --activate-profiles quick
         working-directory: hazelcast-mono
       - name: Upload Hazelcast JAR
@@ -766,156 +756,3 @@ jobs:
           ./rc.sh start
           make test-all
         working-directory: client
-  setup_java_client_matrix:
-    name: Setup the Java Thin client test matrix
-    if: ${{ github.event.inputs.run_java == 'run' }}
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    steps:
-      - name: Setup Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-      - name: Checkout to scripts
-        uses: actions/checkout@v4
-      - name: Set client matrix
-        id: set-matrix
-        #run: echo "matrix=$( python get_client_matrix.py --client java --option tag --use-latest-patch-versions )" >> "$GITHUB_OUTPUT"
-        run: echo 'matrix=["v5.5.0"]' >> "$GITHUB_OUTPUT"
-  test_java_client:
-    needs: [ upload_jars, setup_java_client_matrix ]
-    runs-on: ubicloud-standard-8
-    strategy:
-      fail-fast: false
-      matrix:
-        client_tag: ${{ fromJson(needs.setup_java_client_matrix.outputs.matrix) }}
-        server_kind: [ os, enterprise ]
-        tests_type: [ os, enterprise ]
-        exclude:
-          - server_kind: os
-            tests_type: enterprise
-    name: Test Java client (standalone) ${{ matrix.client_tag }} branch running ${{ matrix.tests_type }} tests against ${{ matrix.server_kind }} server
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/get-enterprise-license
-        id: get-enterprise-license
-        with:
-          hazelcast-version: ${{ github.event.inputs.hz_version }}
-      - name: Set up enterprise license key
-        run: |
-          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
-      - name: Read Java Config
-        run: cat ${{ github.workspace }}/.github/java-config.env >> $GITHUB_ENV
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
-
-      - name: Checkout to ${{ matrix.client_tag }}
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ github.event.inputs.organization_name }}/hazelcast-java-client
-          token: ${{ secrets.GH_PAT }}
-          path: java-client
-          ref: ${{ matrix.client_tag }}
-
-      - name: Setup Local Maven Cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
-      - name: Remove ${{ needs.upload_jars.outputs.hz_server_version }} dir from Local Maven Cache
-        run: |
-          rm -rf ~/.m2/repository/com/hazelcast/hazelcast/${{ needs.upload_jars.outputs.hz_server_version }}
-          rm -rf ~/.m2/repository/com/hazelcast/hazelcast-enterprise/${{ needs.upload_jars.outputs.hz_server_version }}
-
-      - name: Download Hazelcast JAR
-        uses: actions/download-artifact@v4
-        with:
-          name: hazelcast
-          path: hazelcast-server-jars
-
-      - name: Download Hazelcast tests JAR
-        uses: actions/download-artifact@v4
-        with:
-          name: hazelcast-tests
-          path: hazelcast-server-jars
-
-      - name: Download Hazelcast Enterprise JAR
-        uses: actions/download-artifact@v4
-        with:
-          name: hazelcast-enterprise
-          path: hazelcast-server-jars
-
-      - name: Install Hazelcast JAR to maven local
-        run: |
-          mvn -B install:install-file\
-           -Dfile=hazelcast-server-jars/hazelcast-${{ needs.upload_jars.outputs.hz_server_version }}.jar\
-           -DgroupId=com.hazelcast\
-           -DartifactId=hazelcast\
-           -Dversion=${{ needs.upload_jars.outputs.hz_server_version }}\
-           -Dpackaging=jar\
-           -DgeneratePom=true
-
-      - name: Install Hazelcast tests JAR to maven local
-        run: |
-          mvn -B install:install-file\
-           -Dfile=hazelcast-server-jars/hazelcast-${{ needs.upload_jars.outputs.hz_server_version }}-tests.jar\
-           -DgroupId=com.hazelcast\
-           -DartifactId=hazelcast\
-           -Dversion=${{ needs.upload_jars.outputs.hz_server_version }}\
-           -Dclassifier=tests\
-           -Dpackaging=jar\
-           -DgeneratePom=true
-
-      - name: Install Hazelcast Enterprise JAR to maven local
-        run: |
-          mvn -B install:install-file\
-           -Dfile=hazelcast-server-jars/hazelcast-enterprise-${{ needs.upload_jars.outputs.hz_server_version }}.jar\
-           -DgroupId=com.hazelcast\
-           -DartifactId=hazelcast-enterprise\
-           -Dversion=${{ needs.upload_jars.outputs.hz_server_version }}\
-           -Dpackaging=jar\
-           -DgeneratePom=true
-
-      - name: Set up HZ_LICENSEKEY env
-        if: ${{ matrix.server_kind == 'enterprise' }}
-        run: |
-          echo "HZ_LICENSEKEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
-
-      - name: Build modules
-        shell: bash -l {0}
-        run: |
-          chmod +x mvnw
-          ./mvnw -B -V -e clean install -DskipTests
-        working-directory: client
-
-      - name: Run non-enterprise tests
-        if: ${{ matrix.tests_type == 'os' }}
-        shell: bash -l {0}
-        run: |
-          chmod +x mvnw
-          ./mvnw -B -V -e test -Pintegration-tests -Pcode-coverage -Djdk.version=${{ env.JAVA_VERSION }} -Dtest.hazelcast-server.version=${{ needs.upload_jars.outputs.hz_server_version }}
-        working-directory: java-client/hazelcast-java-client
-
-      - name: Run enterprise Vector tests
-        if: ${{ matrix.server_kind == 'enterprise' && matrix.tests_type == 'enterprise' }}
-        shell: bash -l {0}
-        run: |
-          chmod +x mvnw
-          ./mvnw -B -V -e test -Pintegration-tests -Pcode-coverage -Djdk.version=${{ env.JAVA_VERSION }} -Dtest.hazelcast-server.version=${{ needs.upload_jars.outputs.hz_server_version }}
-        working-directory: client/hazelcast-enterprise-java-client-vector
-
-      - name: Run enterprise tests
-        if: ${{ matrix.server_kind == 'enterprise' && matrix.tests_type == 'enterprise' }}
-        shell: bash -l {0}
-        run: |
-          chmod +x mvnw
-          ./mvnw -B -V -e test -Pintegration-tests -Pcode-coverage -Djdk.version=${{ env.JAVA_VERSION }} -Dtest.hazelcast-server.version=${{ needs.upload_jars.outputs.hz_server_version }}
-        working-directory: java-client/hazelcast-enterprise-java-client
