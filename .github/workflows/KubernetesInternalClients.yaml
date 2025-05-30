@@ -28,7 +28,6 @@ on:
         default: master
 
 jobs:
-
   create-csharp-image:
    runs-on: ubuntu-latest
    if: ${{ github.event.inputs.csharp_run != 'no' }}
@@ -63,7 +62,7 @@ jobs:
           docker build -t hazelcast-csharp-client:test KubernetesInternalClients/csharp
           
       - name: Upload image
-        uses: ishworkh/docker-image-artifact-upload@v1
+        uses: ishworkh/container-image-artifact-upload@v2.0.0
         with:
          image: "hazelcast-csharp-client:test"
          
@@ -86,7 +85,7 @@ jobs:
           docker build -t hazelcast-python-client:test KubernetesInternalClients/python
           
       - name: Upload image
-        uses: ishworkh/docker-image-artifact-upload@v1
+        uses: ishworkh/container-image-artifact-upload@v2.0.0
         with:
          image: "hazelcast-python-client:test"
          
@@ -115,7 +114,7 @@ jobs:
           docker build -t hazelcast-nodejs-client:test KubernetesInternalClients/nodejs
           
       - name: Upload image
-        uses: ishworkh/docker-image-artifact-upload@v1
+        uses: ishworkh/container-image-artifact-upload@v2.0.0
         with:
          image: "hazelcast-nodejs-client:test"
          
@@ -138,7 +137,7 @@ jobs:
           docker build -t hazelcast-cpp-client:test KubernetesInternalClients/cpp
           
       - name: Upload image
-        uses: ishworkh/docker-image-artifact-upload@v1
+        uses: ishworkh/container-image-artifact-upload@v2.0.0
         with:
          image: "hazelcast-cpp-client:test"
          
@@ -159,7 +158,7 @@ jobs:
           docker build -t hazelcast-go-client:test KubernetesInternalClients/go
           
       - name: Upload image
-        uses: ishworkh/docker-image-artifact-upload@v1
+        uses: ishworkh/container-image-artifact-upload@v2.0.0
         with:
          image: "hazelcast-go-client:test"
          
@@ -214,7 +213,7 @@ jobs:
           kubectl wait --for=condition=ready pod/hz-hazelcast-2 --timeout=180s
           
       - name: Download image
-        uses: ishworkh/docker-image-artifact-download@v1
+        uses: ishworkh/container-image-artifact-download@v2.0.0
         with:
          image: "hazelcast-${{ matrix.client-language }}-client:test"
           
