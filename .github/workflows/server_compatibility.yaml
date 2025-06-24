@@ -78,11 +78,11 @@ jobs:
 
       - name: ls
         shell: bash
-        run: ls ${{ github.workspace }}
+        run: ls .
 
       - name: ls
         shell: bash
-        run: ls ${{ github.workspace }}/.github
+        run: ls ./.github
 
       - name: Read Java Config
         shell: bash
