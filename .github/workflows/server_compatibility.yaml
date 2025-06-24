@@ -76,6 +76,14 @@ jobs:
         with:
           python-version: 3.9
 
+      - name: ls
+        shell: bash
+        run: ls ${{ github.workspace }}
+
+      - name: ls
+        shell: bash
+        run: ls ${{ github.workspace }}/.github
+
       - name: Read Java Config
         shell: bash
         run: cat ${{ github.workspace }}/.github/java-config.env >> $GITHUB_ENV
