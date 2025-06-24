@@ -59,14 +59,16 @@ jobs:
             6.0.x
 
       - name: Read Java Config
-        shell: bash
-        run: cat ${{ github.workspace }}/.github/java-config.env >> $GITHUB_ENV
+        uses: pietrobolcato/action-read-yaml@9f13718d61111b69f30ab4ac683e67a56d254e1d
+        id: java-config
+        with:
+          config: ${{ github.workspace }}/.github/java-config.yml
 
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-version: ${{ steps.java-config.outputs['java-version'] }}
+          distribution: ${{ steps.java-config.outputs['distribution'] }}
 
       - name: Checkout to ${{ github.event.inputs.branch_name }}
         uses: actions/checkout@v4
