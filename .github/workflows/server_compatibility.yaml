@@ -145,7 +145,7 @@ jobs:
         with:
           python-version: 3.9
       - name: Read Java Config
-        run: cat ${{ github.workspace }}/.github/java-config.env >> $GITHUB_ENV
+        run: cat ${GITHUB_WORKSPACE}/.github/java-config.env >> $GITHUB_ENV
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -254,7 +254,7 @@ jobs:
         with:
           node-version: 14
       - name: Read Java Config
-        run: cat ${{ github.workspace }}/.github/java-config.env >> $GITHUB_ENV
+        run: cat ${GITHUB_WORKSPACE}/.github/java-config.env >> $GITHUB_ENV
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -368,7 +368,7 @@ jobs:
 
       - name: Read Java Config
         shell: bash
-        run: cat ${{ github.workspace }}/.github/java-config.env >> $GITHUB_ENV
+        run: cat ${GITHUB_WORKSPACE}/.github/java-config.env >> $GITHUB_ENV
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -585,7 +585,7 @@ jobs:
         with:
           python-version: 3.9
       - name: Read Java Config
-        run: cat ${{ github.workspace }}/.github/java-config.env >> $GITHUB_ENV
+        run: cat ${GITHUB_WORKSPACE}/.github/java-config.env >> $GITHUB_ENV
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -705,7 +705,7 @@ jobs:
         run: |
           echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
       - name: Read Java Config
-        run: cat ${{ github.workspace }}/.github/java-config.env >> $GITHUB_ENV
+        run: cat ${GITHUB_WORKSPACE}/.github/java-config.env >> $GITHUB_ENV
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
