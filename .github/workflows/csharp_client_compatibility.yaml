@@ -60,7 +60,7 @@ jobs:
 
       - name: Read Java Config
         shell: bash
-        run: cat ${{ github.workspace }}/.github/java-config.env >> $GITHUB_ENV
+        run: cat ${GITHUB_WORKSPACE}/.github/java-config.env >> $GITHUB_ENV
 
       - name: Setup Java
         uses: actions/setup-java@v4
