@@ -648,15 +648,39 @@ jobs:
         with:
           name: hazelcast-enterprise-tests
           path: tag
+
+      - name: Detect Client Version
+        id: compute_client_version
+        run: |
+          client="${{ matrix.client_tag }}"
+          echo "CLIENT_VERSION=${client#v}" >> ${GITHUB_OUTPUT}
+
+      # https://github.com/madhead/semver-utils/releases/tag/v4.3.0
+      - uses: madhead/semver-utils@36d1e0ed361bd7b4b77665de8093092eaeabe6ba
+        id: client-version
+        with:
+          version: ${{ steps.compute_client_version.outputs.CLIENT_VERSION }}
+          compare-to: 5.2.0
+
+      - name: Determine if test with OpenSSL
+        id: with-openssl
+        run: |
+          if [[ "${{ steps.client-version.outputs.comparison-result }}" = "<" ]]; then
+            # Workaround lack of https://github.com/hazelcast/hazelcast-cpp-client/pull/1098
+            echo "WITH_OPENSSL=OFF" >> ${GITHUB_OUTPUT}
+          else
+            echo "WITH_OPENSSL=ON" >> ${GITHUB_OUTPUT}
+          fi
+
       - name: Build & Install
         env:
           BUILD_DIR: build
         run: |
-          ./scripts/build-unix.sh                                          \
-              -DCMAKE_BUILD_TYPE=Debug                                     \
-              -DBUILD_SHARED_LIBS=ON                                       \
-              -DWITH_OPENSSL=ON                                            \
-              -DBUILD_TESTS=ON                                             \
+          ./scripts/build-unix.sh                                           \
+              -DCMAKE_BUILD_TYPE=Debug                                      \
+              -DBUILD_SHARED_LIBS=ON                                        \
+              -DWITH_OPENSSL=${{ steps.with-openssl.outputs.WITH_OPENSSL }} \
+              -DBUILD_TESTS=ON                                              \
               -DBUILD_EXAMPLES=OFF
         working-directory: tag
       - name: Test
