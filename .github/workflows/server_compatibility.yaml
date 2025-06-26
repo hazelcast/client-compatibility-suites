@@ -11,10 +11,6 @@ on:
         description: Name of the branch to build JARs from
         required: true
         default: master
-      hz_version:
-        description: Version of the JARs that will be built, without the SNAPSHOT suffix.
-        required: true
-        default: "5.0"
       run_python:
         description: Whether or not to run Python client tests. Set to something else to not run the tests.
         required: true
@@ -39,6 +35,8 @@ jobs:
   upload_jars:
     name: Create and upload JARs
     runs-on: ubuntu-latest
+    outputs:
+      hz_version: ${{ steps.compute_hz_version.outputs.hz_version }}
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v4
@@ -67,6 +65,10 @@ jobs:
           token: ${{ secrets.GH_PAT }}
       - name: Build JARs
         run: ./mvnw clean install --activate-profiles quick
+        working-directory: hazelcast-mono
+      - name: Compute HZ_VERSION
+        id: compute_hz_version
+        run: echo "hz_version=$(./mvnw help:evaluate -Dexpression=project.version --quiet -DforceStdout)" >> ${GITHUB_OUTPUT}
         working-directory: hazelcast-mono
       - name: Upload Hazelcast JAR
         uses: actions/upload-artifact@v4
@@ -136,7 +138,7 @@ jobs:
       - uses: ./.github/actions/get-enterprise-license
         id: get-enterprise-license
         with:
-          hazelcast-version: ${{ github.event.inputs.hz_version }}
+          hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
       - name: Set up enterprise license key
         run: |
           echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
@@ -241,7 +243,7 @@ jobs:
       - uses: ./.github/actions/get-enterprise-license
         id: get-enterprise-license
         with:
-          hazelcast-version: ${{ github.event.inputs.hz_version }}
+          hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
       - name: Set up enterprise license key
         run: |
           echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
@@ -356,7 +358,7 @@ jobs:
       - uses: ./.github/actions/get-enterprise-license
         id: get-enterprise-license
         with:
-          hazelcast-version: ${{ github.event.inputs.hz_version }}
+          hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
       - name: Set up enterprise license key
         shell: pwsh
         run: |
@@ -499,10 +501,10 @@ jobs:
         if: ${{ matrix.server_kind == 'os' && steps.backport-tests.outcome == 'skipped'  }}
         shell: pwsh
         run: |
-          ./hz.ps1 test -tf "method != SendReceive and namespace !~ Hazelcast.Tests.CP" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
+          ./hz.ps1 test -tf "method != SendReceive and namespace !~ Hazelcast.Tests.CP" -server ${{ needs.upload_jars.outputs.hz_version }}
         working-directory: tag      
         env:
-          HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}
+          HAZELCAST_SERVER_VERSION: ${{ needs.upload_jars.outputs.hz_version }}
           HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
           HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
 
@@ -510,10 +512,9 @@ jobs:
         if: ${{ matrix.server_kind == 'os' && steps.backport-tests.outcome == 'success'  }}
         shell: pwsh
         run: |
-          ./hz.ps1 test -tf "method != SendReceive and namespace !~ Hazelcast.Tests.CP" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT
+          ./hz.ps1 test -tf "method != SendReceive and namespace !~ Hazelcast.Tests.CP" -server ${{ needs.upload_jars.outputs.hz_version }}
         working-directory: tag      
         env:
-          HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}          
           HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
           HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
 
@@ -521,10 +522,9 @@ jobs:
         if: ${{ matrix.server_kind == 'enterprise' && steps.backport-tests.outcome == 'skipped'  }}
         shell: pwsh
         run: |
-           ./hz.ps1 -enterprise -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
+           ./hz.ps1 -enterprise -tf "method != SendReceive" -server ${{ needs.upload_jars.outputs.hz_version }} test ${{ secrets.GH_PAT }}
         working-directory: tag
         env:
-          HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }}
           HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
           HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
 
@@ -532,10 +532,10 @@ jobs:
         if: ${{matrix.server_kind == 'enterprise' && steps.backport-tests.outcome == 'success'}}
         shell: pwsh
         run: |
-           ./hz.ps1 -enterprise -tf "method != SendReceive" -server ${{ github.event.inputs.hz_version }}-SNAPSHOT test ${{ secrets.GH_PAT }}
+           ./hz.ps1 -enterprise -tf "method != SendReceive" -server ${{ needs.upload_jars.outputs.hz_version }} test ${{ secrets.GH_PAT }}
         working-directory: tag
         env:
-          HAZELCAST_SERVER_VERSION: ${{ github.event.inputs.hz_version }} 
+          HAZELCAST_SERVER_VERSION: ${{ needs.upload_jars.outputs.hz_version }}
           HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
           HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
       
@@ -576,7 +576,7 @@ jobs:
       - uses: ./.github/actions/get-enterprise-license
         id: get-enterprise-license
         with:
-          hazelcast-version: ${{ github.event.inputs.hz_version }}
+          hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
       - name: Set up enterprise license key
         run: |
           echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
@@ -663,7 +663,7 @@ jobs:
         env:
           BUILD_DIR: build
           GTEST_FILTER: -*Aws*:*DescribeInstancesTest*
-          HZ_VERSION: '${{ github.event.inputs.hz_version }}-SNAPSHOT'
+          HZ_VERSION: '${{ needs.upload_jars.outputs.hz_version }}'
         run: |
           ulimit -c unlimited
           sudo sh -c "echo 'core' > /proc/sys/kernel/core_pattern"
@@ -700,7 +700,7 @@ jobs:
       - uses: ./.github/actions/get-enterprise-license
         id: get-enterprise-license
         with:
-          hazelcast-version: ${{ github.event.inputs.hz_version }}
+          hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
       - name: Set up enterprise license key
         run: |
           echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
@@ -764,7 +764,7 @@ jobs:
 
       - name: Test
         env:
-          HZ_VERSION: '${{ github.event.inputs.hz_version }}-SNAPSHOT'
+          HZ_VERSION: '${{ needs.upload_jars.outputs.hz_version }}'
           SSL_ENABLED: 1
         run: |
           make test-all
