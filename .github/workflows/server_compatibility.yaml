@@ -67,7 +67,7 @@ jobs:
         run: ./mvnw clean install --activate-profiles quick
       - name: Compute HZ_VERSION
         id: compute_hz_version
-        run: echo "hz_version=$(mvn help:evaluate -Dexpression=project.version --quiet -DforceStdout)" >> ${GITHUB_OUTPUT}
+        run: echo "hz_version=$(./mvnw help:evaluate -Dexpression=project.version --quiet -DforceStdout)" >> ${GITHUB_OUTPUT}
         working-directory: hazelcast-mono
       - name: Upload Hazelcast JAR
         uses: actions/upload-artifact@v4
