@@ -759,8 +759,8 @@ jobs:
         env:
           HZ_VERSION: '${{ github.event.inputs.hz_version }}-SNAPSHOT'
         run: |
-          ./rc.sh start
-        working-directory: client-master
+          ../client-master/rc.sh start
+        working-directory: client
 
       - name: Test
         env:
