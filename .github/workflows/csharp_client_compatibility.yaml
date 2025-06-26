@@ -90,6 +90,8 @@ jobs:
         if: ${{ matrix.kind == 'os' }}
         run: ./hz.ps1 -server ${{ matrix.version }} test
         working-directory: client
+        env:
+          HAZELCAST_SERVER_VERSION: ${{ matrix.version }}      
         
       - uses: ./.github/actions/get-enterprise-license
         id: get-enterprise-license
@@ -103,5 +105,6 @@ jobs:
         working-directory: client        
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
+          HAZELCAST_SERVER_VERSION: ${{ matrix.version }}
 
           
