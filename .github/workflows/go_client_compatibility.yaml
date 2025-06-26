@@ -70,6 +70,15 @@ jobs:
           path: client
           ref: ${{ github.event.inputs.branch_name }}
 
+      - name: Checkout default branch
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.inputs.organization_name }}/hazelcast-go-client
+          path: client-master
+          sparse-checkout: |
+            rc.sh
+          sparse-checkout-cone-mode: false
+
       - name: Copy certificates JAR to destination with the appropriate name
         run: |
           cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/client/hazelcast-enterprise-${{ matrix.version }}-tests.jar
@@ -79,12 +88,18 @@ jobs:
         with:
           hazelcast-version: ${{ matrix.version }}
 
+      - name: Start Remote Controller
+        env:
+          HZ_VERSION: ${{ matrix.version }}
+        run: |
+          ./rc.sh start
+        working-directory: client-master
+
       - name: Test
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
           HZ_VERSION: ${{ matrix.version }}
           SSL_ENABLED: 1
         run: |
-          ./rc.sh start
           make test-all
         working-directory: client

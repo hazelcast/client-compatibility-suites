@@ -718,7 +718,16 @@ jobs:
           repository: hazelcast/hazelcast-go-client
           path: client
           ref: ${{ matrix.client_tag }}
-          
+
+      - name: Checkout default branch
+        uses: actions/checkout@v4
+        with:
+          repository: hazelcast/hazelcast-go-client
+          path: client-master
+          sparse-checkout: |
+            rc.sh
+          sparse-checkout-cone-mode: false
+
       - name: Download Hazelcast tests JAR
         uses: actions/download-artifact@v4
         with:
@@ -745,12 +754,18 @@ jobs:
         with:
           name: hazelcast-enterprise-tests
           path: client
-          
+
+      - name: Start Remote Controller
+        env:
+          HZ_VERSION: '${{ github.event.inputs.hz_version }}-SNAPSHOT'
+        run: |
+          ./rc.sh start
+        working-directory: client-master
+
       - name: Test
         env:
           HZ_VERSION: '${{ github.event.inputs.hz_version }}-SNAPSHOT'
           SSL_ENABLED: 1
         run: |
-          ./rc.sh start
           make test-all
         working-directory: client
