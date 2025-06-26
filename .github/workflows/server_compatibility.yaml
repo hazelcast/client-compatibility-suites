@@ -757,7 +757,7 @@ jobs:
 
       - name: Start Remote Controller
         env:
-          HZ_VERSION: '${{ github.event.inputs.hz_version }}-SNAPSHOT'
+          HZ_VERSION: '${{ needs.upload_jars.outputs.hz_version }}'
         run: |
           ../client-master/rc.sh start
         working-directory: client
