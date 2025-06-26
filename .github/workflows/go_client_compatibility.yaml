@@ -92,8 +92,8 @@ jobs:
         env:
           HZ_VERSION: ${{ matrix.version }}
         run: |
-          ./rc.sh start
-        working-directory: client-master
+          ../client-master/rc.sh start
+        working-directory: client
 
       - name: Test
         env:
