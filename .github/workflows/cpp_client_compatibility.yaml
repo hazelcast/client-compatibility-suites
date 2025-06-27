@@ -42,16 +42,6 @@ jobs:
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v4
-        
-      - name: Read Java Config
-        run: cat ${GITHUB_WORKSPACE}/.github/java-config.env >> $GITHUB_ENV
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
-          check-latest: true
 
       - name: Checkout to test artifacts
         if: ${{ matrix.kind == 'enterprise' }}
@@ -68,58 +58,7 @@ jobs:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-cpp-client
           path: client
           ref: ${{ github.event.inputs.branch_name }}
-
-      - name: Install Necessary Packages
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y net-tools libssl-dev gdb
-        working-directory: client
           
-      - name: Install Boost
-        run: |
-          sudo ./scripts/install-boost.sh 1.76.0
-        working-directory: client
-          
-      - name: Install Thrift
-        run: |
-          sudo ./scripts/install-thrift.sh 0.13.0
-        working-directory: client
-          
-      - name: Detect Client Version
-        id: compute_client_version
-        run: |
-          client="${{ github.event.inputs.branch_name }}"
-          echo "CLIENT_VERSION=${client#v}" >> ${GITHUB_OUTPUT}
-
-      # https://github.com/madhead/semver-utils/releases/tag/v4.3.0
-      - uses: madhead/semver-utils@36d1e0ed361bd7b4b77665de8093092eaeabe6ba
-        id: client-version
-        with:
-          version: ${{ steps.compute_client_version.outputs.CLIENT_VERSION }}
-          compare-to: 5.2.0
-
-      - name: Determine if test with OpenSSL
-        id: with-openssl
-        run: |
-          if [[ "${{ steps.client-version.outputs.comparison-result }}" = "<" ]]; then
-            # Workaround lack of https://github.com/hazelcast/hazelcast-cpp-client/pull/1098
-            echo "WITH_OPENSSL=OFF" >> ${GITHUB_OUTPUT}
-          else
-            echo "WITH_OPENSSL=ON" >> ${GITHUB_OUTPUT}
-          fi
-
-      - name: Build & Install
-        env:
-          BUILD_DIR: build
-        run: |
-          ./scripts/build-unix.sh                                           \
-              -DCMAKE_BUILD_TYPE=Debug                                      \
-              -DBUILD_SHARED_LIBS=ON                                        \
-              -DWITH_OPENSSL=${{ steps.with-openssl.outputs.WITH_OPENSSL }} \
-              -DBUILD_TESTS=ON                                              \
-              -DBUILD_EXAMPLES=OFF
-        working-directory: client
-
       - name: Copy certificates JAR to destination with the appropriate name
         if: ${{ matrix.kind == 'enterprise' }}
         run: |
@@ -130,15 +69,9 @@ jobs:
         with:
           hazelcast-version: ${{ matrix.version }}
 
-      - name: Test
-        env:
-          BUILD_DIR: build
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
-          GTEST_FILTER: -*Aws*:*DescribeInstancesTest*
-          HZ_VERSION: ${{ matrix.version }}
-        run: |
-          ulimit -c unlimited
-          sudo sh -c "echo 'core' > /proc/sys/kernel/core_pattern"
-          sudo sh -c "echo '1' > /proc/sys/kernel/core_uses_pid"
-          ./scripts/test-unix.sh
-        working-directory: client
+      - uses: ./.github/actions/cpp-compatibility
+        with:
+          client-branch-name: ${{ github.event.inputs.branch_name }}
+          working-directory: client
+          hazelcast-version: ${{ matrix.version }}
+          hazelcast-enterprise-key: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}

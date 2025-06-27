@@ -578,75 +578,52 @@ jobs:
     name: Test CPP client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/get-enterprise-license
-        id: get-enterprise-license
-        with:
-          hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
-      - name: Set up enterprise license key
-        run: |
-          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.9
-      - name: Read Java Config
-        run: cat ${GITHUB_WORKSPACE}/.github/java-config.env >> $GITHUB_ENV
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
+
       - name: Checkout master
         uses: actions/checkout@v4
         with:
           repository: hazelcast/hazelcast-cpp-client
           path: master
+
       - name: Checkout to tag
         uses: actions/checkout@v4
         with:
           repository: hazelcast/hazelcast-cpp-client
           path: tag
           ref: ${{ matrix.client_tag }}
+
       - name: Delete old scripts and get new ones
         run: |
           rm -rf tag/scripts
           cp -R master/scripts tag/
-      - name: Install Necessary Packages
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y net-tools libssl-dev gdb
-        working-directory: tag
-      - name: Install Boost
-        run: |
-          sudo ./scripts/install-boost.sh 1.76.0
-        working-directory: tag
-      - name: Install Thrift
-        run: |
-          sudo ./scripts/install-thrift.sh 0.13.0
-        working-directory: tag
+
       - name: Download Hazelcast tests JAR
         uses: actions/download-artifact@v4
         with:
           name: hazelcast-tests
           path: tag
+
       - name: Download Hazelcast SQL JAR (if exists)
         continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: hazelcast-sql
           path: tag
+
       - name: Download Hazelcast JAR
         if: ${{ matrix.server_kind == 'os' }}
         uses: actions/download-artifact@v4
         with:
           name: hazelcast
           path: tag
+
       - name: Download Hazelcast Enterprise JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
         uses: actions/download-artifact@v4
         with:
           name: hazelcast-enterprise
           path: tag
+
       - name: Download Hazelcast Enterprise tests JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
         uses: actions/download-artifact@v4
@@ -654,51 +631,18 @@ jobs:
           name: hazelcast-enterprise-tests
           path: tag
 
-      - name: Detect Client Version
-        id: compute_client_version
-        run: |
-          client="${{ matrix.client_tag }}"
-          echo "CLIENT_VERSION=${client#v}" >> ${GITHUB_OUTPUT}
-
-      # https://github.com/madhead/semver-utils/releases/tag/v4.3.0
-      - uses: madhead/semver-utils@36d1e0ed361bd7b4b77665de8093092eaeabe6ba
-        id: client-version
+      - uses: ./.github/actions/get-enterprise-license
+        id: get-enterprise-license
         with:
-          version: ${{ steps.compute_client_version.outputs.CLIENT_VERSION }}
-          compare-to: 5.2.0
+          hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
 
-      - name: Determine if test with OpenSSL
-        id: with-openssl
-        run: |
-          if [[ "${{ steps.client-version.outputs.comparison-result }}" = "<" ]]; then
-            # Workaround lack of https://github.com/hazelcast/hazelcast-cpp-client/pull/1098
-            echo "WITH_OPENSSL=OFF" >> ${GITHUB_OUTPUT}
-          else
-            echo "WITH_OPENSSL=ON" >> ${GITHUB_OUTPUT}
-          fi
+      - uses: ./.github/actions/cpp-compatibility
+        with:
+          client-branch-name: ${{ matrix.client_tag }}
+          working-directory: tag
+          hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
+          hazelcast-enterprise-key: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
 
-      - name: Build & Install
-        env:
-          BUILD_DIR: build
-        run: |
-          ./scripts/build-unix.sh                                           \
-              -DCMAKE_BUILD_TYPE=Debug                                      \
-              -DBUILD_SHARED_LIBS=ON                                        \
-              -DWITH_OPENSSL=${{ steps.with-openssl.outputs.WITH_OPENSSL }} \
-              -DBUILD_TESTS=ON                                              \
-              -DBUILD_EXAMPLES=OFF
-        working-directory: tag
-      - name: Test
-        env:
-          BUILD_DIR: build
-          GTEST_FILTER: -*Aws*:*DescribeInstancesTest*
-          HZ_VERSION: '${{ needs.upload_jars.outputs.hz_version }}'
-        run: |
-          ulimit -c unlimited
-          sudo sh -c "echo 'core' > /proc/sys/kernel/core_pattern"
-          sudo sh -c "echo '1' > /proc/sys/kernel/core_uses_pid"
-          ./scripts/test-unix.sh
-        working-directory: tag        
   setup_go_client_matrix:
     name: Setup the Go client test matrix
     if: ${{ inputs.run_go }}
