@@ -578,71 +578,59 @@ jobs:
     name: Test CPP client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
       - uses: actions/checkout@v4
-
+        with:
+          repository: hazelcast/hazelcast-cpp-client
+          ref: ${{ matrix.client_tag }}
+      - uses: actions/checkout@v4
+        with:
+          path: client-compatibility-suites
       - name: Checkout master
         uses: actions/checkout@v4
         with:
           repository: hazelcast/hazelcast-cpp-client
           path: master
-
-      - name: Checkout to tag
-        uses: actions/checkout@v4
-        with:
-          repository: hazelcast/hazelcast-cpp-client
-          path: tag
-          ref: ${{ matrix.client_tag }}
-
       - name: Delete old scripts and get new ones
         run: |
-          rm -rf tag/scripts
-          cp -R master/scripts tag/
+          for path in scripts .github; do
+            rm -rf "${path}"
+            cp -R "master/${path}" .
+          done
 
+          rm -rf "master"
       - name: Download Hazelcast tests JAR
         uses: actions/download-artifact@v4
         with:
           name: hazelcast-tests
-          path: tag
-
       - name: Download Hazelcast SQL JAR (if exists)
         continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: hazelcast-sql
-          path: tag
-
       - name: Download Hazelcast JAR
         if: ${{ matrix.server_kind == 'os' }}
         uses: actions/download-artifact@v4
         with:
           name: hazelcast
-          path: tag
-
       - name: Download Hazelcast Enterprise JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
         uses: actions/download-artifact@v4
         with:
           name: hazelcast-enterprise
-          path: tag
-
       - name: Download Hazelcast Enterprise tests JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
         uses: actions/download-artifact@v4
         with:
           name: hazelcast-enterprise-tests
-          path: tag
-
-      - uses: ./.github/actions/get-enterprise-license
+      - uses: ./client-compatibility-suites/.github/actions/get-enterprise-license
         id: get-enterprise-license
         with:
           hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
-
-      - uses: ./.github/actions/cpp-compatibility
+      - uses: ./client-compatibility-suites/.github/actions/cpp-compatibility
         with:
+          gh-token: ${{ secrets.GH_PAT }}
           client-branch-name: ${{ matrix.client_tag }}
-          working-directory: tag
           hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
           hazelcast-enterprise-key: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
-
   setup_go_client_matrix:
     name: Setup the Go client test matrix
     if: ${{ inputs.run_go }}
