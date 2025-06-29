@@ -594,6 +594,7 @@ jobs:
             scripts
             .github
           sparse-checkout-cone-mode: false
+          clean: false
 
       - name: Download Hazelcast tests JAR
         uses: actions/download-artifact@v4
