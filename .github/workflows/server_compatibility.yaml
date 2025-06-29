@@ -624,6 +624,22 @@ jobs:
         with:
           name: hazelcast-enterprise-tests
 
+      - name: Debug
+        run: |
+          ls .
+      - name: Debug
+        run: |
+          ls /client-compatibility-suites
+      - name: Debug
+        run: |
+          ls /client-compatibility-suites/.github
+      - name: Debug
+        run: |
+          ls /client-compatibility-suites/.github/actions
+      - name: Debug
+        run: |
+          ls /client-compatibility-suites/.github/actions/get-enterprise-license
+
       - uses: ./client-compatibility-suites/.github/actions/get-enterprise-license
         id: get-enterprise-license
         with:
