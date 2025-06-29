@@ -586,6 +586,13 @@ jobs:
           rm -rf scripts
           rm -rf .github
 
+      - name: Debug
+        run: |
+          ls .
+      - name: Debug
+        run: |
+          ls /client-compatibility-suites
+
       - name: Checkout master
         uses: actions/checkout@v4
         with:
@@ -595,6 +602,13 @@ jobs:
             .github
           sparse-checkout-cone-mode: false
           clean: false
+
+      - name: Debug
+        run: |
+          ls .
+      - name: Debug
+        run: |
+          ls /client-compatibility-suites
 
       - name: Download Hazelcast tests JAR
         uses: actions/download-artifact@v4
