@@ -12,27 +12,27 @@ on:
         required: true
         default: master
       run_python:
-        description: Whether or not to run Python client tests
+        description: run Python client tests
         type: boolean
         required: true
         default: true
       run_nodejs:
-        description: Whether or not to run Node.js client tests (not supported client)
+        description: run Node.js client tests (not supported client)
         type: boolean
         required: true
         default: false
       run_cpp:
-        description: Whether or not to run CPP client tests (not supported client)
+        description: run CPP client tests (not supported client)
         type: boolean
         required: true
         default: false
       run_csharp:
-        description: Whether or not to run Csharp client tests
+        description: run Csharp client tests
         type: boolean
         required: true
         default: true
       run_go:
-        description: Whether or not to run Go client tests (not supported client)
+        description: run Go client tests (not supported client)
         type: boolean
         required: true
         default: false
