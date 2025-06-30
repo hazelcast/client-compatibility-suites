@@ -675,7 +675,6 @@ jobs:
           sudo sh -c "echo '1' > /proc/sys/kernel/core_uses_pid"
           ./scripts/test-unix.sh
         working-directory: tag        
-
   setup_go_client_matrix:
     name: Setup the Go client test matrix
     if: ${{ inputs.run_go }}
