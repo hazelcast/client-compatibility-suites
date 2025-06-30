@@ -27,7 +27,7 @@ on:
         required: true
         default: false
       run_csharp:
-        description: Whether or not to run Csharp client tests. Set to something else to not run the tests
+        description: Whether or not to run Csharp client tests
         type: boolean
         required: true
         default: true
