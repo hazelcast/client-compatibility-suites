@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       organization_name:
-        description: Name of the organization to build JARs from. If you want to run the tests with the JARs from your fork, set this to your username.
+        description: Name of the organization to build JARs from. If you want to run the tests with the JARs from your fork, set this to your username
         required: true
         default: hazelcast
       branch_name:
@@ -12,25 +12,30 @@ on:
         required: true
         default: master
       run_python:
-        description: Whether or not to run Python client tests. Set to something else to not run the tests.
+        description: Whether or not to run Python client tests
+        type: boolean
         required: true
-        default: run
+        default: true
       run_nodejs:
-        description: Whether or not to run Node.js client tests (not supported client). Set to "run" to run the tests.
+        description: Whether or not to run Node.js client tests (not supported client)
+        type: boolean
         required: true
-        default: dontrun
+        default: false
       run_cpp:
-        description: Whether or not to run CPP client tests (not supported client). Set to "run" to run the tests. 
+        description: Whether or not to run CPP client tests (not supported client)
+        type: boolean
         required: true
-        default: dontrun
+        default: false
       run_csharp:
-        description: Whether or not to run Csharp client tests. Set to something else to not run the tests. 
+        description: Whether or not to run Csharp client tests. Set to something else to not run the tests
+        type: boolean
         required: true
-        default: run
+        default: true
       run_go:
-        description: Whether or not to run Go client tests (not supported client). Set to "run" to run the tests. 
+        description: Whether or not to run Go client tests (not supported client)
+        type: boolean
         required: true
-        default: dontrun
+        default: false
 jobs:
   upload_jars:
     name: Create and upload JARs
@@ -109,7 +114,7 @@ jobs:
           retention-days: 1
   setup_python_client_matrix:
     name: Setup the Python client test matrix
-    if: ${{ github.event.inputs.run_python == 'run' }}
+    if: ${{ inputs.run_python }}
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -215,7 +220,7 @@ jobs:
         working-directory: master
   setup_nodejs_client_matrix:
     name: Setup the Node.js client test matrix
-    if: ${{ github.event.inputs.run_nodejs == 'run' }}
+    if: ${{ inputs.run_nodejs }}
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -330,7 +335,7 @@ jobs:
         working-directory: master
   setup_csharp_client_matrix:
     name: Setup the Csharp client test matrix
-    if: ${{ github.event.inputs.run_csharp == 'run' }}
+    if: ${{ inputs.run_csharp }}
     runs-on: windows-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -548,7 +553,7 @@ jobs:
           path: '${{github.workspace}}\tag\temp\rc\' # entire directory          
   setup_cpp_client_matrix:
     name: Setup the Cpp client test matrix
-    if: ${{ github.event.inputs.run_cpp == 'run' }}
+    if: ${{ inputs.run_cpp }}
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -670,9 +675,10 @@ jobs:
           sudo sh -c "echo '1' > /proc/sys/kernel/core_uses_pid"
           ./scripts/test-unix.sh
         working-directory: tag        
+
   setup_go_client_matrix:
     name: Setup the Go client test matrix
-    if: ${{ github.event.inputs.run_go == 'run' }}
+    if: ${{ inputs.run_go }}
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
