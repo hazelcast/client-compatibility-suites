@@ -1,7 +1,5 @@
 name: C++ Compatibility
 inputs:
-  client-branch-name:
-    required: true
   working-directory:
     required: true
   hazelcast-version:
@@ -39,31 +37,6 @@ runs:
         sudo ./scripts/install-thrift.sh 0.13.0
       working-directory: ${{ inputs.working-directory }}
 
-    - name: Detect Client Version
-      shell: bash
-      id: compute_client_version
-      run: |
-        client="${{ inputs.client-branch-name }}"
-        echo "CLIENT_VERSION=${client#v}" >> ${GITHUB_OUTPUT}
-
-    # https://github.com/madhead/semver-utils/releases/tag/v4.3.0
-    - uses: madhead/semver-utils@36d1e0ed361bd7b4b77665de8093092eaeabe6ba
-      id: client-version
-      with:
-        version: ${{ steps.compute_client_version.outputs.CLIENT_VERSION }}
-        compare-to: 5.2.0
-
-    - name: Determine if test with OpenSSL
-      shell: bash
-      id: with-openssl
-      run: |
-        if [[ "${{ steps.client-version.outputs.comparison-result }}" = "<" ]]; then
-          # Workaround lack of https://github.com/hazelcast/hazelcast-cpp-client/pull/1098
-          echo "WITH_OPENSSL=OFF" >> ${GITHUB_OUTPUT}
-        else
-          echo "WITH_OPENSSL=ON" >> ${GITHUB_OUTPUT}
-        fi
-
     - name: Build & Install
       shell: bash
       env:
@@ -72,7 +45,7 @@ runs:
         ./scripts/build-unix.sh                                           \
             -DCMAKE_BUILD_TYPE=Debug                                      \
             -DBUILD_SHARED_LIBS=ON                                        \
-            -DWITH_OPENSSL=${{ steps.with-openssl.outputs.WITH_OPENSSL }} \
+            -DWITH_OPENSSL=OpenSSL                                        \
             -DBUILD_TESTS=ON                                              \
             -DBUILD_EXAMPLES=OFF
       working-directory: ${{ inputs.working-directory }}
