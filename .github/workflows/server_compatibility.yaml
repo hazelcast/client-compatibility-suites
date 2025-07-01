@@ -626,7 +626,7 @@ jobs:
         id: get-enterprise-license
         with:
           hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
-      - uses: ./.github/actions/cpp-compatibility
+      - uses: ./.github/actions/cpp-compatibility-test
         with:
           working-directory: tag
           hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}

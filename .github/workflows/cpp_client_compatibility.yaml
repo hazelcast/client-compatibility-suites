@@ -69,7 +69,7 @@ jobs:
         with:
           hazelcast-version: ${{ matrix.version }}
 
-      - uses: ./.github/actions/cpp-compatibility
+      - uses: ./.github/actions/cpp-compatibility-test
         with:
           working-directory: client
           hazelcast-version: ${{ matrix.version }}
