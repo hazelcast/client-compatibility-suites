@@ -1,4 +1,4 @@
-name: C++ Compatibility
+name: C++ Compatibility Test
 inputs:
   working-directory:
     required: true
