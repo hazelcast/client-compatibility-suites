@@ -1,8 +1,8 @@
 name: C++ Compatibility
 inputs:
-  gh-token:
-    required: true
   client-branch-name:
+    required: true
+  working-directory:
     required: true
   hazelcast-version:
     required: true
@@ -11,6 +11,34 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Read Java Config
+      shell: bash
+      run: cat ${GITHUB_WORKSPACE}/.github/java-config.env >> ${GITHUB_ENV}
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: ${{ env.JAVA_DISTRIBUTION }}
+
+    - name: Install Necessary Packages
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y net-tools libssl-dev gdb
+
+    - name: Install Boost
+      shell: bash
+      run: |
+        sudo ./scripts/install-boost.sh 1.76.0
+      working-directory: ${{ inputs.working-directory }}
+        
+    - name: Install Thrift
+      shell: bash
+      run: |
+        sudo ./scripts/install-thrift.sh 0.13.0
+      working-directory: ${{ inputs.working-directory }}
+
     - name: Detect Client Version
       shell: bash
       id: compute_client_version
@@ -36,19 +64,29 @@ runs:
           echo "WITH_OPENSSL=ON" >> ${GITHUB_OUTPUT}
         fi
 
-    - uses: ./.github/actions/build-test/ubuntu-x86_64
-      with:
-        GH_TOKEN: ${{ inputs.gh-token }}
-        BOOST_VERSION: 1.76.0
-        THRIFT_VERSION: 0.13.0
-        # Running against already-released tags, compiler warnings and additional validation are unhelpful when code is static
-        BUILD_TYPE: Release
-        SHARED_LIBS_TOGGLE: ON
-        OPENSSL_TOGGLE: ${{ steps.with-openssl.outputs.WITH_OPENSSL }}
-        RUN_TESTS: true
-        HAZELCAST_ENTERPRISE_KEY: ${{ inputs.hazelcast-enterprise-key }}
-        AWS_ACCESS_KEY_ID:
-        AWS_SECRET_ACCESS_KEY:
-        HZ_TEST_AWS_INSTANCE_PRIVATE_IP:
+    - name: Build & Install
+      shell: bash
       env:
+        BUILD_DIR: build
+      run: |
+        ./scripts/build-unix.sh                                           \
+            -DCMAKE_BUILD_TYPE=Debug                                      \
+            -DBUILD_SHARED_LIBS=ON                                        \
+            -DWITH_OPENSSL=${{ steps.with-openssl.outputs.WITH_OPENSSL }} \
+            -DBUILD_TESTS=ON                                              \
+            -DBUILD_EXAMPLES=OFF
+      working-directory: ${{ inputs.working-directory }}
+
+    - name: Test
+      shell: bash
+      env:
+        BUILD_DIR: build
+        HAZELCAST_ENTERPRISE_KEY: ${{ inputs.hazelcast-enterprise-key }}
         GTEST_FILTER: -*Aws*:*DescribeInstancesTest*
+        HZ_VERSION: ${{ inputs.hazelcast-version }}
+      run: |
+        ulimit -c unlimited
+        sudo sh -c "echo 'core' > /proc/sys/kernel/core_pattern"
+        sudo sh -c "echo '1' > /proc/sys/kernel/core_uses_pid"
+        ./scripts/test-unix.sh
+      working-directory: ${{ inputs.working-directory }}

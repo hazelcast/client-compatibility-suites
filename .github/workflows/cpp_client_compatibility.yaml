@@ -42,8 +42,6 @@ jobs:
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v4
-        with:
-          path: client-compatibility-suites
 
       - name: Checkout to test artifacts
         if: ${{ matrix.kind == 'enterprise' }}
@@ -58,21 +56,22 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-cpp-client
+          path: client
           ref: ${{ github.event.inputs.branch_name }}
           
       - name: Copy certificates JAR to destination with the appropriate name
         if: ${{ matrix.kind == 'enterprise' }}
         run: |
-          cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/hazelcast-enterprise-${{ matrix.version }}-tests.jar
+          cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/client/hazelcast-enterprise-${{ matrix.version }}-tests.jar
 
-      - uses: ./client-compatibility-suites/.github/actions/get-enterprise-license
+      - uses: ./.github/actions/get-enterprise-license
         id: get-enterprise-license
         with:
           hazelcast-version: ${{ matrix.version }}
 
-      - uses: ./client-compatibility-suites/.github/actions/cpp-compatibility
+      - uses: ./.github/actions/cpp-compatibility
         with:
-          gh-token: ${{ secrets.GH_PAT }}
           client-branch-name: ${{ github.event.inputs.branch_name }}
+          working-directory: client
           hazelcast-version: ${{ matrix.version }}
           hazelcast-enterprise-key: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
