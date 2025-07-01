@@ -71,7 +71,6 @@ jobs:
 
       - uses: ./.github/actions/cpp-compatibility
         with:
-          client-branch-name: ${{ github.event.inputs.branch_name }}
           working-directory: client
           hazelcast-version: ${{ matrix.version }}
           hazelcast-enterprise-key: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
