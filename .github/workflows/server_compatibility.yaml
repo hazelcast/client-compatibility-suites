@@ -649,17 +649,11 @@ jobs:
           name: hazelcast-enterprise-tests
           path: tag
 
-      - name: Detect Client Version
-        id: compute_client_version
-        run: |
-          client="${{ matrix.client_tag }}"
-          echo "CLIENT_VERSION=${client#v}" >> ${GITHUB_OUTPUT}
-
       # https://github.com/madhead/semver-utils/releases/tag/v4.3.0
       - uses: madhead/semver-utils@36d1e0ed361bd7b4b77665de8093092eaeabe6ba
         id: client-version
         with:
-          version: ${{ steps.compute_client_version.outputs.CLIENT_VERSION }}
+          version: ${{ matrix.client_tag }}
           compare-to: 5.2.0
 
       - name: Determine if test with OpenSSL

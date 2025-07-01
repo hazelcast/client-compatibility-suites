@@ -84,18 +84,12 @@ jobs:
         run: |
           sudo ./scripts/install-thrift.sh 0.13.0
         working-directory: client
-          
-      - name: Detect Client Version
-        id: compute_client_version
-        run: |
-          client="${{ github.event.inputs.branch_name }}"
-          echo "CLIENT_VERSION=${client#v}" >> ${GITHUB_OUTPUT}
 
       # https://github.com/madhead/semver-utils/releases/tag/v4.3.0
       - uses: madhead/semver-utils@36d1e0ed361bd7b4b77665de8093092eaeabe6ba
         id: client-version
         with:
-          version: ${{ steps.compute_client_version.outputs.CLIENT_VERSION }}
+          version: ${{ github.event.inputs.branch_name }}
           compare-to: 5.2.0
 
       - name: Determine if test with OpenSSL
