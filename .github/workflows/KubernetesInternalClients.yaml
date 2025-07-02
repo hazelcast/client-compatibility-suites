@@ -176,11 +176,11 @@ jobs:
 
     - name: Set which client will be run
       id: set-matrix
-      run: echo "matrix=$( python set_which_client_run.py \
-       --nodejs ${{ github.event.inputs.nodejs_run }} \ 
-       --go ${{ github.event.inputs.go_run }} \
-       --cpp ${{ github.event.inputs.cpp_run }} \
-       --csharp ${{ github.event.inputs.csharp_run }} \
+      run: echo "matrix=$( python set_which_client_run.py
+       --nodejs ${{ github.event.inputs.nodejs_run }}
+       --go ${{ github.event.inputs.go_run }}
+       --cpp ${{ github.event.inputs.cpp_run }}
+       --csharp ${{ github.event.inputs.csharp_run }}
        --python ${{ github.event.inputs.python_run }})" >> ${GITHUB_OUTPUT}
          
   run-tests:
