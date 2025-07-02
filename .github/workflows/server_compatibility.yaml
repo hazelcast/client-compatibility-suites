@@ -132,7 +132,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Set client matrix
         id: set-matrix
-        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client py --option tag --use-latest-patch-versions )"
+        run: echo "matrix=$( python get_client_matrix.py --client py --option tag --use-latest-patch-versions )" >> ${GITHUB_OUTPUT}
   test_python_clients:
     needs: [ upload_jars, setup_python_client_matrix ]
     runs-on: ubuntu-latest
@@ -233,7 +233,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Set client matrix
         id: set-matrix
-        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client node --option tag --use-latest-patch-versions )"
+        run: echo "matrix=$( python get_client_matrix.py --client node --option tag --use-latest-patch-versions )" >> ${GITHUB_OUTPUT}
   test_nodejs_clients:
     needs: [ upload_jars, setup_nodejs_client_matrix ]
     runs-on: ubuntu-latest
@@ -343,7 +343,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Set client matrix
         id: set-matrix
-        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client cs --option tag --use-latest-patch-versions )"
+        run: echo "matrix=$( python get_client_matrix.py --client cs --option tag --use-latest-patch-versions )" >> ${GITHUB_OUTPUT}
   test_csharp_clients:
     needs: [ upload_jars,  setup_csharp_client_matrix ]
     runs-on: windows-latest
@@ -555,7 +555,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Set client matrix
         id: set-matrix
-        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client cpp --option tag --use-latest-patch-versions )"
+        run: echo "matrix=$( python get_client_matrix.py --client cpp --option tag --use-latest-patch-versions )" >> ${GITHUB_OUTPUT}
   test_cpp_clients:
     needs: [ upload_jars, setup_cpp_client_matrix ]
     runs-on: ubuntu-latest
@@ -674,7 +674,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Set client matrix
         id: set-matrix
-        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client go --option tag --use-latest-patch-versions )"       
+        run: echo "matrix=$( python get_client_matrix.py --client go --option tag --use-latest-patch-versions )" >> ${GITHUB_OUTPUT}
   test_go_client:
     needs: [upload_jars, setup_go_client_matrix]
     runs-on: ubuntu-latest

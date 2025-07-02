@@ -116,13 +116,13 @@ jobs:
         echo "EXTERNAL_IP=${EXTERNAL_IP}" >> $GITHUB_ENV
     - name: Set output of external-ip
       id: external-ip
-      run: echo "::set-output name=external-ip::${{ env.EXTERNAL_IP }}"
+      run: echo "external-ip=${{ env.EXTERNAL_IP }}" >> ${GITHUB_OUTPUT}
     - name: Set output of gke_zone  
       id: gke_zone
-      run: echo "::set-output name=gke_zone::${{env.GKE_ZONE}}"
+      run: echo "gke_zone=${{ env.GKE_ZONE }}" >> ${GITHUB_OUTPUT}
     - name: Set output of cluster_name  
       id: cluster_name
-      run: echo "::set-output name=cluster_name::${{env.clusterName}}"
+      run: echo "cluster_name=${{ env.clusterName }}" >> ${GITHUB_OUTPUT}
         
   run_go:
     name: Run Go compatibility test
