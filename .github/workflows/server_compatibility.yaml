@@ -565,8 +565,6 @@ jobs:
         client_tag: ${{ fromJson(needs.setup_cpp_client_matrix.outputs.matrix) }}
         server_kind: [ enterprise ] #TODO When tests are divided as OS, ENTERPRISE, OS matrix will be added
     name: Test CPP client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
-    env:
-      HAZELCAST_ENTERPRISE_KEY: ${{ secrets[needs.upload_jars.outputs.hazelcast_enterprise_key_secret] }}
     steps:
       - uses: actions/checkout@v4
       - name: Checkout master
@@ -613,15 +611,11 @@ jobs:
         with:
           name: hazelcast-enterprise-tests
           path: tag
-      - uses: ./.github/actions/get-enterprise-license
-        id: get-enterprise-license
-        with:
-          hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
       - uses: ./.github/actions/cpp-compatibility-test
         with:
           working-directory: tag
           hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
-          hazelcast-enterprise-key: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
+          hazelcast-enterprise-key: ${{ secrets[needs.upload_jars.outputs.hazelcast_enterprise_key_secret] }}
   setup_go_client_matrix:
     name: Setup the Go client test matrix
     if: ${{ inputs.run_go }}
