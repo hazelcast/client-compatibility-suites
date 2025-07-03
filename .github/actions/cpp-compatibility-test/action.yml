@@ -48,6 +48,7 @@ runs:
 
     - name: Determine if test with OpenSSL
       id: with-openssl
+      shell: bash
       run: |
         if [[ "${{ steps.client-version.outputs.comparison-result }}" = "<" ]]; then
           # Workaround lack of https://github.com/hazelcast/hazelcast-cpp-client/pull/1098
