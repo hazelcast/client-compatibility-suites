@@ -22,10 +22,10 @@ on:
         required: true
         default: false
       run_cpp:
-        description: run CPP client tests (not supported client)
+        description: run CPP client tests
         type: boolean
         required: true
-        default: false
+        default: true
       run_csharp:
         description: run Csharp client tests
         type: boolean
