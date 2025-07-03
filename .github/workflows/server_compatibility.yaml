@@ -210,13 +210,33 @@ jobs:
           path: jars
       - name: Start RC
         run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.server_kind }} --use-simple-server
-      - name: Run non-enterprise tests
-        if: ${{ matrix.server_kind == 'os' }}
-        run: pytest -m 'not enterprise' tests/integration/backward_compatible
-        working-directory: master
-      - name: Run all tests
-        if: ${{ matrix.server_kind == 'enterprise' }}
-        run: pytest tests/integration/backward_compatible
+      - name: Convert major.minor version to semver
+        id: generate-semver
+        run: |
+          # `semver-utils` expects a fully qualified semver, but some older Python clients were major.minor (e.g. `v5.0`) which was unsupported
+          # In those cases, convert major.minor (e.g. `v5.0`) -> major.minor.patch (e.g. `v.5.0.0`)
+          VERSION="${{ matrix.client_tag }}"
+          if [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+$ ]]; then
+            VERSION="${VERSION}.0"
+          fi
+          echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
+      # https://github.com/madhead/semver-utils/releases/tag/v4.3.0
+      - uses: madhead/semver-utils@36d1e0ed361bd7b4b77665de8093092eaeabe6ba
+        id: client-version
+        with:
+          version: ${{ steps.generate-semver.outputs.version }}
+          compare-to: 5.5.0
+      - name: Run tests
+        run: |
+          args=()
+          if [ "${{ matrix.server_kind }}" = "os" ]; then
+            args+=(-m "not enterprise")
+          fi
+          if [[ "${{ steps.client-version.outputs.comparison-result }}" = "<" ]]; then
+            # Workaround https://github.com/hazelcast/hazelcast-python-client/issues/666 by skipping those tests
+            args+=(--ignore tests/integration/backward_compatible/predicate_test.py)
+          fi
+          pytest tests/integration/backward_compatible "${args[@]}"
         working-directory: master
   setup_nodejs_client_matrix:
     name: Setup the Node.js client test matrix
