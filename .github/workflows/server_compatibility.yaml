@@ -320,6 +320,9 @@ jobs:
           path: jars
       - name: Start RC
         run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.server_kind }}
+      - name: Update certificates
+        if: ${{ matrix.server_kind == 'enterprise' }}
+        run: unzip -p jars/hazelcast-enterprise-${{ needs.upload_jars.outputs.hz_version }}-tests.jar com/hazelcast/nio/ssl/letsencrypt.jks > master/test/integration/backward_compatible/parallel/ssl/keystore.jks
       - name: Run all tests
         run: node node_modules/mocha/bin/mocha --recursive test/integration/backward_compatible
         working-directory: master
