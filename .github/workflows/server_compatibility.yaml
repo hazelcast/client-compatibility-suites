@@ -643,6 +643,8 @@ jobs:
     name: Test Go client ${{ matrix.client_tag }} with enterprise server on ubuntu-latest
     env:
       HAZELCAST_ENTERPRISE_KEY: ${{ secrets[needs.upload_jars.outputs.hazelcast_enterprise_key_secret] }}
+      HZ_VERSION: '${{ needs.upload_jars.outputs.hz_version }}'
+      SSL_ENABLED: 1
     steps:
       - uses: actions/checkout@v4
       - name: Read Java Config
@@ -659,6 +661,12 @@ jobs:
           repository: hazelcast/hazelcast-go-client
           path: client
           ref: ${{ matrix.client_tag }}
+
+      - name: Checkout default branch
+        uses: actions/checkout@v4
+        with:
+          repository: hazelcast/hazelcast-go-client
+          path: master
           
       - name: Download Hazelcast tests JAR
         uses: actions/download-artifact@v4
@@ -686,12 +694,11 @@ jobs:
         with:
           name: hazelcast-enterprise-tests
           path: client
-          
-      - name: Test
-        env:
-          HZ_VERSION: '${{ needs.upload_jars.outputs.hz_version }}'
-          SSL_ENABLED: 1
+      - name: Start Remote Controller
         run: |
           ./rc.sh start
+        working-directory: master
+      - name: Test
+        run: |
           make test-all
         working-directory: client
