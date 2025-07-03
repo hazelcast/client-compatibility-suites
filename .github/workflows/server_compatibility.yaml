@@ -615,6 +615,7 @@ jobs:
         with:
           working-directory: tag
           hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
+          client-version: ${{ matrix.client_tag }}
           hazelcast-enterprise-key: ${{ secrets[needs.upload_jars.outputs.hazelcast_enterprise_key_secret] }}
   setup_go_client_matrix:
     name: Setup the Go client test matrix

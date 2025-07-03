@@ -73,4 +73,5 @@ jobs:
         with:
           working-directory: client
           hazelcast-version: ${{ matrix.version }}
+          client-version: ${{ github.event.inputs.branch_name }}
           hazelcast-enterprise-key: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
