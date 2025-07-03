@@ -1,0 +1,65 @@
+name: C++ Compatibility Test
+inputs:
+  working-directory:
+    required: true
+  hazelcast-version:
+    required: true
+  hazelcast-enterprise-key:
+    required: false
+runs:
+  using: "composite"
+  steps:
+    - name: Read Java Config
+      shell: bash
+      run: cat ${GITHUB_WORKSPACE}/.github/java-config.env >> ${GITHUB_ENV}
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: ${{ env.JAVA_DISTRIBUTION }}
+
+    - name: Install Necessary Packages
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y net-tools libssl-dev gdb
+
+    - name: Install Boost
+      shell: bash
+      run: |
+        sudo ./scripts/install-boost.sh 1.76.0
+      working-directory: ${{ inputs.working-directory }}
+        
+    - name: Install Thrift
+      shell: bash
+      run: |
+        sudo ./scripts/install-thrift.sh 0.13.0
+      working-directory: ${{ inputs.working-directory }}
+
+    - name: Build & Install
+      shell: bash
+      env:
+        BUILD_DIR: build
+      run: |
+        ./scripts/build-unix.sh                                           \
+            -DCMAKE_BUILD_TYPE=Debug                                      \
+            -DBUILD_SHARED_LIBS=ON                                        \
+            -DWITH_OPENSSL=OpenSSL                                        \
+            -DBUILD_TESTS=ON                                              \
+            -DBUILD_EXAMPLES=OFF
+      working-directory: ${{ inputs.working-directory }}
+
+    - name: Test
+      shell: bash
+      env:
+        BUILD_DIR: build
+        HAZELCAST_ENTERPRISE_KEY: ${{ inputs.hazelcast-enterprise-key }}
+        GTEST_FILTER: -*Aws*:*DescribeInstancesTest*
+        HZ_VERSION: ${{ inputs.hazelcast-version }}
+      run: |
+        ulimit -c unlimited
+        sudo sh -c "echo 'core' > /proc/sys/kernel/core_pattern"
+        sudo sh -c "echo '1' > /proc/sys/kernel/core_uses_pid"
+        ./scripts/test-unix.sh
+      working-directory: ${{ inputs.working-directory }}

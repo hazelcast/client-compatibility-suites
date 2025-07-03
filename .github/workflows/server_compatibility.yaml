@@ -565,21 +565,8 @@ jobs:
         client_tag: ${{ fromJson(needs.setup_cpp_client_matrix.outputs.matrix) }}
         server_kind: [ enterprise ] #TODO When tests are divided as OS, ENTERPRISE, OS matrix will be added
     name: Test CPP client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
-    env:
-      HAZELCAST_ENTERPRISE_KEY: ${{ secrets[needs.upload_jars.outputs.hazelcast_enterprise_key_secret] }}
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.9
-      - name: Read Java Config
-        run: cat ${GITHUB_WORKSPACE}/.github/java-config.env >> $GITHUB_ENV
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
       - name: Checkout master
         uses: actions/checkout@v4
         with:
@@ -595,19 +582,6 @@ jobs:
         run: |
           rm -rf tag/scripts
           cp -R master/scripts tag/
-      - name: Install Necessary Packages
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y net-tools libssl-dev gdb
-        working-directory: tag
-      - name: Install Boost
-        run: |
-          sudo ./scripts/install-boost.sh 1.76.0
-        working-directory: tag
-      - name: Install Thrift
-        run: |
-          sudo ./scripts/install-thrift.sh 0.13.0
-        working-directory: tag
       - name: Download Hazelcast tests JAR
         uses: actions/download-artifact@v4
         with:
@@ -637,28 +611,11 @@ jobs:
         with:
           name: hazelcast-enterprise-tests
           path: tag
-      - name: Build & Install
-        env:
-          BUILD_DIR: build
-        run: |
-          ./scripts/build-unix.sh                                          \
-              -DCMAKE_BUILD_TYPE=Debug                                     \
-              -DBUILD_SHARED_LIBS=ON                                       \
-              -DWITH_OPENSSL=ON                                            \
-              -DBUILD_TESTS=ON                                             \
-              -DBUILD_EXAMPLES=OFF
-        working-directory: tag
-      - name: Test
-        env:
-          BUILD_DIR: build
-          GTEST_FILTER: -*Aws*:*DescribeInstancesTest*
-          HZ_VERSION: '${{ needs.upload_jars.outputs.hz_version }}'
-        run: |
-          ulimit -c unlimited
-          sudo sh -c "echo 'core' > /proc/sys/kernel/core_pattern"
-          sudo sh -c "echo '1' > /proc/sys/kernel/core_uses_pid"
-          ./scripts/test-unix.sh
-        working-directory: tag        
+      - uses: ./.github/actions/cpp-compatibility-test
+        with:
+          working-directory: tag
+          hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
+          hazelcast-enterprise-key: ${{ secrets[needs.upload_jars.outputs.hazelcast_enterprise_key_secret] }}
   setup_go_client_matrix:
     name: Setup the Go client test matrix
     if: ${{ inputs.run_go }}
