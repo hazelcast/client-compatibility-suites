@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       organization_name:
-        description: Name of the organization to build JARs from. If you want to run the tests with the JARs from your fork, set this to your username.
+        description: Name of the organization to build JARs from. If you want to run the tests with the JARs from your fork, set this to your username
         required: true
         default: hazelcast
       branch_name:
@@ -12,31 +12,37 @@ on:
         required: true
         default: master
       run_python:
-        description: Whether or not to run Python client tests. Set to something else to not run the tests.
+        description: run Python client tests
+        type: boolean
         required: true
-        default: run
+        default: true
       run_nodejs:
-        description: Whether or not to run Node.js client tests (not supported client). Set to "run" to run the tests.
+        description: run Node.js client tests (not supported client)
+        type: boolean
         required: true
-        default: dontrun
+        default: false
       run_cpp:
-        description: Whether or not to run CPP client tests (not supported client). Set to "run" to run the tests. 
+        description: run CPP client tests (not supported client)
+        type: boolean
         required: true
-        default: dontrun
+        default: false
       run_csharp:
-        description: Whether or not to run Csharp client tests. Set to something else to not run the tests. 
+        description: run Csharp client tests
+        type: boolean
         required: true
-        default: run
+        default: true
       run_go:
-        description: Whether or not to run Go client tests (not supported client). Set to "run" to run the tests. 
+        description: run Go client tests (not supported client)
+        type: boolean
         required: true
-        default: dontrun
+        default: false
 jobs:
   upload_jars:
     name: Create and upload JARs
     runs-on: ubuntu-latest
     outputs:
       hz_version: ${{ steps.compute_hz_version.outputs.hz_version }}
+      hazelcast_enterprise_key_secret: ${{ steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET }}
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v4
@@ -107,9 +113,13 @@ jobs:
           name: hazelcast-enterprise-tests
           path: certs/hazelcast-enterprise-*-tests.jar
           retention-days: 1
+      - uses: ./master/.github/actions/get-enterprise-license
+        id: get-enterprise-license
+        with:
+          hazelcast-version: ${{ steps.compute_hz_version.outputs.hz_version }}
   setup_python_client_matrix:
     name: Setup the Python client test matrix
-    if: ${{ github.event.inputs.run_python == 'run' }}
+    if: ${{ inputs.run_python }}
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -122,7 +132,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Set client matrix
         id: set-matrix
-        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client py --option tag --use-latest-patch-versions )"
+        run: echo "matrix=$( python get_client_matrix.py --client py --option tag --use-latest-patch-versions )" >> ${GITHUB_OUTPUT}
   test_python_clients:
     needs: [ upload_jars, setup_python_client_matrix ]
     runs-on: ubuntu-latest
@@ -132,16 +142,11 @@ jobs:
         client_tag: ${{ fromJson(needs.setup_python_client_matrix.outputs.matrix) }}
         server_kind: [ os, enterprise ]
     name: Test Python client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
+    env:
+      HAZELCAST_ENTERPRISE_KEY: ${{ secrets[needs.upload_jars.outputs.hazelcast_enterprise_key_secret] }}
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v4
-      - uses: ./.github/actions/get-enterprise-license
-        id: get-enterprise-license
-        with:
-          hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
-      - name: Set up enterprise license key
-        run: |
-          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -215,7 +220,7 @@ jobs:
         working-directory: master
   setup_nodejs_client_matrix:
     name: Setup the Node.js client test matrix
-    if: ${{ github.event.inputs.run_nodejs == 'run' }}
+    if: ${{ inputs.run_nodejs }}
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -228,7 +233,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Set client matrix
         id: set-matrix
-        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client node --option tag --use-latest-patch-versions )"
+        run: echo "matrix=$( python get_client_matrix.py --client node --option tag --use-latest-patch-versions )" >> ${GITHUB_OUTPUT}
   test_nodejs_clients:
     needs: [ upload_jars, setup_nodejs_client_matrix ]
     runs-on: ubuntu-latest
@@ -238,15 +243,10 @@ jobs:
         client_tag: ${{ fromJson(needs.setup_nodejs_client_matrix.outputs.matrix) }}
         server_kind: [ os, enterprise ]
     name: Test Node.js client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
+    env:
+      HAZELCAST_ENTERPRISE_KEY: ${{ secrets[needs.upload_jars.outputs.hazelcast_enterprise_key_secret] }}
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/get-enterprise-license
-        id: get-enterprise-license
-        with:
-          hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
-      - name: Set up enterprise license key
-        run: |
-          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -330,7 +330,7 @@ jobs:
         working-directory: master
   setup_csharp_client_matrix:
     name: Setup the Csharp client test matrix
-    if: ${{ github.event.inputs.run_csharp == 'run' }}
+    if: ${{ inputs.run_csharp }}
     runs-on: windows-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -343,7 +343,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Set client matrix
         id: set-matrix
-        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client cs --option tag --use-latest-patch-versions )"
+        run: echo "matrix=$( python get_client_matrix.py --client cs --option tag --use-latest-patch-versions )" >> ${GITHUB_OUTPUT}
   test_csharp_clients:
     needs: [ upload_jars,  setup_csharp_client_matrix ]
     runs-on: windows-latest
@@ -353,16 +353,10 @@ jobs:
         client_tag: ${{ fromJson(needs.setup_csharp_client_matrix.outputs.matrix) }}
         server_kind: [ os, enterprise ]
     name: Test Csharp client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
+    env:
+      HAZELCAST_ENTERPRISE_KEY: ${{ secrets[needs.upload_jars.outputs.hazelcast_enterprise_key_secret] }}
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/get-enterprise-license
-        id: get-enterprise-license
-        with:
-          hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
-      - name: Set up enterprise license key
-        shell: pwsh
-        run: |
-          "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> $env:GITHUB_ENV
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -548,7 +542,7 @@ jobs:
           path: '${{github.workspace}}\tag\temp\rc\' # entire directory          
   setup_cpp_client_matrix:
     name: Setup the Cpp client test matrix
-    if: ${{ github.event.inputs.run_cpp == 'run' }}
+    if: ${{ inputs.run_cpp }}
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -561,7 +555,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Set client matrix
         id: set-matrix
-        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client cpp --option tag --use-latest-patch-versions )"
+        run: echo "matrix=$( python get_client_matrix.py --client cpp --option tag --use-latest-patch-versions )" >> ${GITHUB_OUTPUT}
   test_cpp_clients:
     needs: [ upload_jars, setup_cpp_client_matrix ]
     runs-on: ubuntu-latest
@@ -573,24 +567,6 @@ jobs:
     name: Test CPP client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/get-enterprise-license
-        id: get-enterprise-license
-        with:
-          hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
-      - name: Set up enterprise license key
-        run: |
-          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.9
-      - name: Read Java Config
-        run: cat ${GITHUB_WORKSPACE}/.github/java-config.env >> $GITHUB_ENV
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
       - name: Checkout master
         uses: actions/checkout@v4
         with:
@@ -606,19 +582,6 @@ jobs:
         run: |
           rm -rf tag/scripts
           cp -R master/scripts tag/
-      - name: Install Necessary Packages
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y net-tools libssl-dev gdb
-        working-directory: tag
-      - name: Install Boost
-        run: |
-          sudo ./scripts/install-boost.sh 1.76.0
-        working-directory: tag
-      - name: Install Thrift
-        run: |
-          sudo ./scripts/install-thrift.sh 0.13.0
-        working-directory: tag
       - name: Download Hazelcast tests JAR
         uses: actions/download-artifact@v4
         with:
@@ -648,49 +611,14 @@ jobs:
         with:
           name: hazelcast-enterprise-tests
           path: tag
-
-      # https://github.com/madhead/semver-utils/releases/tag/v4.3.0
-      - uses: madhead/semver-utils@36d1e0ed361bd7b4b77665de8093092eaeabe6ba
-        id: client-version
+      - uses: ./.github/actions/cpp-compatibility-test
         with:
-          version: ${{ matrix.client_tag }}
-          compare-to: 5.2.0
-
-      - name: Determine if test with OpenSSL
-        id: with-openssl
-        run: |
-          if [[ "${{ steps.client-version.outputs.comparison-result }}" = "<" ]]; then
-            # Workaround lack of https://github.com/hazelcast/hazelcast-cpp-client/pull/1098
-            echo "WITH_OPENSSL=OFF" >> ${GITHUB_OUTPUT}
-          else
-            echo "WITH_OPENSSL=ON" >> ${GITHUB_OUTPUT}
-          fi
-
-      - name: Build & Install
-        env:
-          BUILD_DIR: build
-        run: |
-          ./scripts/build-unix.sh                                           \
-              -DCMAKE_BUILD_TYPE=Debug                                      \
-              -DBUILD_SHARED_LIBS=ON                                        \
-              -DWITH_OPENSSL=${{ steps.with-openssl.outputs.WITH_OPENSSL }} \
-              -DBUILD_TESTS=ON                                              \
-              -DBUILD_EXAMPLES=OFF
-        working-directory: tag
-      - name: Test
-        env:
-          BUILD_DIR: build
-          GTEST_FILTER: -*Aws*:*DescribeInstancesTest*
-          HZ_VERSION: '${{ needs.upload_jars.outputs.hz_version }}'
-        run: |
-          ulimit -c unlimited
-          sudo sh -c "echo 'core' > /proc/sys/kernel/core_pattern"
-          sudo sh -c "echo '1' > /proc/sys/kernel/core_uses_pid"
-          ./scripts/test-unix.sh
-        working-directory: tag        
+          working-directory: tag
+          hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
+          hazelcast-enterprise-key: ${{ secrets[needs.upload_jars.outputs.hazelcast_enterprise_key_secret] }}
   setup_go_client_matrix:
     name: Setup the Go client test matrix
-    if: ${{ github.event.inputs.run_go == 'run' }}
+    if: ${{ inputs.run_go }}
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -703,7 +631,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Set client matrix
         id: set-matrix
-        run: echo "::set-output name=matrix::$( python get_client_matrix.py --client go --option tag --use-latest-patch-versions )"       
+        run: echo "matrix=$( python get_client_matrix.py --client go --option tag --use-latest-patch-versions )" >> ${GITHUB_OUTPUT}
   test_go_client:
     needs: [upload_jars, setup_go_client_matrix]
     runs-on: ubuntu-latest
@@ -713,15 +641,10 @@ jobs:
         client_tag: ${{ fromJson(needs.setup_go_client_matrix.outputs.matrix) }}
         
     name: Test Go client ${{ matrix.client_tag }} with enterprise server on ubuntu-latest
+    env:
+      HAZELCAST_ENTERPRISE_KEY: ${{ secrets[needs.upload_jars.outputs.hazelcast_enterprise_key_secret] }}
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/get-enterprise-license
-        id: get-enterprise-license
-        with:
-          hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
-      - name: Set up enterprise license key
-        run: |
-          echo "HAZELCAST_ENTERPRISE_KEY=${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}" >> ${GITHUB_ENV}
       - name: Read Java Config
         run: cat ${GITHUB_WORKSPACE}/.github/java-config.env >> $GITHUB_ENV
       - name: Setup Java
