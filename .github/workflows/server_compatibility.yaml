@@ -329,7 +329,7 @@ jobs:
   setup_csharp_client_matrix:
     name: Setup the Csharp client test matrix
     if: ${{ inputs.run_csharp }}
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
