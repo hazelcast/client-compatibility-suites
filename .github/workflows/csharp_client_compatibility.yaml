@@ -58,16 +58,8 @@ jobs:
             8.0.x
             6.0.x
 
-      - name: Read Java Config
-        shell: bash
-        run: cat ${GITHUB_WORKSPACE}/.github/java-config.env >> $GITHUB_ENV
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
-          cache: 'maven'
+      - uses: ./.github/actions/setup-maven
 
       - name: Checkout to ${{ github.event.inputs.branch_name }}
         uses: actions/checkout@v4

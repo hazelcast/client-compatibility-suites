@@ -42,15 +42,8 @@ jobs:
       - name: Checkout to scripts
         uses: actions/checkout@v4
 
-      - name: Read Java Config
-        run: cat ${GITHUB_WORKSPACE}/.github/java-config.env >> $GITHUB_ENV
+      - uses: ./.github/actions/setup-maven
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
-          cache: 'maven'
       - uses: actions/setup-go@v2
         with:
           go-version: '1.18'
