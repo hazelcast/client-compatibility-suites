@@ -43,6 +43,8 @@ jobs:
         uses: actions/checkout@v4
 
       - uses: ./.github/actions/setup-maven
+        with:
+          name: ${{ matrix.version }}
 
       - uses: actions/setup-go@v2
         with:

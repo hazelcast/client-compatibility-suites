@@ -57,6 +57,8 @@ jobs:
         with:
           node-version: 14
       - uses: ./.github/actions/setup-maven
+        with:
+          name: ${{ matrix.version }}
       - name: Download JARs
         run: python download_server_jars.py --version ${{ matrix.version }} --server-kind ${{ matrix.kind }} --dst jars
       - name: Copy certificates JAR to destination with the appropriate name

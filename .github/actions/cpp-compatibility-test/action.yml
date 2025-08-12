@@ -12,6 +12,8 @@ runs:
   using: "composite"
   steps:
     - uses: ./.github/actions/setup-maven
+      with:
+        name: ${{ inputs.hazelcast-version }}
 
     - name: Install Necessary Packages
       shell: bash

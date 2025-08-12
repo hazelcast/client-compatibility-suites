@@ -33,6 +33,8 @@ jobs:
           python-version: 3.9
 
       - uses: ./.github/actions/setup-maven
+        with:
+          name: ${{ inputs.hzVersion }}
 
       - name: Checkout to ${{ github.event.inputs.branch_name }}
         uses: actions/checkout@v4

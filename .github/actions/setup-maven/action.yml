@@ -1,4 +1,8 @@
 name: Setup Maven
+inputs:
+  hazelcast-version:
+    description: Hazelcast version to use as a cache key
+    required: true
 runs:
   using: "composite"
   steps:
@@ -11,6 +15,13 @@ runs:
       with:
         java-version: ${{ env.JAVA_VERSION }}
         distribution: ${{ env.JAVA_DISTRIBUTION }}
+      
+    # https://github.com/madhead/semver-utils/releases/tag/v4.3.0
+    - uses: madhead/semver-utils@36d1e0ed361bd7b4b77665de8093092eaeabe6ba
+      id: version
+      with:
+        version: ${{ inputs.hazelcast-version }}
+    
 
       # Based off https://github.com/actions/cache/blob/master/examples.md#java---maven
       # Uses seperate cache action to avoid SNAPSHOTs
@@ -20,4 +31,6 @@ runs:
         path: |
           ~/.m2/repository/repository
           !**/*SNAPSHOT*/
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        # Ideally we run these tests only once per release
+        # We need the cache key to be looser to encourage re-use accross multiple patch releases
+        key: ${{ runner.os }}-maven-${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}
