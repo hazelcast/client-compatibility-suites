@@ -30,14 +30,19 @@ runs:
       id: version
       with:
         version: ${{ inputs.hazelcast-version }}
-    
+      
+    - name: Get Maven repository location
+      shell: bash
+      id: get-local-repository
+      run: echo "LOCAL_REPOSITORY=mvn help:evaluate -Dexpression="settings.localRepository" -DforceStdout" >> ${GITHUB_OUTPUT}
+
       # Based off https://github.com/actions/cache/blob/master/examples.md#java---maven
       # Uses seperate cache action to avoid SNAPSHOTs
     - id: maven-cache
       uses: actions/cache@v4
       with:
         path: |
-          ~/.m2/repository
+          ${{ steps.get-local-repository.outputs.LOCAL_REPOSITORY }}
           !**/*SNAPSHOT*/
         # Ideally we run these tests only once per release
         # We need the cache key to be looser to encourage re-use accross multiple patch releases
@@ -45,4 +50,5 @@ runs:
 
     - shell: bash
       run: find ~/.m2/repository -size +100M -printf '%s\t%p\n' | sort -n
+
 
