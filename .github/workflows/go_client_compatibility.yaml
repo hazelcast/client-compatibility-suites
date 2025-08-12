@@ -50,7 +50,7 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
-          check-latest: true
+          cache: 'maven'
       - uses: actions/setup-go@v2
         with:
           go-version: '1.18'

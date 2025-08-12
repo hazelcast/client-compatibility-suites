@@ -20,6 +20,7 @@ runs:
       with:
         java-version: ${{ env.JAVA_VERSION }}
         distribution: ${{ env.JAVA_DISTRIBUTION }}
+        cache: 'maven'
 
     - name: Install Necessary Packages
       shell: bash

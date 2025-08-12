@@ -57,6 +57,7 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
+          cache: 'maven'
       - name: Checkout to test artifacts
         uses: actions/checkout@v4
         with:
@@ -160,6 +161,7 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
+          cache: 'maven'
       - name: Checkout to master
         uses: actions/checkout@v4
         with:
@@ -284,6 +286,7 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
+          cache: 'maven'
       - name: Checkout to master
         uses: actions/checkout@v4
         with:
@@ -391,6 +394,7 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
+          cache: 'maven'
 
       - name: Install .NET
         uses: actions/setup-dotnet@v3
@@ -673,6 +677,7 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
+          cache: 'maven'
             
       - name: Checkout the ${{ matrix.client_tag }}     
         uses: actions/checkout@v4

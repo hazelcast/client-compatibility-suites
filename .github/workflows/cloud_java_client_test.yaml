@@ -30,6 +30,7 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
+          cache: 'maven'
           
       - name: Run cloud tests for Viridian
         env:
