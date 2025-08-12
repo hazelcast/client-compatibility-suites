@@ -34,7 +34,7 @@ runs:
     - name: Get Maven repository location
       shell: bash
       id: get-local-repository
-      run: echo "LOCAL_REPOSITORY=$(mvn help:evaluate -Dexpression="settings.localRepository" -DforceStdout") >> ${GITHUB_OUTPUT}
+      run: echo "LOCAL_REPOSITORY=$(mvn help:evaluate -Dexpression=settings.localRepository -DforceStdout") >> ${GITHUB_OUTPUT}
 
       # Based off https://github.com/actions/cache/blob/master/examples.md#java---maven
       # Uses seperate cache action to avoid SNAPSHOTs
@@ -50,6 +50,7 @@ runs:
 
     - shell: bash
       run: find ~/.m2/repository -size +100M -printf '%s\t%p\n' | sort -n
+
 
 
 
