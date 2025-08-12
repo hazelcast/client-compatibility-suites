@@ -44,7 +44,7 @@ jobs:
 
       - uses: ./.github/actions/setup-maven
         with:
-          name: ${{ matrix.version }}
+          hazelcast-version: ${{ matrix.version }}
 
       - uses: actions/setup-go@v2
         with:

@@ -34,7 +34,7 @@ jobs:
 
       - uses: ./.github/actions/setup-maven
         with:
-          name: ${{ inputs.hzVersion }}
+          hazelcast-version: ${{ inputs.hzVersion }}
 
       - name: Install .NET
         uses: actions/setup-dotnet@v3

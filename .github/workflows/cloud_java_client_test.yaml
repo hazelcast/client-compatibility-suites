@@ -24,7 +24,7 @@ jobs:
 
       - uses: ./.github/actions/setup-maven
         with:
-          name: ${{ inputs.hzVersion }}
+          hazelcast-version: ${{ inputs.hzVersion }}
           
       - name: Run cloud tests for Viridian
         env:

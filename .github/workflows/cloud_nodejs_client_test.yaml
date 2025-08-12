@@ -34,7 +34,7 @@ jobs:
 
       - uses: ./.github/actions/setup-maven
         with:
-          name: ${{ inputs.hzVersion }}
+          hazelcast-version: ${{ inputs.hzVersion }}
 
       - name: Checkout to ${{ github.event.inputs.branch_name }}
         uses: actions/checkout@v4

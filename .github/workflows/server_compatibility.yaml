@@ -70,7 +70,7 @@ jobs:
         working-directory: hazelcast-mono
       - uses: ./master/.github/actions/setup-maven
         with:
-          name: ${{ steps.compute_hz_version.outputs.hz_version }}
+          hazelcast-version: ${{ steps.compute_hz_version.outputs.hz_version }}
       - name: Build JARs
         run: ./mvnw clean install --activate-profiles quick
         working-directory: hazelcast-mono
@@ -151,7 +151,7 @@ jobs:
           python-version: 3.9
       - uses: ./.github/actions/setup-maven
         with:
-          name: ${{ needs.upload_jars.outputs.hz_version }}
+          hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
       - name: Checkout to master
         uses: actions/checkout@v4
         with:
@@ -271,7 +271,7 @@ jobs:
           node-version: 14
       - uses: ./.github/actions/setup-maven
         with:
-          name: ${{ needs.upload_jars.outputs.hz_version }}
+          hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
       - name: Checkout to master
         uses: actions/checkout@v4
         with:
@@ -370,10 +370,9 @@ jobs:
         with:
           python-version: 3.9
 
-
       - uses: ./.github/actions/setup-maven
         with:
-          name: ${{ needs.upload_jars.outputs.hz_version }}
+          hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
 
       - name: Install .NET
         uses: actions/setup-dotnet@v3
@@ -652,7 +651,7 @@ jobs:
 
       - uses: ./.github/actions/setup-maven
         with:
-          name: ${{ needs.upload_jars.outputs.hz_version }}
+          hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
             
       - name: Checkout the ${{ matrix.client_tag }}     
         uses: actions/checkout@v4

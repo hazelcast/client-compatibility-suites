@@ -15,9 +15,9 @@ runs:
         echo "ROOT_FOLDER=${GITHUB_ACTION_PATH}/../../../" >> ${GITHUB_OUTPUT}
   
     - name: Read Java Config
-      shell: bash 
+      shell: bash
       working-directory: ${{ steps.get-root-folder.outputs.ROOT_FOLDER }}
-      run: cat ${GITHUB_WORKSPACE}/.github/java-config.env >> $GITHUB_ENV
+      run: cat .github/java-config.env >> $GITHUB_ENV
 
     - name: Setup Java
       uses: actions/setup-java@v4

@@ -60,7 +60,7 @@ jobs:
 
       - uses: ./.github/actions/setup-maven
         with:
-          name: ${{ matrix.version }}
+          hazelcast-version: ${{ matrix.version }}
 
       - name: Checkout to ${{ github.event.inputs.branch_name }}
         uses: actions/checkout@v4
