@@ -31,7 +31,6 @@ runs:
       with:
         version: ${{ inputs.hazelcast-version }}
     
-
       # Based off https://github.com/actions/cache/blob/master/examples.md#java---maven
       # Uses seperate cache action to avoid SNAPSHOTs
     - id: maven-cache
@@ -46,4 +45,5 @@ runs:
 
     - name: Read Java Config
       shell: bash
-      run: find ~/.m2/repository -type f -printf "%s %p\n" | sort -nr | head -n 100
+      run: find ~/.m2/repository -type f -print0 | du -h --files0-from=- | sort -hr | head -n 100
+
