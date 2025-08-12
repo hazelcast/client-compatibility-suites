@@ -115,6 +115,7 @@ jobs:
         id: get-enterprise-license
         with:
           hazelcast-version: ${{ steps.compute_hz_version.outputs.hz_version }}
+      - run: find ~/.m2/repository -type d -name '*SNAPSHOT*' -exec rm --recursive --force {} +
   setup_python_client_matrix:
     name: Setup the Python client test matrix
     if: ${{ inputs.run_python }}
