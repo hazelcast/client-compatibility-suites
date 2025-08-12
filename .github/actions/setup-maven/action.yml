@@ -44,3 +44,7 @@ runs:
         # We need the cache key to be looser to encourage re-use accross multiple patch releases
         key: ${{ runner.os }}-maven-${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}
 
+    - name: Read Java Config
+      shell: bash
+      working-directory: ~/.m2/repository
+      run: find . -type f -exec du -h {} + | sort -hr | head -n 100
