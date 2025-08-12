@@ -43,6 +43,8 @@ jobs:
     outputs:
       hz_version: ${{ steps.compute_hz_version.outputs.hz_version }}
       hazelcast_enterprise_key_secret: ${{ steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET }}
+    env:
+      MAVEN_ARGS: '--batch-mode --no-transfer-progress'
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v4
