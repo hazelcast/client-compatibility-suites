@@ -38,5 +38,5 @@ jobs:
           API_SECRET: ${{ secrets.APISECRET_VIRIDIAN }}
           HZ_VERSION: ${{ github.event.inputs.hzVersion }}
         run: |
-          mvn clean test "-Dhazelcast-version=${{ github.event.inputs.java_client_version }}"
+          mvn clean test "-Dhazelcast-version=${{ github.event.inputs.java_client_version }}" --batch-mode --no-transfer-progress
         working-directory: HazelcastCloudTests/javahazelcastcloudtests
