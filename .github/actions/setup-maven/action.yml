@@ -6,8 +6,17 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Set ROOT_FOLDER
+      shell: bash
+      id: get-root-folder
+      run: |
+        # Path to the root of the checked-out `hazelcast-mono` repo
+        # Support execution from non-root directory (e.g. when cloned in a custom subdirectory)
+        echo "ROOT_FOLDER=${GITHUB_ACTION_PATH}/../../../" >> ${GITHUB_OUTPUT}
+  
     - name: Read Java Config
       shell: bash 
+      working-directory: ${{ steps.get-root-folder.outputs.ROOT_FOLDER }}
       run: cat ${GITHUB_WORKSPACE}/.github/java-config.env >> $GITHUB_ENV
 
     - name: Setup Java
