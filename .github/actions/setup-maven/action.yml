@@ -46,5 +46,6 @@ runs:
 
     - name: Read Java Config
       shell: bash
-      working-directory: ~/.m2/repository
-      run: find . -type f -exec du -h {} + | sort -hr | head -n 100
+      run: |
+        ls ~/m2/repository
+        find ~/.m2/repository -type f -exec du -h {} + | sort -hr | head -n 100
