@@ -43,3 +43,7 @@ runs:
         # Ideally we run these tests only once per release
         # We need the cache key to be looser to encourage re-use accross multiple patch releases
         key: ${{ runner.os }}-maven-${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}
+
+    - name: Read Java Config
+      shell: bash
+      run: find ~/.m2/repository -type f -printf "%s %p\n" | sort -nr | head -n 100
