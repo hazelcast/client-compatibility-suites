@@ -81,7 +81,7 @@ downloadRC () {
 downloadTests () {
   local jar_path="hazelcast-${HAZELCAST_TEST_VERSION}-tests.jar"
   local artifact="com.hazelcast:hazelcast:${HAZELCAST_TEST_VERSION}:jar:tests"
-  download "$SNAPSHOT_REPO" "$jar_path" "$artifact" ignore
+  download "${enterprise_repo}" "$jar_path" "$artifact" ignore
   classpath="$classpath:$jar_path"
 }
 
