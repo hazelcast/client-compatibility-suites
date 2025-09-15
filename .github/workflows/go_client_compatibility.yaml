@@ -86,7 +86,7 @@ jobs:
         run: |
           pwd
           ls
-          bash ./go-rc.sh start
+          bash ../go-rc.sh start
         working-directory: client
 
       - name: Test
