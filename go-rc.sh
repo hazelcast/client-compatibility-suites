@@ -81,7 +81,7 @@ downloadRC () {
 downloadTests () {
   local jar_path="hazelcast-${HAZELCAST_TEST_VERSION}-tests.jar"
   local artifact="com.hazelcast:hazelcast:${HAZELCAST_TEST_VERSION}:jar:tests"
-  download "${enterprise_repo}" "$jar_path" "$artifact" ignore
+  download "${enterprise_repo}" "$jar_path" "$artifact"
   classpath="$classpath:$jar_path"
 }
 
@@ -95,7 +95,7 @@ downloadHazelcast () {
 downloadSQL () {
   local jar_path="hazelcast-sql-${HZ_VERSION}.jar"
   local artifact="com.hazelcast:hazelcast-sql:${HZ_VERSION}"
-  download "${repo}" "$jar_path" "$artifact" ignore
+  download "${enterprise_repo}" "$jar_path" "$artifact"
   classpath="$classpath:$jar_path"
 }
 
