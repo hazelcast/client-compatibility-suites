@@ -41,7 +41,7 @@ log_fatal () {
   local msg=$1
   local ts
   ts=$(date "$TIMESTAMP_FMT")
-  echo "$ts FATAL: $msg"
+  printf "$ts FATAL: $msg"
   exit 1
 }
 
@@ -88,7 +88,7 @@ downloadTests () {
 downloadHazelcast () {
   local jar_path="hazelcast-${HZ_VERSION}.jar"
   local artifact="com.hazelcast:hazelcast:${HZ_VERSION}"
-  download "${repo}" "$jar_path" "$artifact"
+  download "${enterprise_repo}" "$jar_path" "$artifact"
   classpath="$classpath:$jar_path"
 }
 
