@@ -91,6 +91,7 @@ jobs:
       - name: Start Remote Controller
         env:
           HZ_VERSION: ${{ matrix.version }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
         run: |
           ../client-master/rc.sh start
         working-directory: client
