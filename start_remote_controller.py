@@ -7,7 +7,7 @@ from os.path import isfile
 SERVER_VERSION = "5.0"
 RC_VERSION = "0.8-SNAPSHOT"
 
-RELEASE_REPO = "https://repo1.maven.apache.org/maven2"
+RELEASE_REPO = "https://repo.maven.apache.org/maven2"
 ENTERPRISE_RELEASE_REPO = "https://repository.hazelcast.com/release/"
 SNAPSHOT_REPO = "https://oss.sonatype.org/content/repositories/snapshots"
 ENTERPRISE_SNAPSHOT_REPO = "https://repository.hazelcast.com/snapshot/"
@@ -80,7 +80,7 @@ def download_if_necessary(repo, artifact_id, version, is_test_artifact=False):
 def start_rc(use_simple_server: bool, stdout=None, stderr=None):
     artifacts = []
 
-    rc = download_if_necessary(RC_REPO, "hazelcast-remote-controller", RC_VERSION)
+    rc = download_if_necessary(ENTERPRISE_SNAPSHOT_REPO, "hazelcast-remote-controller", RC_VERSION)
     tests = download_if_necessary(REPO, "hazelcast", SERVER_VERSION, True)
     sql = download_if_necessary(REPO, "hazelcast-sql", SERVER_VERSION)
 

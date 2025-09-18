@@ -7,8 +7,7 @@ from contextlib import closing
 from os import path
 
 from util import (
-    SNAPSHOT_REPO,
-    RELEASE_REPO,
+    ENTERPRISE_SNAPSHOT_REPO,
     download_via_maven,
     IS_ON_WINDOWS,
     ServerKind,
@@ -61,12 +60,7 @@ def parse_args() -> argparse.Namespace:
 def start_rc(
     rc_version: str, dst_folder: str, use_simple_server: bool, server_kind: ServerKind
 ) -> None:
-    if rc_version.upper().endswith("-SNAPSHOT"):
-        rc_repo = SNAPSHOT_REPO
-    else:
-        rc_repo = RELEASE_REPO
-
-    download_via_maven(rc_repo, "hazelcast-remote-controller", rc_version, dst_folder)
+    download_via_maven(ENTERPRISE_SNAPSHOT_REPO, "hazelcast-remote-controller", rc_version, dst_folder)
     class_path = path.join(dst_folder, "*")
 
     args = [
