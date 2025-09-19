@@ -49,7 +49,7 @@ HAZELCAST_SERVERS = "https://raw.githubusercontent.com/hazelcast/rel-scripts/mas
 
 CLIENT_HEADER = "======= %s Client\n---\n(.*?)\n---\n==="
 
-RELEASE_REPO = "http://repo1.maven.apache.org/maven2"
+RELEASE_REPO = "https://repo.maven.apache.org/maven2"
 ENTERPRISE_RELEASE_REPO = "https://repository.hazelcast.com/release/"
 SNAPSHOT_REPO = "https://oss.sonatype.org/content/repositories/snapshots"
 ENTERPRISE_SNAPSHOT_REPO = "https://repository.hazelcast.com/snapshot/"

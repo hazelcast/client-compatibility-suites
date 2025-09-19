@@ -82,14 +82,6 @@
     </dependencies>
     <repositories>
         <repository>
-            <id>oss-sonatype</id>
-            <name>oss-sonatype</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
             <id>private-repository</id>
             <name>Hazelcast Private Repository</name>
             <url>https://repository.hazelcast.com/snapshot/</url>
