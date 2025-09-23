@@ -60,6 +60,9 @@ if __name__ == "__main__":
     if client_kind == ClientKind.GO:
         filtered_major_version = [1]
         unsupported_versions = [Version("1.0"), Version("1.1")]
+    elif client_kind == ClientKind.CPP:
+        filtered_major_version = [5]
+        unsupported_versions = [Version("5.0.0"), Version("5.1.0"), Version("5.2.0")]
     else:
         filtered_major_version = [5]
         unsupported_versions = []
