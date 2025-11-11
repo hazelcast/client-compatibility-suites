@@ -39,6 +39,19 @@ jobs:
         
     name: Test Go client against enterprise ${{ matrix.version }} server on ubuntu-latest
     steps:
+      - name: Set ROOT_FOLDER
+        shell: bash
+        id: get-root-folder
+        run: |
+          # Path to the root of the checked-out repo
+          # Support execution from non-root directory (e.g. when cloned in a custom subdirectory)
+          echo "ROOT_FOLDER=${GITHUB_ACTION_PATH}/../../../" >> ${GITHUB_OUTPUT}      
+
+      - name: Read Config
+        shell: bash
+        working-directory: ${{ steps.get-root-folder.outputs.ROOT_FOLDER }}
+        run: cat .github/config.env >> ${GITHUB_ENV}
+
       - name: Checkout to scripts
         uses: actions/checkout@v4
 
@@ -79,13 +92,24 @@ jobs:
         with:
           hazelcast-version: ${{ matrix.version }}
 
-      - name: Start Remote Controller
+      - name: Download RCD (Linux/MacOS)
+        if: "!contains(inputs.OS, 'windows')"
+        shell: bash
+        working-directory: ${{ steps.get-root-folder.outputs.ROOT_FOLDER }}
+        run: |
+          wget https://client-rcd-download.s3.us-east-2.amazonaws.com/rcd-${{ inputs.OS }}
+
+      - name: Start Hazelcast Remote Controller (Linux/MacOS)
+        if: "!contains(inputs.OS, 'windows')"
         env:
           HZ_VERSION: ${{ matrix.version }}
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
+        shell: bash
+        working-directory: ${{ steps.get-root-folder.outputs.ROOT_FOLDER }}
         run: |
-          bash ../go-rc.sh start
-        working-directory: client
+          chmod +x rcd-${{ inputs.OS }} 
+          ./rcd-${{ inputs.OS }} -version $HZ_VERSION -dir $HOME &
+          sleep 10
 
       - name: Test
         env:
