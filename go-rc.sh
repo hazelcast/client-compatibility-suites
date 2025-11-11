@@ -28,7 +28,7 @@ set -e
 # Treat unset variables an parameters as an error.
 set -u
 # Disable printing trace.
-# set +x
+set -x
 
 log_info () {
   local msg=$1
