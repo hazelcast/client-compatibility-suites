@@ -74,7 +74,7 @@ download () {
 downloadRC () {
   local jar_path="hazelcast-remote-controller-${HAZELCAST_RC_VERSION}.jar"
   local artifact="com.hazelcast:hazelcast-remote-controller:${HAZELCAST_RC_VERSION}"
-  download "$ENTERPRISE_RELEASE_REPO" "$jar_path" "$artifact"
+  download "$ENTERPRISE_SNAPSHOT_REPO" "$jar_path" "$artifact"
   classpath="$classpath:$jar_path"
 }
 
