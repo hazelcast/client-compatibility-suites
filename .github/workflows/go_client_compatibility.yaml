@@ -102,8 +102,8 @@ jobs:
         shell: bash
         working-directory: ${{ steps.get-root-folder.outputs.ROOT_FOLDER }}
         run: |
-          chmod +x rcd-${{ inputs.OS }} 
-          ./rcd-${{ inputs.OS }} -version $HZ_VERSION -dir $HOME &
+          chmod +x rcd-ubuntu-latest 
+          ./rcd-ubuntu-latest -version $HZ_VERSION -dir $HOME &
           sleep 10
 
       - name: Test
