@@ -89,7 +89,6 @@ jobs:
 
       - name: Download RCD Linux
         shell: bash
-        working-directory: ${{ steps.get-root-folder.outputs.ROOT_FOLDER }}
         run: |
           echo "PWD: $PWD"
           echo "ROOT_FOLDER: ${{ steps.get-root-folder.outputs.ROOT_FOLDER }}"
@@ -100,7 +99,6 @@ jobs:
           HZ_VERSION: ${{ matrix.version }}
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
         shell: bash
-        working-directory: ${{ steps.get-root-folder.outputs.ROOT_FOLDER }}
         run: |
           chmod +x rcd-ubuntu-latest 
           ./rcd-ubuntu-latest -version $HZ_VERSION -dir $HOME &
