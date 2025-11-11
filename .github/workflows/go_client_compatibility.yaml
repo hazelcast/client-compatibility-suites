@@ -71,7 +71,7 @@ jobs:
           ref: data
           token: ${{ secrets.GH_PAT }}
 
-      - name: Checkout the ${{ github.event.inputs.branch_name }}     
+      - name: Checkout the ${{ github.event.inputs.branch_name }}
         uses: actions/checkout@v4
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-go-client
@@ -92,7 +92,7 @@ jobs:
         shell: bash
         working-directory: ${{ steps.get-root-folder.outputs.ROOT_FOLDER }}
         run: |
-          wget https://client-rcd-download.s3.us-east-2.amazonaws.com/rcd-${{ inputs.OS }}
+          wget https://client-rcd-download.s3.us-east-2.amazonaws.com/rcd-ubuntu-latest
 
       - name: Start Hazelcast Remote Controller (Linux/MacOS)
         if: "!contains(inputs.OS, 'windows')"
