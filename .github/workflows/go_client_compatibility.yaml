@@ -61,7 +61,7 @@ jobs:
           check-latest: true
       - uses: actions/setup-go@v2
         with:
-          go-version: '1.18'
+          go-version: '1.20'
 
       - name: Checkout to test artifacts
         uses: actions/checkout@v4
@@ -87,15 +87,15 @@ jobs:
         with:
           hazelcast-version: ${{ matrix.version }}
 
-      - name: Download RCD (Linux/MacOS)
-        if: "!contains(inputs.OS, 'windows')"
+      - name: Download RCD Linux
         shell: bash
         working-directory: ${{ steps.get-root-folder.outputs.ROOT_FOLDER }}
         run: |
+          echo "PWD: $PWD"
+          echo "ROOT_FOLDER: ${{ steps.get-root-folder.outputs.ROOT_FOLDER }}"
           wget https://client-rcd-download.s3.us-east-2.amazonaws.com/rcd-ubuntu-latest
 
-      - name: Start Hazelcast Remote Controller (Linux/MacOS)
-        if: "!contains(inputs.OS, 'windows')"
+      - name: Start Hazelcast Remote Controller Linux
         env:
           HZ_VERSION: ${{ matrix.version }}
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
