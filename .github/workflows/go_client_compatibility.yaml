@@ -47,11 +47,6 @@ jobs:
           # Support execution from non-root directory (e.g. when cloned in a custom subdirectory)
           echo "ROOT_FOLDER=${GITHUB_ACTION_PATH}/../../../" >> ${GITHUB_OUTPUT}      
 
-      - name: Read Config
-        shell: bash
-        working-directory: ${{ steps.get-root-folder.outputs.ROOT_FOLDER }}
-        run: cat .github/config.env >> ${GITHUB_ENV}
-
       - name: Checkout to scripts
         uses: actions/checkout@v4
 
