@@ -242,11 +242,14 @@ jobs:
         
     steps: 
     
-    - name: Setup .NET Core 8.0
-      uses: actions/setup-dotnet@v1
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v3
       with:
         dotnet-version: |
             8.0.x
+            9.0.x
+            10.0.x
+
     - name: Checkout to scripts
       uses: actions/checkout@v4
         
