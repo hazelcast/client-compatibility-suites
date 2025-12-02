@@ -11,6 +11,14 @@ on:
         description: Name of the branch to test client from
         required: true
         default: master
+      debug:
+        description: Set to true to enable debug logs
+        required: false
+        default: 'false'
+      test_filter:
+        description: Filter to run specific tests
+        required: false
+        default: ''
 
 jobs:
   setup_server_matrix:
@@ -82,15 +90,15 @@ jobs:
             git submodule update --init
         working-directory: client
 
-      - name: Build
+      - name: Build as ${{ github.event.inputs.debug == 'true' && 'Debug' || 'Release' }} 
         shell: pwsh
-        run: ./hz.ps1 -localRestore build
+        run: ./hz.ps1 -localRestore build -configuration ${{ github.event.inputs.debug == 'true' && 'Debug' || 'Release' }}
         working-directory: client      
 
       - name: Run non-enterprise tests
         shell: pwsh
         if: ${{ matrix.kind == 'os' }}
-        run: ./hz.ps1 -server ${{ matrix.version }} test
+        run: ./hz.ps1 -server ${{ matrix.version }} test ${{github.event.inputs.debug == 'true' && '-verbose-logs' || ''}} ${{ github.event.inputs.test_filter != '' && '-tf "${{ github.event.inputs.test_filter }}"' || '' }}
         working-directory: client
         env:
           HAZELCAST_SERVER_VERSION: ${{ matrix.version }}      
@@ -103,10 +111,17 @@ jobs:
       - name: Run all tests        
         shell: pwsh
         if: ${{ matrix.kind == 'enterprise' }}
-        run: ./hz.ps1 -enterprise -noRestore -localRestore -server ${{ matrix.version }} test ${{ secrets.GH_PAT }}
+        run: ./hz.ps1 -enterprise -noRestore -localRestore -server ${{ matrix.version }} test ${{github.event.inputs.debug == 'true' && '-verbose-logs' || ''}} ${{ github.event.inputs.test_filter != '' && '-tf "${{ github.event.inputs.test_filter }}"' || '' }} ${{ secrets.GH_PAT }} 
         working-directory: client        
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
           HAZELCAST_SERVER_VERSION: ${{ matrix.version }}
+      
+      - name: Upload Test Results
+        if: github.event.inputs.debug == 'true'
+        uses: actions/upload-artifact@v3        
+        with:
+          name: Test Results - ${{ matrix.kind }} ${{ matrix.version }} server on ${{ matrix.os }}
+          path: /client/temp/tests/results/*
 
           
