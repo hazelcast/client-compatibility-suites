@@ -122,6 +122,9 @@ jobs:
         uses: actions/upload-artifact@v3        
         with:
           name: Test Results - ${{ matrix.kind }} ${{ matrix.version }} server on ${{ matrix.os }}
-          path: /client/temp/tests/results/*
+          path: 
+            client/temp/tests/results/*
+            client/temp/rc/*
+
 
           
