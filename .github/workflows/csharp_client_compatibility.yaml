@@ -123,8 +123,8 @@ jobs:
         with:
           name: Test Results - ${{ matrix.kind }} ${{ matrix.version }} server on ${{ matrix.os }}
           path: 
-            ./temp/tests/results/*
-            ./temp/rc/*
+            client/temp/tests/results/*
+            client/temp/rc/*
 
 
           
