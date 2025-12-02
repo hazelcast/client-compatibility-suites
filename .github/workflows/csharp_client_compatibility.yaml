@@ -117,11 +117,6 @@ jobs:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
           HAZELCAST_SERVER_VERSION: ${{ matrix.version }}
       
-      - name: List the file sin the paths
-        if: github.event.inputs.debug == 'true' && ${{ matrix.os == 'ubuntu-latest' }}
-        run: |          
-          ls -la ./client          
-          pwd
       
       - name: Upload Test Results
         if: github.event.inputs.debug == 'true' && ${{ matrix.os == 'ubuntu-latest' }}
@@ -130,8 +125,8 @@ jobs:
           name: Test Results - ${{ matrix.kind }} ${{ matrix.version }} server on ${{ matrix.os }}
           #if-no-files-found: 'error'          
           path: 
-            ./*
-            
+            ${{ github.workspace }}/temp/tests/results/*
+            ${{ github.workspace }}/temp/rc/*
             
 
 
