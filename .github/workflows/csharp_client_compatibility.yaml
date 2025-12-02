@@ -98,7 +98,7 @@ jobs:
       - name: Run non-enterprise tests
         shell: pwsh
         if: ${{ matrix.kind == 'os' }}
-        run: ./hz.ps1 -server ${{ matrix.version }} test ${{github.event.inputs.debug == 'true' && '-verbose-tests' || ''}} -tf ${{ github.event.inputs.test_filter != '' &&   github.event.inputs.test_filter || '' }}
+        run: ./hz.ps1 -server ${{ matrix.version }} test ${{github.event.inputs.debug == 'true' && '-verbose-tests' || ''}} -tf "${{ github.event.inputs.test_filter != '' &&   github.event.inputs.test_filter || '' }}"
         working-directory: client
         env:
           HAZELCAST_SERVER_VERSION: ${{ matrix.version }}      
@@ -111,7 +111,7 @@ jobs:
       - name: Run all tests        
         shell: pwsh
         if: ${{ matrix.kind == 'enterprise' }}
-        run: ./hz.ps1 -enterprise -noRestore -localRestore -server ${{ matrix.version }} test ${{github.event.inputs.debug == 'true' && '-verbose-tests' || ''}}  -tf ${{ github.event.inputs.test_filter != '' &&   github.event.inputs.test_filter || '' }} ${{ secrets.GH_PAT }} 
+        run: ./hz.ps1 -enterprise -noRestore -localRestore -server ${{ matrix.version }} test ${{github.event.inputs.debug == 'true' && '-verbose-tests' || ''}}  -tf "${{ github.event.inputs.test_filter != '' &&   github.event.inputs.test_filter || '' }}" ${{ secrets.GH_PAT }} 
         working-directory: client        
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
