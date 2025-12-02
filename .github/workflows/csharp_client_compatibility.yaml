@@ -119,12 +119,12 @@ jobs:
       
       - name: Upload Test Results
         if: github.event.inputs.debug == 'true'
-        uses: actions/upload-artifact@v4        
+        uses: actions/upload-artifact@v4               
         with:
           name: Test Results - ${{ matrix.kind }} ${{ matrix.version }} server on ${{ matrix.os }}
           path: 
-            client/temp/tests/results/*
-            client/temp/rc/*
+            temp/tests/results/*
+            temp/rc/*
 
 
           
