@@ -119,11 +119,9 @@ jobs:
       
       - name: List the file sin the paths
         if: github.event.inputs.debug == 'true' && ${{ matrix.os == 'ubuntu-latest' }}
-        run: |
-          ls -la ./client-compatibility-suites/client/temp/tests/results/
-          ls -la ./client-compatibility-suites/client/temp/rc/
-          ls -la ./client-compatibility-suites/client-compatibility-suites/client/temp/rc/
+        run: |          
           ls -la .          
+          pwd
       
       - name: Upload Test Results
         if: github.event.inputs.debug == 'true' && ${{ matrix.os == 'ubuntu-latest' }}
