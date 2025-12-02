@@ -117,14 +117,19 @@ jobs:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
           HAZELCAST_SERVER_VERSION: ${{ matrix.version }}
       
+
+      
       - name: Upload Test Results
-        if: github.event.inputs.debug == 'true'
+        if: github.event.inputs.debug == 'true' && ${{ matrix.os == 'ubuntu-latest' }}
         uses: actions/upload-artifact@v4               
         with:
           name: Test Results - ${{ matrix.kind }} ${{ matrix.version }} server on ${{ matrix.os }}
+          if-no-files-found: 'error'          
           path: 
-            /home/runner/work/client-compatibility-suites/client-compatibility-suites/client/temp/tests/results/*
-            /home/runner/work/client-compatibility-suites/client-compatibility-suites/client/temp/rc/*
+            ./client-compatibility-suites/client/temp/tests/results/*
+            ./client-compatibility-suites/client/temp/rc/*
+            ./client-compatibility-suites/client-compatibility-suites/client/temp/rc/*
 
 
           
+            
