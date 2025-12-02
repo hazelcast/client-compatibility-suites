@@ -120,7 +120,7 @@ jobs:
       - name: List the file sin the paths
         if: github.event.inputs.debug == 'true' && ${{ matrix.os == 'ubuntu-latest' }}
         run: |          
-          ls -la .          
+          ls -la ./client          
           pwd
       
       - name: Upload Test Results
