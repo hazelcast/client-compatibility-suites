@@ -119,14 +119,13 @@ jobs:
       
       
       - name: Upload Test Results
-        if: github.event.inputs.debug == 'true' && ${{ matrix.os == 'ubuntu-latest' }}
+        if: github.event.inputs.debug == 'true'
         uses: actions/upload-artifact@v4               
         with:
           name: Test Results - ${{ matrix.kind }} ${{ matrix.version }} server on ${{ matrix.os }}
           # if-no-files-found: 'error'          
-          path: 
-            ${{ github.workspace }}/client/temp/tests/results/
-            ${{ github.workspace }}/client/temp/rc/
+          path: |
+            ${{ github.workspace }}/client/temp/
             
 
 
