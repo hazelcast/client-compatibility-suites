@@ -123,10 +123,10 @@ jobs:
         uses: actions/upload-artifact@v4               
         with:
           name: Test Results - ${{ matrix.kind }} ${{ matrix.version }} server on ${{ matrix.os }}
-          if-no-files-found: 'error'          
+          # if-no-files-found: 'error'          
           path: 
-            ${{ github.workspace }}/client/temp/tests/results
-            ${{ github.workspace }}/client/temp/rc
+            ${{ github.workspace }}/client/temp/
+            #${{ github.workspace }}/client/temp/rc/*
             
 
 
