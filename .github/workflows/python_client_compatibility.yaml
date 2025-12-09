@@ -121,6 +121,6 @@ jobs:
           fi
           if [[ "${{ steps.client-version.outputs.comparison-result }}" = "<" ]]; then
             # Workaround https://github.com/hazelcast/hazelcast-python-client/issues/666 by skipping those tests
-            args+=(--ignore tests/integration/backward_compatible/predicate_test.py)
+            args+=(--ignore master/tests/integration/backward_compatible/predicate_test.py)
           fi
-          pytest master/hazelcast/tests/integration "${args[@]}"
+          pytest master/tests/integration "${args[@]}"
