@@ -77,11 +77,6 @@ jobs:
         run: |
           rm -rf $GITHUB_WORKSPACE/master/hazelcast
           cp -a $GITHUB_WORKSPACE/client/hazelcast $GITHUB_WORKSPACE/master/hazelcast
-      - name: Copy certificates JAR to destination with the appropriate name
-        if: ${{ matrix.kind == 'enterprise' }}
-        run: |
-          cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/jars/hazelcast-enterprise-${{ matrix.version }}-tests.jar
-          unzip -p $GITHUB_WORKSPACE/certs/certs.jar com/hazelcast/nio/ssl/letsencrypt.jks > master/tests/integration/backward_compatible/ssl_tests/keystore.jks
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -106,6 +101,11 @@ jobs:
           chmod +x rcd-ubuntu-latest 
           ./rcd-ubuntu-latest -version $HZ_VERSION -dir $HOME &
           sleep 10
+      - name: Copy certificates JAR to destination with the appropriate name
+        if: ${{ matrix.kind == 'enterprise' }}
+        run: |
+          cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/jars/hazelcast-enterprise-${{ matrix.version }}-tests.jar
+          unzip -p $GITHUB_WORKSPACE/certs/certs.jar com/hazelcast/nio/ssl/letsencrypt.jks > master/tests/integration/backward_compatible/ssl_tests/keystore.jks
       - name: Convert major.minor version to semver
         id: generate-semver
         run: |
@@ -133,5 +133,6 @@ jobs:
           if [[ "${{ steps.client-version.outputs.comparison-result }}" = "<" ]]; then
             # Workaround https://github.com/hazelcast/hazelcast-python-client/issues/666 by skipping those tests
             args+=(--ignore master/tests/integration/backward_compatible/predicate_test.py)
+            args+=(--ignore master/tests/integration/asyncio/predicate_test.py)
           fi
           pytest master/tests/integration "${args[@]}"
