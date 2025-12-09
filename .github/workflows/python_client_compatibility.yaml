@@ -138,4 +138,4 @@ jobs:
             args+=(--ignore master/tests/integration/backward_compatible/predicate_test.py)
             args+=(--ignore master/tests/integration/asyncio/predicate_test.py)
           fi
-          pytest master/tests/integration/asyncio master/tests/integration/backward_compatible "${args[@]}"
+          pytest master/tests/integration/asyncio master/tests/integration/backward_compatible "${args[@]}" --log-cli-level debug
