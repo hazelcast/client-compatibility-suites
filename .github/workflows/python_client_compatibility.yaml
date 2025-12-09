@@ -114,7 +114,7 @@ jobs:
       - name: Run tests
         run: |
           echo "HERE: $(pwd)"
-          ls
+          ls master
           args=()
           if [ "${{ matrix.kind }}" = "os" ]; then
             args+=(-m "not enterprise")
@@ -123,4 +123,4 @@ jobs:
             # Workaround https://github.com/hazelcast/hazelcast-python-client/issues/666 by skipping those tests
             args+=(--ignore tests/integration/backward_compatible/predicate_test.py)
           fi
-          pytest $GITHUB_WORKSPACE/master/hazelcast/tests/integration "${args[@]}"
+          pytest master/hazelcast/tests/integration "${args[@]}"
