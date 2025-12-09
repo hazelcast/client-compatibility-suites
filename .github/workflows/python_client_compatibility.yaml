@@ -121,4 +121,4 @@ jobs:
             # Workaround https://github.com/hazelcast/hazelcast-python-client/issues/666 by skipping those tests
             args+=(--ignore tests/integration/backward_compatible/predicate_test.py)
           fi
-          pytest tests/integration/backward_compatible "${args[@]}"
+          pytest tests/integration "${args[@]}"
