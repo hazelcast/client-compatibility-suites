@@ -114,6 +114,7 @@ jobs:
       - name: Run tests
         run: |
           echo "HERE: $(pwd)"
+          ls
           args=()
           if [ "${{ matrix.kind }}" = "os" ]; then
             args+=(-m "not enterprise")
