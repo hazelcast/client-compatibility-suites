@@ -113,6 +113,7 @@ jobs:
           compare-to: 5.5.0
       - name: Run tests
         run: |
+          echo "HERE: $(pwd)"
           args=()
           if [ "${{ matrix.kind }}" = "os" ]; then
             args+=(-m "not enterprise")
