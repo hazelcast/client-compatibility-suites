@@ -101,14 +101,14 @@ jobs:
           chmod +x rcd-ubuntu-latest 
           ./rcd-ubuntu-latest -version $HZ_VERSION -dir $HOME &
           sleep 10
-      - name: Copy certificates JAR to destination with the appropriate name
-        if: ${{ matrix.kind == 'enterprise' }}
-        run: |
-          echo "GIHUB WORKSPACE"
-          ls $GITHUB_WORKSPACE
-          ls $GITHUB_WORKSPACE/certs
-          #cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/jars/hazelcast-enterprise-${{ matrix.version }}-tests.jar
-          unzip -p $GITHUB_WORKSPACE/certs/certs.jar com/hazelcast/nio/ssl/letsencrypt.jks > master/tests/integration/backward_compatible/ssl_tests/keystore.jks
+#      - name: Copy certificates JAR to destination with the appropriate name
+#        if: ${{ matrix.kind == 'enterprise' }}
+#        run: |
+#          echo "GIHUB WORKSPACE"
+#          ls $GITHUB_WORKSPACE
+#          ls $GITHUB_WORKSPACE/certs
+#          #cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/jars/hazelcast-enterprise-${{ matrix.version }}-tests.jar
+#          unzip -p $GITHUB_WORKSPACE/certs/certs.jar com/hazelcast/nio/ssl/letsencrypt.jks > master/tests/integration/backward_compatible/ssl_tests/keystore.jks
       - name: Convert major.minor version to semver
         id: generate-semver
         run: |
@@ -138,4 +138,4 @@ jobs:
             args+=(--ignore master/tests/integration/backward_compatible/predicate_test.py)
             args+=(--ignore master/tests/integration/asyncio/predicate_test.py)
           fi
-          pytest master/tests/integration/asyncio master/tests/integration/backward_compatible "${args[@]}" --log-cli-level debug
+          pytest master/tests/integration/asyncio master/tests/integration/backward_compatible "${args[@]}"
