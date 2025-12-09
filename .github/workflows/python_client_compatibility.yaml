@@ -106,7 +106,8 @@ jobs:
         run: |
           echo "GIHUB WORKSPACE"
           ls $GITHUB_WORKSPACE
-          cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/jars/hazelcast-enterprise-${{ matrix.version }}-tests.jar
+          ls $GITHUB_WORKSPACE/certs
+          #cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/jars/hazelcast-enterprise-${{ matrix.version }}-tests.jar
           unzip -p $GITHUB_WORKSPACE/certs/certs.jar com/hazelcast/nio/ssl/letsencrypt.jks > master/tests/integration/backward_compatible/ssl_tests/keystore.jks
       - name: Convert major.minor version to semver
         id: generate-semver
