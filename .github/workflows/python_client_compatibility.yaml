@@ -59,8 +59,8 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
-      - name: Download JARs
-        run: python download_server_jars.py --version ${{ matrix.version }} --server-kind ${{ matrix.kind }} --dst jars
+#      - name: Download JARs
+#        run: python download_server_jars.py --version ${{ matrix.version }} --server-kind ${{ matrix.kind }} --dst jars
       - name: Checkout to master
         uses: actions/checkout@v4
         with:
@@ -91,10 +91,21 @@ jobs:
         id: get-enterprise-license
         with:
           hazelcast-version: ${{ matrix.version }}
-      - name: Start RC
+      - name: Download RCD Linux
+        shell: bash
+        run: |
+          echo "PWD: $PWD"
+          echo "ROOT_FOLDER: ${{ steps.get-root-folder.outputs.ROOT_FOLDER }}"
+          wget https://client-rcd-download.s3.us-east-2.amazonaws.com/rcd-ubuntu-latest
+      - name: Start Hazelcast Remote Controller Linux
         env:
+          HZ_VERSION: ${{ matrix.version }}
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
-        run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.kind }} --use-simple-server
+        shell: bash
+        run: |
+          chmod +x rcd-ubuntu-latest 
+          ./rcd-ubuntu-latest -version $HZ_VERSION -dir $HOME &
+          sleep 10
       - name: Convert major.minor version to semver
         id: generate-semver
         run: |
