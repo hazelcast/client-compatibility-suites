@@ -104,9 +104,9 @@ jobs:
 #      - name: Copy certificates JAR to destination with the appropriate name
 #        if: ${{ matrix.kind == 'enterprise' }}
 #        run: |
-#          echo "GIHUB WORKSPACE"
-#          ls $GITHUB_WORKSPACE
-#          ls $GITHUB_WORKSPACE/certs
+          echo "GIHUB WORKSPACE"
+          ls $GITHUB_WORKSPACE
+          ls $GITHUB_WORKSPACE/certs
 #          #cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/jars/hazelcast-enterprise-${{ matrix.version }}-tests.jar
 #          unzip -p $GITHUB_WORKSPACE/certs/certs.jar com/hazelcast/nio/ssl/letsencrypt.jks > master/tests/integration/backward_compatible/ssl_tests/keystore.jks
       - name: Convert major.minor version to semver
