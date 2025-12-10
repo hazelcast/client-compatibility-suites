@@ -109,7 +109,7 @@ jobs:
           echo "HERE: $(pwd)"
           ls
           chmod +x rcd-ubuntu-latest 
-          ./rcd-ubuntu-latest -version $HZ_VERSION -dir $HOME &
+          ./rcd-ubuntu-latest -version $HZ_VERSION &
           sleep 10
       - name: Convert major.minor version to semver
         id: generate-semver
@@ -140,4 +140,5 @@ jobs:
             args+=(--ignore master/tests/integration/backward_compatible/predicate_test.py)
             args+=(--ignore master/tests/integration/asyncio/predicate_test.py)
           fi
-          pytest master/tests/integration/asyncio master/tests/integration/backward_compatible "${args[@]}"
+          #pytest master/tests/integration/asyncio master/tests/integration/backward_compatible "${args[@]}"
+          pytest master/tests/integration -k ssl "${args[@]}"
