@@ -101,9 +101,9 @@ jobs:
           chmod +x rcd-ubuntu-latest 
           ./rcd-ubuntu-latest -version $HZ_VERSION -dir $HOME &
           sleep 10
-#      - name: Copy certificates JAR to destination with the appropriate name
-#        if: ${{ matrix.kind == 'enterprise' }}
-#        run: |
+      - name: Copy certificates JAR to destination with the appropriate name
+        if: ${{ matrix.kind == 'enterprise' }}
+        run: |
           echo "GIHUB WORKSPACE"
           ls $GITHUB_WORKSPACE
           ls $GITHUB_WORKSPACE/certs
