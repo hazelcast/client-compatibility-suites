@@ -59,8 +59,6 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
-#      - name: Download JARs
-#        run: python download_server_jars.py --version ${{ matrix.version }} --server-kind ${{ matrix.kind }} --dst jars
       - name: Checkout to master
         uses: actions/checkout@v4
         with:
@@ -90,6 +88,10 @@ jobs:
       - name: Create the test jar with certificates
         working-directory: certs
         run: |
+          echo "HERE: $PWD"
+          ls
+          echo "dir .."
+          ls ..
           zip -r -j certs.jar $GITHUB_WORKSPACE/tests/integration/backward_compatible/ssl_tests/hostname_verification/*.p12
           cp certs.jar ../hazelcast-enterprise-${{ matrix.version }}-tests.jar            
 
