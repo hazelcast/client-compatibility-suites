@@ -22,7 +22,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: 3.11
       - name: Checkout to scripts
         uses: actions/checkout@v4
       - name: Set server matrix
@@ -40,6 +40,7 @@ jobs:
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v4
+
       - name: Checkout to test artifacts
         if: ${{ matrix.kind == 'enterprise' }}
         uses: actions/checkout@v4
@@ -48,40 +49,47 @@ jobs:
           path: certs
           ref: data
           token: ${{ secrets.GH_PAT }}
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: 3.11
+
       - name: Read Java Config
         run: cat ${GITHUB_WORKSPACE}/.github/java-config.env >> $GITHUB_ENV
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
-      - name: Download JARs
-        run: python download_server_jars.py --version ${{ matrix.version }} --server-kind ${{ matrix.kind }} --dst jars
+
       - name: Checkout to master
         uses: actions/checkout@v4
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
           path: master
           ref: master
+
       - name: Checkout to ${{ github.event.inputs.branch_name }}
         uses: actions/checkout@v4
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
           path: client
           ref: ${{ github.event.inputs.branch_name }}
+
       - name: Copy the client code into master
         run: |
           rm -rf $GITHUB_WORKSPACE/master/hazelcast
           cp -a $GITHUB_WORKSPACE/client/hazelcast $GITHUB_WORKSPACE/master/hazelcast
-      - name: Copy certificates JAR to destination with the appropriate name
+
+      - name: Create the test jar with certificates
         if: ${{ matrix.kind == 'enterprise' }}
+        working-directory: certs
         run: |
-          cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/jars/hazelcast-enterprise-${{ matrix.version }}-tests.jar
-          unzip -p $GITHUB_WORKSPACE/certs/certs.jar com/hazelcast/nio/ssl/letsencrypt.jks > master/tests/integration/backward_compatible/ssl_tests/keystore.jks
+          zip -r -j certs.jar $GITHUB_WORKSPACE/master/tests/integration/backward_compatible/ssl_tests/hostname_verification/*.p12
+          cp certs.jar ../hazelcast-enterprise-${{ matrix.version }}-tests.jar            
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -91,10 +99,7 @@ jobs:
         id: get-enterprise-license
         with:
           hazelcast-version: ${{ matrix.version }}
-      - name: Start RC
-        env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
-        run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.kind }} --use-simple-server
+
       - name: Convert major.minor version to semver
         id: generate-semver
         run: |
@@ -105,20 +110,36 @@ jobs:
             VERSION="${VERSION}.0"
           fi
           echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
+
       # https://github.com/madhead/semver-utils/releases/tag/v4.3.0
       - uses: madhead/semver-utils@36d1e0ed361bd7b4b77665de8093092eaeabe6ba
         id: client-version
         with:
           version: ${{ steps.generate-semver.outputs.version }}
           compare-to: 5.5.0
-      - name: Run tests
+
+      - name: Download RCD
+        shell: bash
         run: |
-          args=()
+          wget -q https://client-rcd-download.s3.us-east-2.amazonaws.com/rcd-ubuntu-latest
+
+      - name: Run tests
+        env:
+          HZ_VERSION: ${{ matrix.version }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
+        run: |
+          chmod +x rcd-ubuntu-latest 
+          ./rcd-ubuntu-latest -version $HZ_VERSION  &
+          # wait for a bit for RCD to download artifacts
+          sleep 10
+          
+          args=(--verbose)
           if [ "${{ matrix.kind }}" = "os" ]; then
             args+=(-m "not enterprise")
           fi
           if [[ "${{ steps.client-version.outputs.comparison-result }}" = "<" ]]; then
             # Workaround https://github.com/hazelcast/hazelcast-python-client/issues/666 by skipping those tests
-            args+=(--ignore tests/integration/backward_compatible/predicate_test.py)
+            args+=(--ignore master/tests/integration/backward_compatible/predicate_test.py)
+            args+=(--ignore master/tests/integration/asyncio/predicate_test.py)
           fi
-          pytest tests/integration/backward_compatible "${args[@]}"
+          pytest master/tests/integration/asyncio master/tests/integration/backward_compatible "${args[@]}"
