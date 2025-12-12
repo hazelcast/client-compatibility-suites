@@ -9,7 +9,7 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from enum import Enum
 from os import path
-from typing import List, Dict, Callable, Tuple, Optional, DefaultDict
+from typing import List, Dict, Callable, Tuple, Optional, DefaultDict, Tuple
 from urllib.parse import urlparse
 
 # Slightly modified version of
@@ -144,6 +144,17 @@ class MajorVersionFilter(ReleaseFilter):
 
     def filter(self, release: Release) -> bool:
         return release.version.major in self._versions
+
+    def __repr__(self) -> str:
+        return "MajorVersionFilter(versions=%s)" % self._versions
+
+class MajorMinorVersionFilter(ReleaseFilter):
+    def __init__(self, min_major_minor_version: Tuple[int, int]):
+        self._min_version = min_major_minor_version
+
+    def filter(self, release: Release) -> bool:
+        v = release.version
+        return (v.major, v.minor) >= self._min_version
 
     def __repr__(self) -> str:
         return "MajorVersionFilter(versions=%s)" % self._versions
