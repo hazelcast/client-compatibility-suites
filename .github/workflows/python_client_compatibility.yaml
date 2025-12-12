@@ -48,6 +48,15 @@ jobs:
           path: certs
           ref: data
           token: ${{ secrets.GH_PAT }}
+
+      - name: "Check certs"
+        working-directory: certs
+        run: |
+          ls -l
+          echo "dir .."
+          ls -l ..
+          
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
