@@ -40,6 +40,7 @@ jobs:
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v4
+
       - name: Checkout to test artifacts
         if: ${{ matrix.kind == 'enterprise' }}
         uses: actions/checkout@v4
@@ -50,6 +51,7 @@ jobs:
           token: ${{ secrets.GH_PAT }}
 
       - name: "Check certs"
+        if: ${{ matrix.kind == 'enterprise' }}
         working-directory: certs
         run: |
           ls -l
@@ -91,6 +93,7 @@ jobs:
           cp -a $GITHUB_WORKSPACE/client/hazelcast $GITHUB_WORKSPACE/master/hazelcast
 
       - name: Create the test jar with certificates
+        if: ${{ matrix.kind == 'enterprise' }}
         working-directory: certs
         run: |
           echo "HERE: $PWD"
@@ -161,6 +164,7 @@ jobs:
       - name: Run tests
         env:
           HZ_VERSION: ${{ matrix.version }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
         run: |
           echo "HERE: $(pwd)"
           ls master
