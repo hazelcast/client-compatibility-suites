@@ -52,38 +52,44 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.11
+
       - name: Read Java Config
         run: cat ${GITHUB_WORKSPACE}/.github/java-config.env >> $GITHUB_ENV
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
+
       - name: Checkout to master
         uses: actions/checkout@v4
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
           path: master
           ref: master
+
       - name: Checkout to ${{ github.event.inputs.branch_name }}
         uses: actions/checkout@v4
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
           path: client
           ref: ${{ github.event.inputs.branch_name }}
+
       - name: Copy the client code into master
         run: |
           rm -rf $GITHUB_WORKSPACE/master/hazelcast
           cp -a $GITHUB_WORKSPACE/client/hazelcast $GITHUB_WORKSPACE/master/hazelcast
 
       - name: Create the test jar with certificates
+        working-directory: certs
         run: |
           echo "HERE: $PWD"
           ls
           echo "dir .."
           ls ..
-          zip -r -j $GITHUB_WORKSPACE/certs/certs.jar master/tests/integration/backward_compatible/ssl_tests/hostname_verification/*.p12
-          cp $GITHUB_WORKSPACE/certs/certs.jar hazelcast-enterprise-${{ matrix.version }}-tests.jar            
+          zip -r -j certs.jar $GITHUB_WORKSPACE/master/tests/integration/backward_compatible/ssl_tests/hostname_verification/*.p12
+          cp certs.jar ../hazelcast-enterprise-${{ matrix.version }}-tests.jar            
 
 #      - name: Download RCD Linux
 #        shell: bash
