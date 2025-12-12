@@ -50,15 +50,6 @@ jobs:
           ref: data
           token: ${{ secrets.GH_PAT }}
 
-      - name: "Check certs"
-        if: ${{ matrix.kind == 'enterprise' }}
-        working-directory: certs
-        run: |
-          ls -l
-          echo "dir .."
-          ls -l ..
-          
-
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -96,38 +87,8 @@ jobs:
         if: ${{ matrix.kind == 'enterprise' }}
         working-directory: certs
         run: |
-          echo "HERE: $PWD"
-          ls
-          echo "dir .."
-          ls ..
           zip -r -j certs.jar $GITHUB_WORKSPACE/master/tests/integration/backward_compatible/ssl_tests/hostname_verification/*.p12
           cp certs.jar ../hazelcast-enterprise-${{ matrix.version }}-tests.jar            
-
-#      - name: Download RCD Linux
-#        shell: bash
-#        run: |
-#          echo "PWD: $PWD"
-#          echo "ROOT_FOLDER: ${{ steps.get-root-folder.outputs.ROOT_FOLDER }}"
-#          wget https://client-rcd-download.s3.us-east-2.amazonaws.com/rcd-ubuntu-latest
-#      - name: Copy certificates JAR to destination with the appropriate name
-#        if: ${{ matrix.kind == 'enterprise' }}
-#        run: |
-#          echo "GIHUB WORKSPACE"
-#          ls $GITHUB_WORKSPACE
-#          ls $GITHUB_WORKSPACE/certs
-#          cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/hazelcast-enterprise-${{ matrix.version }}-tests.jar
-#          unzip -p $GITHUB_WORKSPACE/certs/certs.jar com/hazelcast/nio/ssl/letsencrypt.jks > master/tests/integration/backward_compatible/ssl_tests/keystore.jks
-#      - name: Start Hazelcast Remote Controller Linux
-#        env:
-#          HZ_VERSION: ${{ matrix.version }}
-#          HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
-#        shell: bash
-#        run: |
-#          echo "HERE: $(pwd)"
-#          ls
-#          chmod +x rcd-ubuntu-latest
-#          ./rcd-ubuntu-latest -version $HZ_VERSION &
-#          sleep 10
 
       - name: Install dependencies
         run: |
@@ -167,8 +128,6 @@ jobs:
           HZ_VERSION: ${{ matrix.version }}
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
         run: |
-          echo "HERE: $(pwd)"
-          ls master
           chmod +x rcd-ubuntu-latest 
           ./rcd-ubuntu-latest -version $HZ_VERSION &
           # wait for a bit for RCD to download artifacts
@@ -183,5 +142,4 @@ jobs:
             args+=(--ignore master/tests/integration/backward_compatible/predicate_test.py)
             args+=(--ignore master/tests/integration/asyncio/predicate_test.py)
           fi
-          #pytest master/tests/integration/asyncio master/tests/integration/backward_compatible "${args[@]}"
-          pytest master/tests/integration -k ssl "${args[@]}"
+          pytest master/tests/integration/asyncio master/tests/integration/backward_compatible "${args[@]}"
