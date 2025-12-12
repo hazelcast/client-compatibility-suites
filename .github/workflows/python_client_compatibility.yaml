@@ -86,14 +86,13 @@ jobs:
           hazelcast-version: ${{ matrix.version }}
 
       - name: Create the test jar with certificates
-        working-directory: certs
         run: |
           echo "HERE: $PWD"
           ls
           echo "dir .."
           ls ..
-          zip -r -j certs.jar $GITHUB_WORKSPACE/tests/integration/backward_compatible/ssl_tests/hostname_verification/*.p12
-          cp certs.jar ../hazelcast-enterprise-${{ matrix.version }}-tests.jar            
+          zip -r -j $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/tests/integration/backward_compatible/ssl_tests/hostname_verification/*.p12
+          cp $GITHUB_WORKSPACE/certs/certs.jar hazelcast-enterprise-${{ matrix.version }}-tests.jar            
 
 #      - name: Download RCD Linux
 #        shell: bash
