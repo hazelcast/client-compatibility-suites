@@ -75,15 +75,6 @@ jobs:
         run: |
           rm -rf $GITHUB_WORKSPACE/master/hazelcast
           cp -a $GITHUB_WORKSPACE/client/hazelcast $GITHUB_WORKSPACE/master/hazelcast
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements-test.txt
-        working-directory: master
-      - uses: ./.github/actions/get-enterprise-license
-        id: get-enterprise-license
-        with:
-          hazelcast-version: ${{ matrix.version }}
 
       - name: Create the test jar with certificates
         run: |
@@ -91,7 +82,7 @@ jobs:
           ls
           echo "dir .."
           ls ..
-          zip -r -j $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/tests/integration/backward_compatible/ssl_tests/hostname_verification/*.p12
+          zip -r -j $GITHUB_WORKSPACE/certs/certs.jar master/tests/integration/backward_compatible/ssl_tests/hostname_verification/*.p12
           cp $GITHUB_WORKSPACE/certs/certs.jar hazelcast-enterprise-${{ matrix.version }}-tests.jar            
 
 #      - name: Download RCD Linux
@@ -119,6 +110,16 @@ jobs:
 #          chmod +x rcd-ubuntu-latest
 #          ./rcd-ubuntu-latest -version $HZ_VERSION &
 #          sleep 10
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-test.txt
+        working-directory: master
+      - uses: ./.github/actions/get-enterprise-license
+        id: get-enterprise-license
+        with:
+          hazelcast-version: ${{ matrix.version }}
 
       - name: Convert major.minor version to semver
         id: generate-semver
