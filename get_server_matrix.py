@@ -3,7 +3,7 @@ import json
 from typing import List
 
 from util import (
-    MajorVersionFilter,
+    MajorMinorVersionFilter,
     ServerReleaseParser,
     SupportedReleaseFilter,
     get_latest_patch_releases,
