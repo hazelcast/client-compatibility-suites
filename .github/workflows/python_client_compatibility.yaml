@@ -149,6 +149,7 @@ jobs:
             VERSION="${VERSION}.0"
           fi
           echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
+
       # https://github.com/madhead/semver-utils/releases/tag/v4.3.0
       - uses: madhead/semver-utils@36d1e0ed361bd7b4b77665de8093092eaeabe6ba
         id: client-version
@@ -172,9 +173,8 @@ jobs:
           ./rcd-ubuntu-latest -version $HZ_VERSION &
           # wait for a bit for RCD to download artifacts
           sleep 10
-          pytest --verbose --cov=hazelcast --cov-report=xml
           
-          args=()
+          args=(--verbose)
           if [ "${{ matrix.kind }}" = "os" ]; then
             args+=(-m "not enterprise")
           fi
