@@ -19,11 +19,11 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: 3.9
       - name: Checkout to scripts
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         
       - name: Set server matrix
         id: set-matrix
@@ -41,11 +41,11 @@ jobs:
     name: Test Cpp client against ${{ matrix.kind }} ${{ matrix.version }} server on ubuntu-latest
     steps:
       - name: Checkout to scripts
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Checkout to test artifacts
         if: ${{ matrix.kind == 'enterprise' }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: hazelcast/private-test-artifacts
           path: certs
@@ -53,7 +53,7 @@ jobs:
           token: ${{ secrets.GH_PAT }}
 
       - name: Checkout the ${{ github.event.inputs.branch_name }}     
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-cpp-client
           path: client

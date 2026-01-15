@@ -20,11 +20,11 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: 3.11
       - name: Checkout to scripts
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set server matrix
         id: set-matrix
         run: echo "matrix=$( python get_server_matrix.py )" >> ${GITHUB_OUTPUT}
@@ -39,11 +39,11 @@ jobs:
     name: Test Python client against ${{ matrix.kind }} ${{ matrix.version }} server
     steps:
       - name: Checkout to scripts
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Checkout to test artifacts
         if: ${{ matrix.kind == 'enterprise' }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: hazelcast/private-test-artifacts
           path: certs
@@ -51,7 +51,7 @@ jobs:
           token: ${{ secrets.GH_PAT }}
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: 3.11
 
@@ -59,20 +59,20 @@ jobs:
         run: cat ${GITHUB_WORKSPACE}/.github/java-config.env >> $GITHUB_ENV
 
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
 
       - name: Checkout to master
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
           path: master
           ref: master
 
       - name: Checkout to ${{ github.event.inputs.branch_name }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
           path: client
