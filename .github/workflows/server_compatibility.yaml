@@ -47,7 +47,7 @@ jobs:
       MAVEN_ARGS: '--batch-mode --no-transfer-progress'
     steps:
       - name: Checkout to scripts
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: master
       - name: Read Java Config
@@ -58,14 +58,14 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
       - name: Checkout to test artifacts
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: hazelcast/private-test-artifacts
           path: certs
           ref: data
           token: ${{ secrets.GH_PAT }}
       - name: Checkout to Hazelcast Mono ${{ github.event.inputs.branch_name }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-mono
           path: hazelcast-mono
@@ -131,7 +131,7 @@ jobs:
         with:
           python-version: 3.9
       - name: Checkout to scripts
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set client matrix
         id: set-matrix
         run: echo "matrix=$( python get_client_matrix.py --client py --option tag --use-latest-patch-versions )" >> ${GITHUB_OUTPUT}
@@ -148,7 +148,7 @@ jobs:
       HAZELCAST_ENTERPRISE_KEY: ${{ secrets[needs.upload_jars.outputs.hazelcast_enterprise_key_secret] }}
     steps:
       - name: Checkout to scripts
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Python
         uses: actions/setup-python@v6
         with:
@@ -161,13 +161,13 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
       - name: Checkout to master
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: hazelcast/hazelcast-python-client
           path: master
           ref: master
       - name: Checkout to tag
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: hazelcast/hazelcast-python-client
           path: tag
@@ -252,7 +252,7 @@ jobs:
         with:
           python-version: 3.9
       - name: Checkout to scripts
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set client matrix
         id: set-matrix
         run: echo "matrix=$( python get_client_matrix.py --client node --option tag --use-latest-patch-versions )" >> ${GITHUB_OUTPUT}
@@ -268,7 +268,7 @@ jobs:
     env:
       HAZELCAST_ENTERPRISE_KEY: ${{ secrets[needs.upload_jars.outputs.hazelcast_enterprise_key_secret] }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Python
         uses: actions/setup-python@v6
         with:
@@ -285,13 +285,13 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
       - name: Checkout to master
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: hazelcast/hazelcast-nodejs-client
           path: master
           ref: master
       - name: Checkout to tag
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: hazelcast/hazelcast-nodejs-client
           path: tag
@@ -360,7 +360,7 @@ jobs:
         with:
           python-version: 3.9
       - name: Checkout to scripts
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set client matrix
         id: set-matrix
         run: echo "matrix=$( python get_client_matrix.py --client cs --option tag --use-latest-patch-versions )" >> ${GITHUB_OUTPUT}
@@ -376,7 +376,7 @@ jobs:
     env:
       HAZELCAST_ENTERPRISE_KEY: ${{ secrets[needs.upload_jars.outputs.hazelcast_enterprise_key_secret] }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Python
         uses: actions/setup-python@v6
         with:
@@ -406,14 +406,14 @@ jobs:
             10.0.x
             
       - name: Checkout to tag
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: hazelcast/hazelcast-csharp-client
           path: tag
           ref: ${{ matrix.client_tag }}
             
       - name: Checkout default branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: hazelcast/hazelcast-csharp-client
           path: hazelcast-csharp-client-master
@@ -574,7 +574,7 @@ jobs:
         with:
           python-version: 3.9
       - name: Checkout to scripts
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set client matrix
         id: set-matrix
         run: echo "matrix=$( python get_client_matrix.py --client cpp --option tag --use-latest-patch-versions )" >> ${GITHUB_OUTPUT}
@@ -588,14 +588,14 @@ jobs:
         server_kind: [ enterprise ] #TODO When tests are divided as OS, ENTERPRISE, OS matrix will be added
     name: Test CPP client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Checkout master
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: hazelcast/hazelcast-cpp-client
           path: master
       - name: Checkout to tag
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: hazelcast/hazelcast-cpp-client
           path: tag
@@ -651,7 +651,7 @@ jobs:
         with:
           python-version: 3.9
       - name: Checkout to scripts
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set client matrix
         id: set-matrix
         run: echo "matrix=$( python get_client_matrix.py --client go --option tag --use-latest-patch-versions )" >> ${GITHUB_OUTPUT}
@@ -667,7 +667,7 @@ jobs:
     env:
       HAZELCAST_ENTERPRISE_KEY: ${{ secrets[needs.upload_jars.outputs.hazelcast_enterprise_key_secret] }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Read Java Config
         run: cat ${GITHUB_WORKSPACE}/.github/java-config.env >> $GITHUB_ENV
       - name: Setup Java
@@ -677,14 +677,14 @@ jobs:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
             
       - name: Checkout the ${{ matrix.client_tag }}     
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: hazelcast/hazelcast-go-client
           path: client
           ref: ${{ matrix.client_tag }}
 
       - name: Checkout default branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: hazelcast/hazelcast-go-client
           path: client-master
