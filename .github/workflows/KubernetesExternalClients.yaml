@@ -63,7 +63,7 @@ jobs:
         gcloud components install kubectl
 
     - name: Install Helm
-      uses: azure/setup-helm@v3
+      uses: azure/setup-helm@v4
       id: install
       
     - name: Create GKE cluster
@@ -243,7 +243,7 @@ jobs:
     steps: 
     
     - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v5
       with:
         dotnet-version: |
             8.0.x
