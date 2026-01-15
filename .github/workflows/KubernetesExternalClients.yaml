@@ -56,7 +56,7 @@ jobs:
         credentials_json: '${{ secrets.GKE_SA_KEY }}'
 
     - name: 'Set up Cloud SDK'
-      uses: 'google-github-actions/setup-gcloud@v1'
+      uses: 'google-github-actions/setup-gcloud@v3'
 
     - name: Install Kubectl
       run: |-
@@ -323,7 +323,7 @@ jobs:
         credentials_json: '${{ secrets.GKE_SA_KEY }}'
 
     - name: 'Set up Cloud SDK'
-      uses: 'google-github-actions/setup-gcloud@v1'
+      uses: 'google-github-actions/setup-gcloud@v3'
         
     - name: Delete cluster
       run: |-
