@@ -63,7 +63,7 @@ jobs:
         gcloud components install kubectl
 
     - name: Install Helm
-      uses: azure/setup-helm@v3
+      uses: azure/setup-helm@v4
       id: install
       
     - name: Create GKE cluster
