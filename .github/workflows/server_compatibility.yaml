@@ -393,7 +393,7 @@ jobs:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
 
       - name: Install .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: |
             2.1.x
