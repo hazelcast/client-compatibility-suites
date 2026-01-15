@@ -23,13 +23,18 @@ def parse_arg() -> argparse.Namespace:
         type=str,
     )
     parser.add_argument(
+        "--cpp",
+        dest="cpp",
+        type=str,
+    )
+    parser.add_argument(
         "--python",
         dest="python",
         type=str,
     )
     parser.add_argument(
-        "--cpp",
-        dest="cpp",
+        "--python-asyncio",
+        dest="python-asyncio",
         type=str,
     )
     return parser.parse_args()
@@ -44,9 +49,11 @@ if __name__ == "__main__":
         options.append("go")
     if args.nodejs != "no":
         options.append("nodejs")
-    if args.python != "no":
-        options.append("python")
     if args.cpp != "no":
         options.append("cpp")
+    if args.python != "no":
+        options.append("python")
+    if args.python_asyncio != "no":
+        options.append("python-asyncio")
 
     print(json.dumps(options))
