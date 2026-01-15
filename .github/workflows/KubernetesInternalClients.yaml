@@ -33,10 +33,10 @@ jobs:
    if: ${{ github.event.inputs.csharp_run != 'no' }}
    steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         
       - name: Checkout the client repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-csharp-client
           path: KubernetesInternalClients/csharp/clientSourceCode
@@ -73,10 +73,10 @@ jobs:
    if: ${{ github.event.inputs.python_run != 'no' }}
    steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         
       - name: Checkout the client repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
           path: KubernetesInternalClients/python/clientSourceCode
@@ -96,10 +96,10 @@ jobs:
    if: ${{ github.event.inputs.nodejs_run != 'no' }}
    steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         
       - name: Checkout the client repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-nodejs-client
           path: KubernetesInternalClients/nodejs/clientSourceCode
@@ -125,10 +125,10 @@ jobs:
    if: ${{ github.event.inputs.cpp_run != 'no' }}
    steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         
       - name: Checkout the client repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-cpp-client
           path: KubernetesInternalClients/cpp/clientSourceCode
@@ -148,7 +148,7 @@ jobs:
    if: ${{ github.event.inputs.go_run != 'no' }}
    steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         
       - name: Give the branch name to go.mod file
         run: |
@@ -174,7 +174,7 @@ jobs:
       
     steps:      
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Set which client will be run
       id: set-matrix

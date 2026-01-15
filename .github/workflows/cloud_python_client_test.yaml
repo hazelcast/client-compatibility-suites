@@ -25,7 +25,7 @@ jobs:
     name: Cloud tests with python
     steps:
       - name: Checkout to scripts
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         
       - name: Setup Python
         uses: actions/setup-python@v6
@@ -42,7 +42,7 @@ jobs:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           
       - name: Checkout to ${{ github.event.inputs.branch_name }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
           path: client

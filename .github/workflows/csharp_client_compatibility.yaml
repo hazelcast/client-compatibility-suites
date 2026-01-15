@@ -25,7 +25,7 @@ jobs:
           python-version: 3.9
 
       - name: Checkout to scripts
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set server matrix
         id: set-matrix
@@ -44,7 +44,7 @@ jobs:
     name: Test CSharp ${{ github.event.inputs.branch_name }} branch against ${{ matrix.kind }} ${{ matrix.version }} server on ${{ matrix.os }}
     steps:      
       - name: Checkout to scripts
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Python
         uses: actions/setup-python@v6
@@ -71,7 +71,7 @@ jobs:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
 
       - name: Checkout to ${{ github.event.inputs.branch_name }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-csharp-client
           path: client

@@ -25,7 +25,7 @@ jobs:
     name: Cloud tests with .NET
     steps:
       - name: Checkout scripts
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install Python
         uses: actions/setup-python@v6
@@ -54,7 +54,7 @@ jobs:
             10.0.x
 
       - name: Checkout .NET client branch ${{ github.event.inputs.branch_name }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-csharp-client
           path: client
