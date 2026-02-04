@@ -48,10 +48,6 @@ jobs:
           path: certs
           ref: data
           token: ${{ secrets.GH_PAT }}
-      - name: Setup Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: 3.9
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
@@ -63,12 +59,10 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
-      - name: Download JARs
-        run: python download_server_jars.py --version ${{ matrix.version }} --server-kind ${{ matrix.kind }} --dst jars
       - name: Copy certificates JAR to destination with the appropriate name
         if: ${{ matrix.kind == 'enterprise' }}
         run: |
-          cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/jars/hazelcast-enterprise-${{ matrix.version }}-tests.jar
+          cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/hazelcast-enterprise-${{ matrix.version }}-tests.jar
       - name: Checkout to master
         uses: actions/checkout@v6
         with:
@@ -100,12 +94,18 @@ jobs:
         id: get-enterprise-license
         with:
           hazelcast-version: ${{ matrix.version }}
-      - name: Start RC
-        env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
-        run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.kind }}
+      - name: Download RCD
+        shell: bash
+        run: |
+          wget -q https://client-rcd-download.s3.us-east-2.amazonaws.com/rcd-ubuntu-latest
       - name: Run all tests
-        run: node node_modules/mocha/bin/mocha --recursive test/integration/backward_compatible
-        working-directory: master
         env:
+          HZ_VERSION: ${{ matrix.version }}
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
+        run: |
+          chmod +x rcd-ubuntu-latest
+          ./rcd-ubuntu-latest -version $HZ_VERSION &
+          # wait for a bit for RCD to download artifacts
+          sleep 10
+          node node_modules/mocha/bin/mocha --recursive test/integration/backward_compatible
+        working-directory: master
