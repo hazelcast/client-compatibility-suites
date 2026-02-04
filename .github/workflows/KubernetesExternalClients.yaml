@@ -9,10 +9,6 @@ on:
         description: Default is hazelcast, but if you would like to run the workflow with your forked repo, set your github username
         required: true
         default: hazelcast
-      python_run:
-        description: PYTHON = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
-        required: true
-        default: master
       nodejs_run:
         description: NODEJS = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
         required: true
@@ -27,6 +23,14 @@ on:
         default: master
       csharp_run:
         description: CSHARP = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
+        required: true
+        default: master
+      python_run:
+        description: PYTHON = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
+        required: true
+        default: master
+      python_asyncio_run:
+        description: PYTHON_ASYNCIO = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
         required: true
         default: master
 
@@ -180,7 +184,7 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v6
       with:
-        python-version: 3.9
+        python-version: 3.11
         
     - name: Checkout to scripts
       uses: actions/checkout@v6
@@ -200,7 +204,38 @@ jobs:
         python client.py &> output.txt && tail -n 20 output.txt &> last20lines.txt
         cat last20lines.txt
         if [ $(grep -o 'Current map size:' last20lines.txt | wc -l) != $"20" ]; then exit 1; fi
-        
+
+  run_python_asyncio:
+    name: Run Python Asyncio compatibility test
+    needs: [create-gke-cluster]
+    if: ${{ github.event.inputs.python_asyncio_run != 'no' }}
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.11
+
+    - name: Checkout to scripts
+      uses: actions/checkout@v4
+
+    - name: Checkout the Python client repo
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
+        path: KubernetesExternalClients/python/clientSourceCode
+        ref: ${{ github.event.inputs.python_run }}
+
+    - name: Run test
+      run: |
+        cp KubernetesExternalClients/python/client_asyncio.py KubernetesExternalClients/python/clientSourceCode/
+        cd KubernetesExternalClients/python/clientSourceCode
+        sed -i "s/<EXTERNAL-IP>/${{needs.create-gke-cluster.outputs.external-ip}}/g" client_asyncio.py
+        python client_asyncio.py &> output.txt && tail -n 20 output.txt &> last20lines.txt
+        cat last20lines.txt
+        if [ $(grep -o 'Current map size:' last20lines.txt | wc -l) != $"20" ]; then exit 1; fi
+
 #TODO: More reliabe verification.
 
   run_nodejs:

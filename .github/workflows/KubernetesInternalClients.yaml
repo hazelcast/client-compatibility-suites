@@ -6,10 +6,6 @@ on:
         description: Default is hazelcast, but if you would like to run the workflow with your forked repo, set your github username
         required: true
         default: hazelcast
-      python_run:
-        description: PYTHON = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
-        required: true
-        default: master
       nodejs_run:
         description: NODEJS = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
         required: true
@@ -24,6 +20,14 @@ on:
         default: master
       csharp_run:
         description: CSHARP = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
+        required: true
+        default: master
+      python_run:
+        description: PYTHON = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
+        required: true
+        default: master
+      python_asyncio_run:
+        description: PYTHON_ASYNCIO = Set the branch name of client to run, otherwise set it as 'no' in order to skip running this client
         required: true
         default: master
 
@@ -90,7 +94,30 @@ jobs:
         uses: ishworkh/container-image-artifact-upload@v2.0.0
         with:
          image: "hazelcast-python-client:test"
-         
+
+  create-python-asyncio-image:
+   runs-on: ubuntu-latest
+   if: ${{ github.event.inputs.python_asyncio_run != 'no' }}
+   steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout the client repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
+          path: KubernetesInternalClients/python/clientSourceCode
+          ref: ${{ github.event.inputs.python-asyncio-run }}
+
+      - name: Build client application
+        run: |-
+          docker build -t hazelcast-python-asyncio-client:test KubernetesInternalClients/python_asyncio
+
+      - name: Upload image
+        uses: ishworkh/container-image-artifact-upload@v2.0.0
+        with:
+         image: "hazelcast-python-asyncio-client:test"
+
   create-nodejs-image:
    runs-on: ubuntu-latest
    if: ${{ github.event.inputs.nodejs_run != 'no' }}
@@ -183,8 +210,9 @@ jobs:
        --go ${{ github.event.inputs.go_run }}
        --cpp ${{ github.event.inputs.cpp_run }}
        --csharp ${{ github.event.inputs.csharp_run }}
-       --python ${{ github.event.inputs.python_run }})" >> ${GITHUB_OUTPUT}
-         
+       --python ${{ github.event.inputs.python_run }})
+       --python-asyncio ${{ github.event.inputs.python_run }})" >> ${GITHUB_OUTPUT}
+
   run-tests:
     name: Run kubernetes compatibility test
     needs: [wait-for-images]
