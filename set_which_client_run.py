@@ -34,7 +34,7 @@ def parse_arg() -> argparse.Namespace:
     )
     parser.add_argument(
         "--python-asyncio",
-        dest="python-asyncio",
+        dest="python_asyncio",
         type=str,
     )
     return parser.parse_args()
