@@ -103,8 +103,8 @@ jobs:
           HZ_VERSION: ${{ matrix.version }}
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
         run: |
-          chmod +x rcd-ubuntu-latest
-          ./rcd-ubuntu-latest -version $HZ_VERSION &
+          chmod +x $GITHUB_WORKSPACE/rcd-ubuntu-latest
+          $GITHUB_WORKSPACE/rcd-ubuntu-latest -version $HZ_VERSION &
           # wait for a bit for RCD to download artifacts
           sleep 10
           node node_modules/mocha/bin/mocha --recursive test/integration/backward_compatible
