@@ -117,7 +117,7 @@ jobs:
       - name: Run all tests
         env:
           HZ_VERSION: ${{ matrix.version }}
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
+#          HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
         run: |
           if [ "${{ matrix.kind }}" = "os" ]; then
             unset HAZELCAST_ENTERPRISE_KEY
