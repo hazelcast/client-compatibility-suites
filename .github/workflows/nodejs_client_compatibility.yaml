@@ -67,13 +67,12 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
 
-      - name: Create the test jar with certificates
-        if: ${{ matrix.kind == 'enterprise' }}
-        working-directory: certs
-        run: |
-          zip -r -j certs.jar $GITHUB_WORKSPACE/master/tests/integration/backward_compatible/ssl_tests/hostname_verification/*.p12
-          cp certs.jar ../hazelcast-enterprise-${{ matrix.version }}-tests.jar            
-
+#      - name: Create the test jar with certificates
+#        if: ${{ matrix.kind == 'enterprise' }}
+#        working-directory: certs
+#        run: |
+#          cp certs.jar ../hazelcast-enterprise-${{ matrix.version }}-tests.jar
+#
       - name: Checkout to master
         uses: actions/checkout@v6
         with:
