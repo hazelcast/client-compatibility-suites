@@ -91,7 +91,7 @@ jobs:
         if: ${{ matrix.kind == 'enterprise' }}
         run: |
           cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/hazelcast-enterprise-${{ matrix.version }}-tests.jar
-          unzip -p ${{ github.workspace }}/certs.jar com/hazelcast/nio/ssl/letsencrypt.jks > test/integration/backward_compatible/parallel/ssl/keystore.jks
+          unzip -p ${{ github.workspace }}/certs.jar com/hazelcast/nio/ssl/letsencrypt.jks > $GITHUB_WORKSPACE/master/test/integration/backward_compatible/parallel/ssl/keystore.jks
 
       - name: Install dependencies and compile client
         run: |
