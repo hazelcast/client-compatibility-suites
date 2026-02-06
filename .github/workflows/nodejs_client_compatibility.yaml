@@ -67,10 +67,12 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
 
-      - name: Copy certificates JAR to destination with the appropriate name
+      - name: Create the test jar with certificates
         if: ${{ matrix.kind == 'enterprise' }}
+        working-directory: certs
         run: |
-          cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/hazelcast-enterprise-${{ matrix.version }}-tests.jar
+          zip -r -j certs.jar $GITHUB_WORKSPACE/master/tests/integration/backward_compatible/ssl_tests/hostname_verification/*.p12
+          cp certs.jar ../hazelcast-enterprise-${{ matrix.version }}-tests.jar            
 
       - name: Checkout to master
         uses: actions/checkout@v6
@@ -85,6 +87,12 @@ jobs:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-nodejs-client
           path: client
           ref: ${{ github.event.inputs.branch_name }}
+
+      - name: Copy certificates JAR to destination with the appropriate name
+        if: ${{ matrix.kind == 'enterprise' }}
+        run: |
+          cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/hazelcast-enterprise-${{ matrix.version }}-tests.jar
+          unzip -p ${{ github.workspace }}/certs.jar com/hazelcast/nio/ssl/letsencrypt.jks > test/integration/backward_compatible/parallel/ssl/keystore.jks
 
       - name: Install dependencies and compile client
         run: |
