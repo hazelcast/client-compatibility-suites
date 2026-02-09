@@ -67,12 +67,12 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
 
-#      - name: Create the test jar with certificates
-#        if: ${{ matrix.kind == 'enterprise' }}
-#        working-directory: certs
-#        run: |
-#          cp certs.jar ../hazelcast-enterprise-${{ matrix.version }}-tests.jar
-#
+      - name: Create the test jar with certificates
+        if: ${{ matrix.kind == 'enterprise' }}
+        working-directory: certs
+        run: |
+          cp certs.jar ../hazelcast-enterprise-${{ matrix.version }}-tests.jar
+
       - name: Checkout to master
         uses: actions/checkout@v6
         with:
@@ -129,10 +129,11 @@ jobs:
           if [ "${{ matrix.kind }}" = "os" ]; then
             unset HAZELCAST_ENTERPRISE_KEY
           fi
+          ls
           chmod +x $GITHUB_WORKSPACE/rcd-ubuntu-latest
           $GITHUB_WORKSPACE/rcd-ubuntu-latest -version $HZ_VERSION -no-simple-server &
           # wait for a bit for RCD to download artifacts
           sleep 10
           #node node_modules/mocha/bin/mocha --recursive test/integration/backward_compatible
-          node node_modules/mocha/bin/mocha -f ClientSSLAuthenticationTest
+          node node_modules/mocha/bin/mocha -f "ma:required, they both know each other should connect"
         working-directory: master
