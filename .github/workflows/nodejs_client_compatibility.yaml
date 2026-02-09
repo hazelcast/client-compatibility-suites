@@ -125,11 +125,9 @@ jobs:
         env:
           HZ_VERSION: ${{ matrix.version }}
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
-          HAZELCAST_LICENSE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
         run: |
           if [ "${{ matrix.kind }}" = "os" ]; then
             unset HAZELCAST_ENTERPRISE_KEY
-            unset HAZELCAST_LICENSE_KEY
           fi
           chmod +x $GITHUB_WORKSPACE/rcd-ubuntu-latest
           $GITHUB_WORKSPACE/rcd-ubuntu-latest -version $HZ_VERSION -no-simple-server &
