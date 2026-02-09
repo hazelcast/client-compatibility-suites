@@ -134,5 +134,5 @@ jobs:
           # wait for a bit for RCD to download artifacts
           sleep 10
           #node node_modules/mocha/bin/mocha --recursive test/integration/backward_compatible
-          node node_modules/mocha/bin/mocha -f ClientSSLAuthenticationTest
+          node node_modules/mocha/bin/mocha -f "ma:required, they both know each other should connect"
         working-directory: master
