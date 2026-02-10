@@ -131,8 +131,4 @@ jobs:
           cd $GITHUB_WORKSPACE && chmod +x ./rcd-ubuntu-latest && ./rcd-ubuntu-latest -version $HZ_VERSION -no-simple-server -log-level trace &
           # wait for a bit for RCD to download artifacts
           sleep 10
-          echo ">>> PWD: $PWD"
-          echo ">>> GITHUB_WORKSPACE:"
-          ls $GITHUB_WORKSPACE
-          #node node_modules/mocha/bin/mocha --recursive test/integration/backward_compatible
-          node node_modules/mocha/bin/mocha -f "should be able to connect to the server with valid certificate" 
+          node node_modules/mocha/bin/mocha --recursive test/integration/backward_compatible
