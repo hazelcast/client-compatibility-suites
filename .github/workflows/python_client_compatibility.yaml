@@ -87,6 +87,7 @@ jobs:
         if: ${{ matrix.kind == 'enterprise' }}
         working-directory: certs
         run: |
+          zip -r -j certs.jar $GITHUB_WORKSPACE/master/tests/integration/backward_compatible/ssl_tests/hostname_verification/*.p12
           cp certs.jar ../hazelcast-enterprise-${{ matrix.version }}-tests.jar
 
       - name: Install dependencies
@@ -131,7 +132,6 @@ jobs:
           ./rcd-ubuntu-latest -version $HZ_VERSION  &
           # wait for a bit for RCD to download artifacts
           sleep 10
-          ls
           
           args=(--verbose)
           if [ "${{ matrix.kind }}" = "os" ]; then
