@@ -23,11 +23,14 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: 3.9
+
       - name: Checkout to scripts
         uses: actions/checkout@v6
+
       - name: Set server matrix
         id: set-matrix
         run: echo "matrix=$( python get_server_matrix.py )" >> ${GITHUB_OUTPUT}
+
   test_client:
     needs: [setup_server_matrix]
     runs-on: ubuntu-latest
@@ -40,6 +43,7 @@ jobs:
     steps:
       - name: Checkout to scripts
         uses: actions/checkout@v6
+
       - name: Checkout to test artifacts
         if: ${{ matrix.kind == 'enterprise' }}
         uses: actions/checkout@v6
@@ -48,64 +52,78 @@ jobs:
           path: certs
           ref: data
           token: ${{ secrets.GH_PAT }}
-      - name: Setup Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: 3.9
+
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 14
+          node-version: 20
+
       - name: Read Java Config
         run: cat ${GITHUB_WORKSPACE}/.github/java-config.env >> $GITHUB_ENV
+
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
-      - name: Download JARs
-        run: python download_server_jars.py --version ${{ matrix.version }} --server-kind ${{ matrix.kind }} --dst jars
-      - name: Copy certificates JAR to destination with the appropriate name
-        if: ${{ matrix.kind == 'enterprise' }}
-        run: |
-          cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/jars/hazelcast-enterprise-${{ matrix.version }}-tests.jar
+
       - name: Checkout to master
         uses: actions/checkout@v6
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-nodejs-client
           path: master
           ref: master
+
       - name: Checkout to ${{ github.event.inputs.branch_name }}
         uses: actions/checkout@v6
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-nodejs-client
           path: client
           ref: ${{ github.event.inputs.branch_name }}
+
+      - name: Copy certificates JAR to destination with the appropriate name
+        if: ${{ matrix.kind == 'enterprise' }}
+        run: |
+          cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/hazelcast-enterprise-${{ matrix.version }}-tests.jar
+
       - name: Install dependencies and compile client
         run: |
           npm install
           npm run compile
         working-directory: client
+
       - name: Install test dependencies
         run: |
           npm install
         working-directory: master
+
       - name: Copy client code into master
         run: |
           rm -rf $GITHUB_WORKSPACE/master/lib
           rm $GITHUB_WORKSPACE/master/package.json
           cp -a $GITHUB_WORKSPACE/client/lib $GITHUB_WORKSPACE/master/lib
           cp -a $GITHUB_WORKSPACE/client/package.json $GITHUB_WORKSPACE/master/package.json
+
       - uses: ./.github/actions/get-enterprise-license
         id: get-enterprise-license
         with:
           hazelcast-version: ${{ matrix.version }}
-      - name: Start RC
-        env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
-        run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ matrix.kind }}
+
+      - name: Download RCD
+        shell: bash
+        run: |
+          wget -q https://client-rcd-download.s3.us-east-2.amazonaws.com/rcd-ubuntu-latest
+
       - name: Run all tests
-        run: node node_modules/mocha/bin/mocha --recursive test/integration/backward_compatible
-        working-directory: master
         env:
+          HZ_VERSION: ${{ matrix.version }}
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
+        working-directory: master
+        run: |
+          if [ "${{ matrix.kind }}" = "os" ]; then
+            unset HAZELCAST_ENTERPRISE_KEY
+          fi
+          cd $GITHUB_WORKSPACE && chmod +x ./rcd-ubuntu-latest && ./rcd-ubuntu-latest -version $HZ_VERSION -no-simple-server -log-level trace &
+          # wait for a bit for RCD to download artifacts
+          sleep 10
+          node node_modules/mocha/bin/mocha --recursive test/integration/backward_compatible
