@@ -104,10 +104,6 @@ jobs:
           cp -a $GITHUB_WORKSPACE/client/lib $GITHUB_WORKSPACE/master/lib
           cp -a $GITHUB_WORKSPACE/client/package.json $GITHUB_WORKSPACE/master/package.json
 
-      - name: Copy hazelcast-default-ca.xml
-        run: |
-          cp $GITHUB_WORKSPACE/etc/hazelcast-default-ca.xml $GITHUB_WORKSPACE/master/test/integration/backward_compatible/parallel/ssl/hazelcast-default-ca.xml
-
       - uses: ./.github/actions/get-enterprise-license
         id: get-enterprise-license
         with:
