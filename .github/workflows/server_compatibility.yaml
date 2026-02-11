@@ -78,31 +78,31 @@ jobs:
         id: compute_hz_version
         run: echo "hz_version=$(./mvnw help:evaluate -Dexpression=project.version --quiet -DforceStdout)" >> ${GITHUB_OUTPUT}
         working-directory: hazelcast-mono
-      - name: Upload Hazelcast JAR
-        uses: actions/upload-artifact@v6
-        with:
-          name: hazelcast
-          path: hazelcast-mono/hazelcast/hazelcast/target/hazelcast-*[!s].jar
-          retention-days: 1
-      - name: Upload Hazelcast SQL JAR (if exists)
-        uses: actions/upload-artifact@v6
-        with:
-          name: hazelcast-sql
-          path: hazelcast-mono/hazelcast/hazelcast-sql/target/hazelcast-sql-*[!s].jar
-          if-no-files-found: ignore
-          retention-days: 1
-      - name: Upload Hazelcast tests JAR
-        uses: actions/upload-artifact@v6
-        with:
-          name: hazelcast-tests
-          path: hazelcast-mono/hazelcast/hazelcast/target/hazelcast-*-tests.jar
-          retention-days: 1
-      - name: Upload Hazelcast Enterprise JAR
-        uses: actions/upload-artifact@v6
-        with:
-          name: hazelcast-enterprise
-          path: hazelcast-mono/hazelcast-enterprise/target/hazelcast-enterprise-*[!s].jar
-          retention-days: 1
+#      - name: Upload Hazelcast JAR
+#        uses: actions/upload-artifact@v6
+#        with:
+#          name: hazelcast
+#          path: hazelcast-mono/hazelcast/hazelcast/target/hazelcast-*[!s].jar
+#          retention-days: 1
+#      - name: Upload Hazelcast SQL JAR (if exists)
+#        uses: actions/upload-artifact@v6
+#        with:
+#          name: hazelcast-sql
+#          path: hazelcast-mono/hazelcast/hazelcast-sql/target/hazelcast-sql-*[!s].jar
+#          if-no-files-found: ignore
+#          retention-days: 1
+#      - name: Upload Hazelcast tests JAR
+#        uses: actions/upload-artifact@v6
+#        with:
+#          name: hazelcast-tests
+#          path: hazelcast-mono/hazelcast/hazelcast/target/hazelcast-*-tests.jar
+#          retention-days: 1
+#      - name: Upload Hazelcast Enterprise JAR
+#        uses: actions/upload-artifact@v6
+#        with:
+#          name: hazelcast-enterprise
+#          path: hazelcast-mono/hazelcast-enterprise/target/hazelcast-enterprise-*[!s].jar
+#          retention-days: 1
       - name: Rename certs.jar as Hazelcast Enterprise tests JAR
         run: |
           HZ_TESTS_JAR_NAME=$(basename $(ls $GITHUB_WORKSPACE/hazelcast-mono/hazelcast/hazelcast/target/hazelcast-*-tests.jar))
@@ -227,9 +227,11 @@ jobs:
           HZ_VERSION: ${{ matrix.version }}
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
         run: |
-          echo "HZ_VERSION: $HZ_VERSION
+          echo ">>> HZ_VERSION: $HZ_VERSION"
+          echo ">>> Jars:"
+          ls "hazelcast-mono/hazelcast/hazelcast/target"
           chmod +x rcd-ubuntu-latest 
-          ./rcd-ubuntu-latest -jars jars &
+          ./rcd-ubuntu-latest -jars hazelcast-mono/hazelcast/hazelcast/target &
           # wait for a bit for RCD to download artifacts
           sleep 10
           
