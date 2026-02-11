@@ -129,7 +129,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v6
         with:
-          python-version: 3.13
+          python-version: 3.11
 
       - name: Checkout to scripts
         uses: actions/checkout@v6
@@ -156,7 +156,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v6
         with:
-          python-version: 3.13
+          python-version: 3.11
 
       - name: Read Java Config
         run: cat ${GITHUB_WORKSPACE}/.github/java-config.env >> $GITHUB_ENV
