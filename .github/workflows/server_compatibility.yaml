@@ -227,8 +227,9 @@ jobs:
           HZ_VERSION: ${{ matrix.version }}
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
         run: |
+          echo "HZ_VERSION: $HZ_VERSION
           chmod +x rcd-ubuntu-latest 
-          ./rcd-ubuntu-latest -version $HZ_VERSION  &
+          ./rcd-ubuntu-latest -jars jars &
           # wait for a bit for RCD to download artifacts
           sleep 10
           
