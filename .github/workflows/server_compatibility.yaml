@@ -78,31 +78,31 @@ jobs:
         id: compute_hz_version
         run: echo "hz_version=$(./mvnw help:evaluate -Dexpression=project.version --quiet -DforceStdout)" >> ${GITHUB_OUTPUT}
         working-directory: hazelcast-mono
-#      - name: Upload Hazelcast JAR
-#        uses: actions/upload-artifact@v6
-#        with:
-#          name: hazelcast
-#          path: hazelcast-mono/hazelcast/hazelcast/target/hazelcast-*[!s].jar
-#          retention-days: 1
-#      - name: Upload Hazelcast SQL JAR (if exists)
-#        uses: actions/upload-artifact@v6
-#        with:
-#          name: hazelcast-sql
-#          path: hazelcast-mono/hazelcast/hazelcast-sql/target/hazelcast-sql-*[!s].jar
-#          if-no-files-found: ignore
-#          retention-days: 1
-#      - name: Upload Hazelcast tests JAR
-#        uses: actions/upload-artifact@v6
-#        with:
-#          name: hazelcast-tests
-#          path: hazelcast-mono/hazelcast/hazelcast/target/hazelcast-*-tests.jar
-#          retention-days: 1
-#      - name: Upload Hazelcast Enterprise JAR
-#        uses: actions/upload-artifact@v6
-#        with:
-#          name: hazelcast-enterprise
-#          path: hazelcast-mono/hazelcast-enterprise/target/hazelcast-enterprise-*[!s].jar
-#          retention-days: 1
+      - name: Upload Hazelcast JAR
+        uses: actions/upload-artifact@v6
+        with:
+          name: hazelcast
+          path: hazelcast-mono/hazelcast/hazelcast/target/hazelcast-*[!s].jar
+          retention-days: 1
+      - name: Upload Hazelcast SQL JAR (if exists)
+        uses: actions/upload-artifact@v6
+        with:
+          name: hazelcast-sql
+          path: hazelcast-mono/hazelcast/hazelcast-sql/target/hazelcast-sql-*[!s].jar
+          if-no-files-found: ignore
+          retention-days: 1
+      - name: Upload Hazelcast tests JAR
+        uses: actions/upload-artifact@v6
+        with:
+          name: hazelcast-tests
+          path: hazelcast-mono/hazelcast/hazelcast/target/hazelcast-*-tests.jar
+          retention-days: 1
+      - name: Upload Hazelcast Enterprise JAR
+        uses: actions/upload-artifact@v6
+        with:
+          name: hazelcast-enterprise
+          path: hazelcast-mono/hazelcast-enterprise/target/hazelcast-enterprise-*[!s].jar
+          retention-days: 1
       - name: Rename certs.jar as Hazelcast Enterprise tests JAR
         run: |
           HZ_TESTS_JAR_NAME=$(basename $(ls $GITHUB_WORKSPACE/hazelcast-mono/hazelcast/hazelcast/target/hazelcast-*-tests.jar))
@@ -222,6 +222,36 @@ jobs:
           version: ${{ steps.generate-semver.outputs.version }}
           compare-to: 5.5.0
 
+      - name: Download Hazelcast tests JAR
+        uses: actions/download-artifact@v7
+        with:
+          name: hazelcast-tests
+          path: jars
+      - name: Download Hazelcast SQL JAR (if exists)
+        continue-on-error: true
+        uses: actions/download-artifact@v7
+        with:
+          name: hazelcast-sql
+          path: jars
+      - name: Download Hazelcast JAR
+        if: ${{ matrix.server_kind == 'os' }}
+        uses: actions/download-artifact@v7
+        with:
+          name: hazelcast
+          path: jars
+      - name: Download Hazelcast Enterprise JAR
+        if: ${{ matrix.server_kind == 'enterprise' }}
+        uses: actions/download-artifact@v7
+        with:
+          name: hazelcast-enterprise
+          path: jars
+      - name: Download Hazelcast Enterprise tests JAR
+        if: ${{ matrix.server_kind == 'enterprise' }}
+        uses: actions/download-artifact@v7
+        with:
+          name: hazelcast-enterprise-tests
+          path: jars
+
       - name: Run tests
         env:
           HZ_VERSION: ${{ matrix.version }}
@@ -229,9 +259,9 @@ jobs:
         run: |
           echo ">>> HZ_VERSION: $HZ_VERSION"
           echo ">>> Jars:"
-          ls "hazelcast-mono/hazelcast/hazelcast/target"
+          ls jars
           chmod +x rcd-ubuntu-latest 
-          ./rcd-ubuntu-latest -jars hazelcast-mono/hazelcast/hazelcast/target &
+          ./rcd-ubuntu-latest -jars jars &
           # wait for a bit for RCD to download artifacts
           sleep 10
           
