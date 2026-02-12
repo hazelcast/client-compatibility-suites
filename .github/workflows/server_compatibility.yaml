@@ -168,7 +168,7 @@ jobs:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
 
       - name: Checkout to test artifacts
-        if: ${{ matrix.kind == 'enterprise' }}
+        if: ${{ matrix.server_kind == 'enterprise' }}
         uses: actions/checkout@v6
         with:
           repository: hazelcast/private-test-artifacts
@@ -196,7 +196,7 @@ jobs:
           cp -a $GITHUB_WORKSPACE/tag/hazelcast $GITHUB_WORKSPACE/master/hazelcast
 
       - name: Create the test jar with certificates
-        if: ${{ matrix.kind == 'enterprise' }}
+        if: ${{ matrix.server_kind == 'enterprise' }}
         working-directory: certs
         run: |
           zip -r -j certs.jar $GITHUB_WORKSPACE/master/tests/integration/backward_compatible/ssl_tests/hostname_verification/*.p12
