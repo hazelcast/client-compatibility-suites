@@ -269,6 +269,12 @@ jobs:
           if [ "${{ matrix.server_kind }}" = "os" ]; then
             args+=(-m "not enterprise")
           fi
+          
+          #debug
+          if [[ "$HAZELCAST_ENTERPRISE_KEY" != "" ]]; then
+            echo ">>> HAS ENTERPRISE_KEY
+          fi
+          
           if [[ "${{ steps.client-version.outputs.comparison-result }}" = "<" ]]; then
             # Workaround https://github.com/hazelcast/hazelcast-python-client/issues/666 by skipping those tests
             args+=(--ignore master/tests/integration/backward_compatible/predicate_test.py)
