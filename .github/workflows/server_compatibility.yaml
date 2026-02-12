@@ -272,7 +272,7 @@ jobs:
           
           #debug
           if [[ "$HAZELCAST_ENTERPRISE_KEY" != "" ]]; then
-            echo ">>> HAS ENTERPRISE_KEY
+            echo ">>> HAS ENTERPRISE_KEY"
           fi
           
           if [[ "${{ steps.client-version.outputs.comparison-result }}" = "<" ]]; then
