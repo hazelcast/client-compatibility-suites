@@ -227,30 +227,34 @@ jobs:
         with:
           name: hazelcast-tests
           path: jars
+
       - name: Download Hazelcast SQL JAR (if exists)
         continue-on-error: true
         uses: actions/download-artifact@v7
         with:
           name: hazelcast-sql
           path: jars
+
       - name: Download Hazelcast JAR
         if: ${{ matrix.server_kind == 'os' }}
         uses: actions/download-artifact@v7
         with:
           name: hazelcast
           path: jars
+
       - name: Download Hazelcast Enterprise JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
         uses: actions/download-artifact@v7
         with:
           name: hazelcast-enterprise
           path: jars
-      - name: Download Hazelcast Enterprise tests JAR
-        if: ${{ matrix.server_kind == 'enterprise' }}
-        uses: actions/download-artifact@v7
-        with:
-          name: hazelcast-enterprise-tests
-          path: jars
+
+  #      - name: Download Hazelcast Enterprise tests JAR
+  #        if: ${{ matrix.server_kind == 'enterprise' }}
+  #        uses: actions/download-artifact@v7
+  #        with:
+  #          name: hazelcast-enterprise-tests
+  #          path: jars
 
       - name: Run tests
         env:
