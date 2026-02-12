@@ -255,7 +255,7 @@ jobs:
       - name: Run tests
         env:
           HZ_VERSION: ${{ matrix.version }}
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets[needs.upload_jars.outputs.hazelcast_enterprise_key_secret] }}
         run: |
           echo ">>> HZ_VERSION: $HZ_VERSION"
           echo ">>> Jars:"
