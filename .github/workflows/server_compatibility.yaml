@@ -259,13 +259,6 @@ jobs:
           name: hazelcast-enterprise
           path: jars
 
-  #      - name: Download Hazelcast Enterprise tests JAR
-  #        if: ${{ matrix.server_kind == 'enterprise' }}
-  #        uses: actions/download-artifact@v7
-  #        with:
-  #          name: hazelcast-enterprise-tests
-  #          path: jars
-
       - name: Run tests
         env:
           HZ_VERSION: "${{ needs.upload_jars.outputs.hz_version }}"
