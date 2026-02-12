@@ -266,7 +266,7 @@ jobs:
           sleep 10
           
           args=(--verbose)
-          if [ "${{ matrix.kind }}" = "os" ]; then
+          if [ "${{ matrix.server_kind }}" = "os" ]; then
             args+=(-m "not enterprise")
           fi
           if [[ "${{ steps.client-version.outputs.comparison-result }}" = "<" ]]; then
