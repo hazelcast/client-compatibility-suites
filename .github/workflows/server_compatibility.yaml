@@ -167,6 +167,15 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
 
+      - name: Checkout to test artifacts
+        if: ${{ matrix.kind == 'enterprise' }}
+        uses: actions/checkout@v6
+        with:
+          repository: hazelcast/private-test-artifacts
+          path: certs
+          ref: data
+          token: ${{ secrets.GH_PAT }}
+
       - name: Checkout to master
         uses: actions/checkout@v6
         with:
