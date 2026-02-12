@@ -264,9 +264,6 @@ jobs:
           HZ_VERSION: "${{ needs.upload_jars.outputs.hz_version }}"
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets[needs.upload_jars.outputs.hazelcast_enterprise_key_secret] }}
         run: |
-          echo ">>> HZ_VERSION: $HZ_VERSION"
-          echo ">>> Jars:"
-          ls jars
           chmod +x rcd-ubuntu-latest 
           ./rcd-ubuntu-latest -jars jars &
           # wait for a bit for RCD to download artifacts
@@ -275,11 +272,6 @@ jobs:
           args=(--verbose)
           if [ "${{ matrix.server_kind }}" = "os" ]; then
             args+=(-m "not enterprise")
-          fi
-          
-          #debug
-          if [[ "$HAZELCAST_ENTERPRISE_KEY" != "" ]]; then
-            echo ">>> HAS ENTERPRISE_KEY"
           fi
           
           if [[ "${{ steps.client-version.outputs.comparison-result }}" = "<" ]]; then
