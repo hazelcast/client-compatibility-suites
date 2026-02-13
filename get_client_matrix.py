@@ -63,6 +63,9 @@ if __name__ == "__main__":
     elif client_kind == ClientKind.CPP:
         filtered_major_version = [5]
         unsupported_versions = [Version("5.0.0"), Version("5.1.0"), Version("5.2.0")]
+    elif client_kind == ClientKind.PY:
+        filtered_major_version = [5]
+        unsupported_versions = [Version("5.0.1"), Version("5.1")]
     else:
         filtered_major_version = [5]
         unsupported_versions = []
