@@ -218,10 +218,10 @@ jobs:
         python-version: 3.11
 
     - name: Checkout to scripts
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Checkout the Python client repo
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
         path: KubernetesExternalClients/python/clientSourceCode
