@@ -408,6 +408,8 @@ jobs:
   test_csharp_clients:
     needs: [ upload_jars,  setup_csharp_client_matrix ]
     runs-on: windows-latest
+    permissions:
+      id-token: write
     strategy:
       fail-fast: false
       matrix:
@@ -554,6 +556,12 @@ jobs:
         run: |
           ./hz.ps1 clean, build
 
+      - uses: hazelcast/docker-actions/get-jfrog-credentials@master
+        id: jfrog
+        with:
+          aws-role-to-assume: ${{ secrets.AWS_HAZELCAST_OIDC_GITHUB_ACTIONS_ROLE_ARN }}
+          jfrog-oidc-provider-name: ${{ github.repository_owner }}-snapshot-internal
+
       - name: Run non-enterprise tests
         if: ${{ matrix.server_kind == 'os' && steps.backport-tests.outcome == 'skipped'  }}
         shell: pwsh
@@ -562,8 +570,8 @@ jobs:
         working-directory: tag      
         env:
           HAZELCAST_SERVER_VERSION: ${{ needs.upload_jars.outputs.hz_version }}
-          HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
-          HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
+          HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ steps.jfrog.outputs.user }}
+          HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ steps.jfrog.outputs.token }}
 
       - name: Run non-enterprise tests with compatibility
         if: ${{ matrix.server_kind == 'os' && steps.backport-tests.outcome == 'success'  }}
@@ -572,8 +580,8 @@ jobs:
           ./hz.ps1 test -tf "method != SendReceive and namespace !~ Hazelcast.Tests.CP" -server ${{ needs.upload_jars.outputs.hz_version }}
         working-directory: tag      
         env:
-          HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
-          HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
+          HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ steps.jfrog.outputs.user }}
+          HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ steps.jfrog.outputs.token }}
 
       - name: Run all tests
         if: ${{ matrix.server_kind == 'enterprise' && steps.backport-tests.outcome == 'skipped'  }}
@@ -582,8 +590,8 @@ jobs:
            ./hz.ps1 -enterprise -tf "method != SendReceive" -server ${{ needs.upload_jars.outputs.hz_version }} test ${{ secrets.GH_PAT }}
         working-directory: tag
         env:
-          HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
-          HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
+          HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ steps.jfrog.outputs.user }}
+          HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ steps.jfrog.outputs.token }}
 
       - name: Run all tests with compatibility
         if: ${{matrix.server_kind == 'enterprise' && steps.backport-tests.outcome == 'success'}}
@@ -593,8 +601,8 @@ jobs:
         working-directory: tag
         env:
           HAZELCAST_SERVER_VERSION: ${{ needs.upload_jars.outputs.hz_version }}
-          HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }}
-          HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
+          HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ steps.jfrog.outputs.user }}
+          HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ steps.jfrog.outputs.token }}
       
       # upload logs
       - name: Upload RC and Server logs
