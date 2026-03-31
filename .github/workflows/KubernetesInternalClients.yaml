@@ -100,10 +100,10 @@ jobs:
    if: ${{ github.event.inputs.python_asyncio_run != 'no' }}
    steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Checkout the client repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
           path: KubernetesInternalClients/python/clientSourceCode
