@@ -233,28 +233,28 @@ jobs:
           compare-to: 5.5.0
 
       - name: Download Hazelcast tests JAR
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: hazelcast-tests
           path: jars
 
       - name: Download Hazelcast SQL JAR (if exists)
         continue-on-error: true
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: hazelcast-sql
           path: jars
 
       - name: Download Hazelcast JAR
         if: ${{ matrix.server_kind == 'os' }}
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: hazelcast
           path: jars
 
       - name: Download Hazelcast Enterprise JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: hazelcast-enterprise
           path: jars
@@ -353,31 +353,31 @@ jobs:
           cp -a $GITHUB_WORKSPACE/tag/lib $GITHUB_WORKSPACE/master/lib
           cp -a $GITHUB_WORKSPACE/tag/package.json $GITHUB_WORKSPACE/master/package.json
       - name: Download Hazelcast tests JAR
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: hazelcast-tests
           path: jars
       - name: Download Hazelcast SQL JAR (if exists)
         continue-on-error: true
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: hazelcast-sql
           path: jars
       - name: Download Hazelcast JAR
         if: ${{ matrix.server_kind == 'os' }}
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: hazelcast
           path: jars
       - name: Download Hazelcast Enterprise JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: hazelcast-enterprise
           path: jars
       - name: Download Hazelcast Enterprise tests JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: hazelcast-enterprise-tests
           path: jars
@@ -466,35 +466,35 @@ jobs:
           sparse-checkout-cone-mode: false
 
       - name: Download Hazelcast tests JAR
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: hazelcast-tests
           path: tag/temp/lib
 
       - name: Download Hazelcast SQL JAR (if exists)
         continue-on-error: true
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: hazelcast-sql
           path: tag/temp/lib
 
       - name: Download Hazelcast JAR
         if: ${{ matrix.server_kind == 'os' }}
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: hazelcast
           path: tag/temp/lib
 
       - name: Download Hazelcast Enterprise JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: hazelcast-enterprise
           path: tag/temp/lib
 
       - name: Download Hazelcast Enterprise tests JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: hazelcast-enterprise-tests
           path: tag/temp/lib
@@ -654,31 +654,31 @@ jobs:
           rm -rf tag/scripts
           cp -R master/scripts tag/
       - name: Download Hazelcast tests JAR
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: hazelcast-tests
           path: tag
       - name: Download Hazelcast SQL JAR (if exists)
         continue-on-error: true
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: hazelcast-sql
           path: tag
       - name: Download Hazelcast JAR
         if: ${{ matrix.server_kind == 'os' }}
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: hazelcast
           path: tag
       - name: Download Hazelcast Enterprise JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: hazelcast-enterprise
           path: tag
       - name: Download Hazelcast Enterprise tests JAR
         if: ${{ matrix.server_kind == 'enterprise' }}
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: hazelcast-enterprise-tests
           path: tag
@@ -742,28 +742,28 @@ jobs:
           sparse-checkout-cone-mode: false
 
       - name: Download Hazelcast tests JAR
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: hazelcast-tests
           path: client
       - name: Download Hazelcast JAR
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: hazelcast
           path: client
       - name: Download Hazelcast SQL JAR (if exists)
         continue-on-error: true
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: hazelcast-sql
           path: client
       - name: Download Hazelcast Enterprise JAR
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: hazelcast-enterprise
           path: client
       - name: Download Hazelcast Enterprise tests JAR
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: hazelcast-enterprise-tests
           path: client
