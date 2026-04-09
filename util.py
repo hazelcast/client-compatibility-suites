@@ -74,11 +74,6 @@ class ClientKind(Enum):
     GO = "Go"
 
 
-class MatrixOptionKind(Enum):
-    TAG = 0
-    VERSION = 1
-
-
 class ServerKind(Enum):
     OS = 0
     ENTERPRISE = 1
@@ -306,16 +301,6 @@ def get_tag(release: Release) -> str:
     return tail
 
 
-def get_version(release: Release) -> str:
-    return release.version.version_str
-
-
-MATRIX_OPTION_KIND_TO_GETTER: Dict[MatrixOptionKind, Callable[[Release], str]] = {
-    MatrixOptionKind.TAG: get_tag,
-    MatrixOptionKind.VERSION: get_version,
-}
-
-
 def get_latest_patch_releases(releases: List[Release]) -> List[Release]:
     major_to_minor_to_latest_patch: DefaultDict[
         int, DefaultDict[int, Release]
@@ -335,10 +320,6 @@ def get_latest_patch_releases(releases: List[Release]) -> List[Release]:
             latest_patch_releases.append(latest_patch)
 
     return latest_patch_releases
-
-
-def get_option_from_release(release: Release, option: MatrixOptionKind) -> str:
-    return MATRIX_OPTION_KIND_TO_GETTER[option](release)
 
 
 class DownloadFailedError(Exception):
