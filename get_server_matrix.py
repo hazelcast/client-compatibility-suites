@@ -5,10 +5,8 @@ from typing import List
 from util import (
     MajorMinorVersionFilter,
     ServerReleaseParser,
-    SupportedReleaseFilter,
     get_latest_patch_releases,
-    ReleaseFilter,
-    Version
+    ReleaseFilter
 )
 
 
@@ -17,13 +15,22 @@ def parse_args() -> argparse.Namespace:
         description="Returns the server version matrix as a JSON array"
     )
 
+    parser.add_argument(
+        "--minimum-version",
+        dest="minimum_version",
+        action="store",
+        type=str,
+        required=True,
+        help="Minimum server version",
+    )
+
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = parse_args()
-    unsupported_versions = []
-    filters: List[ReleaseFilter] = [MajorMinorVersionFilter((5, 2)), SupportedReleaseFilter(unsupported_versions)]
+    minimum_major_version, minimum_minor_version = map(int, args.minimum_version.split("."))
+    filters: List[ReleaseFilter] = [MajorMinorVersionFilter((minimum_major_version, minimum_minor_version))]
     server_release_parser = ServerReleaseParser(filters)
     releases = server_release_parser.get_all_releases()
     latest_patch_releases = get_latest_patch_releases(releases)
