@@ -13,21 +13,7 @@ on:
         default: master
 jobs:
   setup_server_matrix:
-    name: Setup the server test matrix
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    steps:
-      - name: Setup Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: 3.9
-      - name: Checkout to scripts
-        uses: actions/checkout@v6
-        
-      - name: Set server matrix
-        id: set-matrix
-        run: echo "matrix=$( python get_server_matrix.py )" >> ${GITHUB_OUTPUT}
+    uses: ./.github/workflows/get-server-matrix.yaml
         
   test_client:
     needs: [setup_server_matrix]
