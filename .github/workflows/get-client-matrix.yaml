@@ -1,0 +1,32 @@
+name: Get client matrix
+
+on:
+  workflow_call:
+    inputs:
+      client:
+        type: string
+        required: true
+    outputs:
+      matrix:
+        value: ${{ jobs.setup_client_matrix.outputs.matrix }}
+
+jobs:
+  setup_client_matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout to scripts
+        uses: actions/checkout@v6
+      - name: Set client matrix
+        id: set-matrix
+        run: |
+          echo "matrix=$(
+            python \
+            get_client_matrix.py \
+              --client ${CLIENT} \
+              --option tag \
+              --use-latest-patch-versions \
+          )" >> ${GITHUB_OUTPUT}
+        env:
+          CLIENT: ${{ inputs.client }}
