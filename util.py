@@ -44,7 +44,6 @@ TAG_ATTRIBUTE = "Github"
 IMDG_CLIENTS = (
     "https://raw.githubusercontent.com/hazelcast/rel-scripts/master/imdg-clients.txt"
 )
-IMDG_SERVERS = "https://raw.githubusercontent.com/hazelcast/rel-scripts/master/imdg-enterprise.txt"
 HAZELCAST_SERVERS = "https://raw.githubusercontent.com/hazelcast/rel-scripts/master/hazelcast-enterprise.txt"
 
 CLIENT_HEADER = "======= %s Client\n---\n(.*?)\n---\n==="
@@ -241,21 +240,21 @@ class AbstractReleaseParser(ABC):
 
 class ServerReleaseParser(AbstractReleaseParser):
     def get_source_urls(self) -> List[str]:
-        return [IMDG_SERVERS, HAZELCAST_SERVERS]
+        return [HAZELCAST_SERVERS]
 
     def parse_raw_data(self, raw_data: str) -> List[Release]:
         stable_match = re.search(CURRENT_STABLE_SERVER_PATTERN, raw_data)
         if not stable_match:
             raise ValueError(
                 "Cannot find a match on the server data "
-                "located at %s for the current stable version." % IMDG_SERVERS
+                "located at %s for the current stable version." % HAZELCAST_SERVERS
             )
 
         previous_match = re.search(PREVIOUS_STABLE_SERVER_PATTERN, raw_data)
         if not previous_match:
             raise ValueError(
                 "Cannot find a match on the server data "
-                "located at %s for the previous stable versions." % IMDG_SERVERS
+                "located at %s for the previous stable versions." % HAZELCAST_SERVERS
             )
 
         all_releases = []
