@@ -7,9 +7,8 @@ from util import (
     StableReleaseFilter,
     SupportedReleaseFilter,
     MajorVersionFilter,
-    MatrixOptionKind,
     Version,
-    get_option_from_release,
+    get_tag,
     get_latest_patch_releases,
 )
 
@@ -29,33 +28,12 @@ def parse_args() -> argparse.Namespace:
         help="Client type",
     )
 
-    parser.add_argument(
-        "--option",
-        dest="option",
-        action="store",
-        type=str,
-        choices=[kind.name.lower() for kind in MatrixOptionKind],
-        required=True,
-        help="Matrix option type",
-    )
-
-    parser.add_argument(
-        "--use-latest-patch-versions",
-        dest="use_latest_patch_versions",
-        action="store_true",
-        default=False,
-        required=False,
-        help="Use only the latest patch versions",
-    )
-
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = parse_args()
     client_kind = ClientKind[args.client.upper()]
-    matrix_option_kind = MatrixOptionKind[args.option.upper()]
-    use_latest_patch_versions = args.use_latest_patch_versions
 
     if client_kind == ClientKind.GO:
         filtered_major_version = [1]
@@ -79,10 +57,9 @@ if __name__ == "__main__":
     client_release_parser = ClientReleaseParser(client_kind, filters)
     releases = client_release_parser.get_all_releases()
 
-    if use_latest_patch_versions:
-        releases = get_latest_patch_releases(releases)
+    releases = get_latest_patch_releases(releases)
 
     options = [
-        get_option_from_release(release, matrix_option_kind) for release in releases
+        get_tag(release) for release in releases
     ]
     print(json.dumps(options))
