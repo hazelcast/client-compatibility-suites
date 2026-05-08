@@ -13,6 +13,10 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
+      - id: get-maintenance-versions
+        uses: hazelcast/hazelcast/.github/actions/get-supported-maintenance-versions@master
+      - id: calculate-minimum-supported-version
+        run: echo "VERSION=$(echo '${{ steps.get-maintenance-versions.outputs.versions }}' | jq '.[0]')" >> ${GITHUB_OUTPUT}
       - name: Checkout to scripts
         uses: actions/checkout@v6
       - name: Set server matrix
@@ -21,4 +25,5 @@ jobs:
           echo "matrix=$(
             python \
             get_server_matrix.py \
+              --minimum-version ${{ steps.calculate-minimum-supported-version.outputs.VERSION }} \
           )" >> ${GITHUB_OUTPUT}
