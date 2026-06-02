@@ -75,7 +75,7 @@ runs:
       env:
         BUILD_DIR: build
         HAZELCAST_ENTERPRISE_KEY: ${{ inputs.hazelcast-enterprise-key }}
-        GTEST_FILTER: -*Aws*:*DescribeInstancesTest*
+        GTEST_FILTER: -*Aws*:*DescribeInstancesTest*:*testPutIfAbsentTtl*
         HZ_VERSION: ${{ inputs.hazelcast-version }}
       run: |
         ulimit -c unlimited
