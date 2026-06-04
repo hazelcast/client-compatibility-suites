@@ -75,11 +75,20 @@ runs:
       env:
         BUILD_DIR: build
         HAZELCAST_ENTERPRISE_KEY: ${{ inputs.hazelcast-enterprise-key }}
-        GTEST_FILTER: -*Aws*:*DescribeInstancesTest*
         HZ_VERSION: ${{ inputs.hazelcast-version }}
       run: |
         ulimit -c unlimited
         sudo sh -c "echo 'core' > /proc/sys/kernel/core_pattern"
         sudo sh -c "echo '1' > /proc/sys/kernel/core_uses_pid"
+
+        GTEST_FILTER="-*Aws*:*DescribeInstancesTest*"
+
+        if [ "$(printf '%s\n' "$HZ_VERSION" "5.7.0" | sort -V | head -n1)" = "$HZ_VERSION" ] \
+           && [ "$HZ_VERSION" != "5.7.0" ]; then
+          GTEST_FILTER="${GTEST_FILTER}:*testPutIfAbsentTtl*"
+        fi
+
+        export GTEST_FILTER
+
         ./scripts/test-unix.sh
       working-directory: ${{ inputs.working-directory }}
