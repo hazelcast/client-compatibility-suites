@@ -243,7 +243,7 @@ jobs:
           kubectl wait --for=condition=ready pod/hz-hazelcast-2 --timeout=180s
           
       - name: Download image
-        uses: ishworkh/container-image-artifact-download@v2.0.0
+        uses: ishworkh/container-image-artifact-download@v2.1.0
         with:
          image: "hazelcast-${{ matrix.client-language }}-client:test"
           
