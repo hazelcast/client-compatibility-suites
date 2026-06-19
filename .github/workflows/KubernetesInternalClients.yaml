@@ -106,7 +106,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
-          path: KubernetesInternalClients/python/clientSourceCode
+          path: KubernetesInternalClients/python_asyncio/clientSourceCode
           ref: ${{ github.event.inputs.python-asyncio-run }}
 
       - name: Build client application
