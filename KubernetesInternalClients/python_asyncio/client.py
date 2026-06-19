@@ -13,7 +13,7 @@ async def amain():
         cluster_members=["hz-hazelcast"],
     )
 
-    my_map = await client.get_map("map").blocking()
+    my_map = await client.get_map("map")
     await my_map.put("key", "value")
 
     if await my_map.get("key") == "value":
