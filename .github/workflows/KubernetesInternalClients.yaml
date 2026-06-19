@@ -193,7 +193,7 @@ jobs:
          
   wait-for-images:
     name: Waits for image creation and create json for which clients run
-    needs: [create-python-image, create-nodejs-image, create-go-image, create-csharp-image, create-cpp-image]
+    needs: [create-python-image, create-nodejs-image, create-go-image, create-csharp-image, create-cpp-image, create-python-asyncio-image]
     if: always()
     runs-on: ubuntu-latest
     outputs:
