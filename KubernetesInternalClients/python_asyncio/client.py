@@ -28,8 +28,9 @@ async def amain():
             random_key = random.randint(1, 100000)
             try:
                 await my_map.put("key" + str(random_key), "value" + str(random_key))
-            except:
+            except Exception:
                 logging.exception("Put operation failed!")
+                continue
 
             if random_key % 100 == 0:
                 map_size = await my_map.size()
