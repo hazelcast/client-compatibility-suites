@@ -7,6 +7,10 @@ from hazelcast.asyncio import HazelcastClient
 
 
 async def amain():
+    def exception_handler(loop, context):
+        return
+
+    asyncio.get_running_loop().set_exception_handler(exception_handler)
     logging.basicConfig(level=logging.INFO)
 
     client = await HazelcastClient.create_and_start(
