@@ -298,6 +298,9 @@ jobs:
         run: |            
             kubectl logs --tail=20 hazelcast-${{ matrix.client-language }}-client >> output-${{ matrix.client-language }}-deletepods.txt
             cat output-${{ matrix.client-language }}-deletepods.txt
+            echo "==="
+            grep -o 'Current map size:' output-${{ matrix.client-language }}-deletepods.txt
+            echo "==="
             if [ $(grep -o 'Current map size:' output-${{ matrix.client-language }}-deletepods.txt | wc -l) != $"20" ]; then exit 1; fi
             
       - name: Logs
