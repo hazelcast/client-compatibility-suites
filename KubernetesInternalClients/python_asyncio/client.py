@@ -10,7 +10,7 @@ async def amain():
     def exception_handler(loop, context):
         return
 
-    asyncio.get_running_loop().set_exception_handler(exception_handler)
+    # asyncio.get_running_loop().set_exception_handler(exception_handler)
     logging.basicConfig(level=logging.INFO)
 
     client = await HazelcastClient.create_and_start(
@@ -28,9 +28,8 @@ async def amain():
             random_key = random.randint(1, 100000)
             try:
                 await my_map.put("key" + str(random_key), "value" + str(random_key))
-            except Exception:
+            except:
                 logging.exception("Put operation failed!")
-                continue
 
             if random_key % 100 == 0:
                 map_size = await my_map.size()
