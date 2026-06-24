@@ -296,7 +296,11 @@ jobs:
             
       - name: Verify after delete pods
         run: |            
-          echo "OK"
+            kubectl logs --tail=20 hazelcast-${{ matrix.client-language }}-client >> output-${{ matrix.client-language }}-deletepods.txt
+            cat output-${{ matrix.client-language }}-deletepods.txt
+            echo "==="
+            grep -o 'Current map size:' output-${{ matrix.client-language }}-deletepods.txt
+            echo "==="
 
       - name: Logs
         if: always()
