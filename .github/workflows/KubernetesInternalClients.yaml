@@ -107,7 +107,7 @@ jobs:
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
           path: KubernetesInternalClients/python_asyncio/clientSourceCode
-          ref: ${{ github.event.inputs.python-asyncio-run }}
+          ref: ${{ github.event.inputs.python_asyncio_run }}
 
       - name: Build client application
         run: |-
