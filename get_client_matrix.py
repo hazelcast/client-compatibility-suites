@@ -38,15 +38,9 @@ if __name__ == "__main__":
     if client_kind == ClientKind.GO:
         filtered_major_version = [1]
         unsupported_versions = [Version("1.0"), Version("1.1")]
-    elif client_kind == ClientKind.CPP:
-        filtered_major_version = [5]
-        unsupported_versions = [Version("5.0.0"), Version("5.1.0"), Version("5.2.0")]
-    elif client_kind == ClientKind.PY:
-        filtered_major_version = [5]
-        unsupported_versions = [Version("5.0.1"), Version("5.1")]
     else:
         filtered_major_version = [5]
-        unsupported_versions = []
+        unsupported_versions = [Version("5.0.0"), Version("5.0.1"), Version("5.0.2"), Version("5.0.4"), Version("5.1.0"), Version("5.2.0")]
 
     filters = [
         MajorVersionFilter(filtered_major_version),
