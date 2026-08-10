@@ -51,11 +51,11 @@ jobs:
       id-token: write
     env:
       GCP_NETWORK: operator-test-network
-    
+
     steps:
     - name: Checkout
       uses: actions/checkout@v6
-    
+
     - id: 'auth'
       uses: 'google-github-actions/auth@v3'
       with:
@@ -71,7 +71,7 @@ jobs:
     - name: Install Helm
       uses: azure/setup-helm@v5
       id: install
-      
+
     - name: Create GKE cluster
       run: |-
         repoName='kubernetes-clients-compatibility'
@@ -135,20 +135,20 @@ jobs:
     - name: Set output of external-ip
       id: external-ip
       run: echo "external-ip=${{ env.EXTERNAL_IP }}" >> ${GITHUB_OUTPUT}
-    - name: Set output of gke_zone  
+    - name: Set output of gke_zone
       id: gke_zone
       run: echo "gke_zone=${{ env.GKE_ZONE }}" >> ${GITHUB_OUTPUT}
-    - name: Set output of cluster_name  
+    - name: Set output of cluster_name
       id: cluster_name
       run: echo "cluster_name=${{ env.clusterName }}" >> ${GITHUB_OUTPUT}
-        
+
   run_go:
     name: Run Go compatibility test
     needs: [create-gke-cluster]
     if: ${{ github.event.inputs.go_run != 'no' }}
     runs-on: ubuntu-latest
-    
-    steps:  
+
+    steps:
     - name: Set up Golang
       uses: actions/setup-go@v6
       with:
@@ -156,14 +156,14 @@ jobs:
 
     - name: Checkout to scripts
       uses: actions/checkout@v6
-        
+
     - name: Checkout the go client repo
       uses: actions/checkout@v6
       with:
         repository: ${{ github.event.inputs.organization_name }}/hazelcast-go-client
         path: KubernetesExternalClients/go/clientSourceCode
         ref: ${{ github.event.inputs.go_run }}
-      
+
     - name: Run test
       run: |
         cd KubernetesExternalClients/go
@@ -172,31 +172,31 @@ jobs:
         go run main.go &> output.txt && tail -n 20 output.txt &> last20lines.txt
         cat last20lines.txt
         if [ $(grep -o 'Current map size:' last20lines.txt | wc -l) != $"20" ]; then exit 1; fi
-        
+
 #TODO: More reliabe verification
-        
+
   run_python:
     name: Run Python compatibility test
     needs: [create-gke-cluster]
     if: ${{ github.event.inputs.python_run != 'no' }}
     runs-on: ubuntu-latest
-      
-    steps:  
+
+    steps:
     - name: Setup Python
       uses: actions/setup-python@v6
       with:
         python-version: 3.11
-        
+
     - name: Checkout to scripts
       uses: actions/checkout@v6
-        
+
     - name: Checkout the Python client repo
       uses: actions/checkout@v6
       with:
         repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
         path: KubernetesExternalClients/python/clientSourceCode
         ref: ${{ github.event.inputs.python_run }}
-        
+
     - name: Run test
       run: |
         cp KubernetesExternalClients/python/client.py KubernetesExternalClients/python/clientSourceCode/
@@ -244,23 +244,23 @@ jobs:
     needs: [create-gke-cluster]
     if: ${{ github.event.inputs.nodejs_run != 'no' }}
     runs-on: ubuntu-latest
-      
-    steps:  
+
+    steps:
     - name: Setup Node.js
       uses: actions/setup-node@v6
       with:
-        node-version: 14
-        
+        node-version: 20
+
     - name: Checkout to scripts
       uses: actions/checkout@v6
-        
+
     - name: Checkout the Nodejs client repo
       uses: actions/checkout@v6
       with:
         repository: ${{ github.event.inputs.organization_name }}/hazelcast-nodejs-client
         path: KubernetesExternalClients/nodejs/clientSourceCode
         ref: ${{ github.event.inputs.nodejs_run }}
-        
+
     - name: Run test
       run: |
         cp KubernetesExternalClients/nodejs/client.js KubernetesExternalClients/nodejs/clientSourceCode/
@@ -275,9 +275,9 @@ jobs:
     needs: [create-gke-cluster]
     if: ${{ github.event.inputs.csharp_run != 'no' }}
     runs-on: ubuntu-latest
-        
-    steps: 
-    
+
+    steps:
+
     - name: Setup .NET Core SDK
       uses: actions/setup-dotnet@v5
       with:
@@ -288,14 +288,14 @@ jobs:
 
     - name: Checkout to scripts
       uses: actions/checkout@v6
-        
+
     - name: Checkout the Csharp client repo
       uses: actions/checkout@v6
       with:
         repository: ${{ github.event.inputs.organization_name }}/hazelcast-csharp-client
         path: KubernetesExternalClients/csharp/clientSourceCode
         ref: ${{ github.event.inputs.csharp_run }}
-      
+
     - name: Run test
       run: |
         cp -R KubernetesExternalClients/csharp/KubernetesTest/ KubernetesExternalClients/csharp/clientSourceCode/src/KubernetesTest/
@@ -308,17 +308,17 @@ jobs:
         if [ $(grep -o 'Current map size:' last20lines.txt | wc -l) != $"20" ]; then exit 1; fi
 
 #TODO: More reliabe verification.
-        
+
   run_cpp:
     name: Run Cpp compatibility test
     needs: [create-gke-cluster]
     if: ${{ github.event.inputs.cpp_run != 'no' }}
     runs-on: ubuntu-latest
-        
-    steps: 
+
+    steps:
     - name: Checkout to scripts
       uses: actions/checkout@v6
-        
+
     - name: Checkout the Cpp client repo
       uses: actions/checkout@v6
       with:
@@ -329,12 +329,12 @@ jobs:
     - name: Install Boost
       run: |
         sudo apt-get install libboost-dev libboost-thread-dev libboost-chrono-dev
-      
+
     - name: Build&Install client
       run: |
         cd KubernetesExternalClients/cpp/clientSourceCode/ && mkdir build && cd build
         cmake .. && cmake --build . --parallel && sudo cmake --build . --target install
-        
+
     - name: Run test
       run: |
         cd KubernetesExternalClients/cpp
@@ -352,7 +352,7 @@ jobs:
     needs: [run_nodejs, run_python, run_go, run_cpp, run_csharp, create-gke-cluster]
     if: always()
     steps:
-    
+
     - id: 'auth'
       uses: 'google-github-actions/auth@v3'
       with:
@@ -360,7 +360,7 @@ jobs:
 
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v1'
-        
+
     - name: Delete cluster
       run: |-
         gcloud container clusters delete ${{ needs.create-gke-cluster.outputs.cluster_name}} --zone=${{ needs.create-gke-cluster.outputs.gke_zone }} --quiet  
