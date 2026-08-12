@@ -338,25 +338,6 @@ jobs:
         if: ${{ matrix.kind == 'enterprise' }}
         run: |
           cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/hazelcast-enterprise-${{ matrix.version }}-tests.jar
-
-      - name: Install dependencies and compile client
-        run: |
-          npm install
-          npm run compile
-        working-directory: client
-
-      - name: Install test dependencies
-        run: |
-          npm install
-        working-directory: master
-
-      - name: Copy client code into master
-        run: |
-          rm -rf $GITHUB_WORKSPACE/master/lib
-          rm $GITHUB_WORKSPACE/master/package.json
-          cp -a $GITHUB_WORKSPACE/client/lib $GITHUB_WORKSPACE/master/lib
-          cp -a $GITHUB_WORKSPACE/client/package.json $GITHUB_WORKSPACE/master/package.json
-
       - uses: ./.github/actions/get-enterprise-license
         id: get-enterprise-license
         with:
