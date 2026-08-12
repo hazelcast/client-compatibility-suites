@@ -323,6 +323,11 @@ jobs:
           repository: hazelcast/hazelcast-nodejs-client
           path: tag
           ref: ${{ matrix.client_tag }}
+      - name: Install dependencies and compile client
+        run: |
+          npm install
+          npm run compile
+        working-directory: tag
       - name: Copy client code into master
         run: |
           rm -rf $GITHUB_WORKSPACE/master/lib
