@@ -334,6 +334,10 @@ jobs:
           rm $GITHUB_WORKSPACE/master/package.json
           cp -a $GITHUB_WORKSPACE/tag/lib $GITHUB_WORKSPACE/master/lib
           cp -a $GITHUB_WORKSPACE/tag/package.json $GITHUB_WORKSPACE/master/package.json
+      - name: Install test dependencies
+        run: |
+          npm install
+        working-directory: master
       - name: Copy certificates JAR to destination with the appropriate name
         if: ${{ matrix.server_kind == 'enterprise' }}
         run: |
