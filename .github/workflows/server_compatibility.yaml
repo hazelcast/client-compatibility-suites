@@ -337,12 +337,12 @@ jobs:
       - name: Copy certificates JAR to destination with the appropriate name
         if: ${{ matrix.server_kind == 'enterprise' }}
         run: |
-          echo "HZ_VERSION: ${{ steps.compute_hz_version.outputs.hz_version }}"
-          cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/hazelcast-enterprise-${{ steps.compute_hz_version.outputs.hz_version }}-tests.jar
+          echo "HZ_VERSION: ${{ needs.upload_jars.outputs.hz_version }}"
+          cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/hazelcast-enterprise-${{ needs.upload_jars.outputs.hz_version }}-tests.jar
       - uses: ./.github/actions/get-enterprise-license
         id: get-enterprise-license
         with:
-          hazelcast-version: ${{ steps.compute_hz_version.outputs.hz_version }}
+          hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
 
       - name: Download RCD
         shell: bash
@@ -351,7 +351,7 @@ jobs:
 
       - name: Run all tests
         env:
-          HZ_VERSION: ${{ steps.compute_hz_version.outputs.hz_version }}
+          HZ_VERSION: ${{ needs.upload_jars.outputs.hz_version }}
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
         working-directory: master
         run: |
