@@ -337,6 +337,7 @@ jobs:
       - name: Copy certificates JAR to destination with the appropriate name
         if: ${{ matrix.kind == 'enterprise' }}
         run: |
+          echo "HZ_VERSION: ${{ steps.compute_hz_version.outputs.hz_version }}"
           cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/hazelcast-enterprise-${{ steps.compute_hz_version.outputs.hz_version }}-tests.jar
       - uses: ./.github/actions/get-enterprise-license
         id: get-enterprise-license
