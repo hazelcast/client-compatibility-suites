@@ -314,17 +314,21 @@ jobs:
       - name: Checkout to master
         uses: actions/checkout@v6
         with:
-          repository: ${{ github.event.inputs.organization_name }}/hazelcast-nodejs-client
+          repository: hazelcast/hazelcast-nodejs-client
           path: master
           ref: master
-
-      - name: Checkout to ${{ github.event.inputs.branch_name }}
+      - name: Checkout to tag
         uses: actions/checkout@v6
         with:
-          repository: ${{ github.event.inputs.organization_name }}/hazelcast-nodejs-client
-          path: client
-          ref: ${{ github.event.inputs.branch_name }}
-
+          repository: hazelcast/hazelcast-nodejs-client
+          path: tag
+          ref: ${{ matrix.client_tag }}
+      - name: Copy client code into master
+        run: |
+          rm -rf $GITHUB_WORKSPACE/master/lib
+          rm $GITHUB_WORKSPACE/master/package.json
+          cp -a $GITHUB_WORKSPACE/tag/lib $GITHUB_WORKSPACE/master/lib
+          cp -a $GITHUB_WORKSPACE/tag/package.json $GITHUB_WORKSPACE/master/package.json
       - name: Copy certificates JAR to destination with the appropriate name
         if: ${{ matrix.kind == 'enterprise' }}
         run: |
@@ -371,3 +375,367 @@ jobs:
           # wait for a bit for RCD to download artifacts
           sleep 10
           node node_modules/mocha/bin/mocha --recursive test/integration/backward_compatible
+
+  setup_csharp_client_matrix:
+    name: Setup the Csharp client test matrix
+    if: ${{ inputs.run_csharp }}
+    uses: ./.github/workflows/get-client-matrix.yaml
+    with:
+      client: cs
+  test_csharp_clients:
+    needs: [ upload_jars,  setup_csharp_client_matrix ]
+    runs-on: windows-latest
+    permissions:
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        client_tag: ${{ fromJson(needs.setup_csharp_client_matrix.outputs.matrix) }}
+        server_kind: [ os, enterprise ]
+    name: Test Csharp client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
+    env:
+      HAZELCAST_ENTERPRISE_KEY: ${{ secrets[needs.upload_jars.outputs.hazelcast_enterprise_key_secret] }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: 3.9
+
+      - name: Read Java Config
+        shell: bash
+        run: cat ${GITHUB_WORKSPACE}/.github/java-config.env >> $GITHUB_ENV
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            2.1.x
+            3.1.x
+            5.0.x
+            6.0.x
+            7.0.x
+            8.0.x
+            9.0.x
+            10.0.x
+
+      - name: Checkout to tag
+        uses: actions/checkout@v6
+        with:
+          repository: hazelcast/hazelcast-csharp-client
+          path: tag
+          ref: ${{ matrix.client_tag }}
+
+      - name: Checkout default branch
+        uses: actions/checkout@v6
+        with:
+          repository: hazelcast/hazelcast-csharp-client
+          path: hazelcast-csharp-client-master
+          sparse-checkout: |
+            hz.ps1
+            build/utils.ps1
+          sparse-checkout-cone-mode: false
+
+      - name: Download Hazelcast tests JAR
+        uses: actions/download-artifact@v8
+        with:
+          name: hazelcast-tests
+          path: tag/temp/lib
+
+      - name: Download Hazelcast SQL JAR (if exists)
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          name: hazelcast-sql
+          path: tag/temp/lib
+
+      - name: Download Hazelcast JAR
+        if: ${{ matrix.server_kind == 'os' }}
+        uses: actions/download-artifact@v8
+        with:
+          name: hazelcast
+          path: tag/temp/lib
+
+      - name: Download Hazelcast Enterprise JAR
+        if: ${{ matrix.server_kind == 'enterprise' }}
+        uses: actions/download-artifact@v8
+        with:
+          name: hazelcast-enterprise
+          path: tag/temp/lib
+
+      - name: Download Hazelcast Enterprise tests JAR
+        if: ${{ matrix.server_kind == 'enterprise' }}
+        uses: actions/download-artifact@v8
+        with:
+          name: hazelcast-enterprise-tests
+          path: tag/temp/lib
+
+      - name: Update submodules
+        run: |
+          git submodule update --init
+        working-directory: tag
+
+      - name: Detect Client Version
+        shell: pwsh
+        run: |
+          $client = "${{matrix.client_tag}}".replace("v","")
+          "CLIENT_VERSION=$client" >> $env:GITHUB_ENV
+
+      # https://github.com/madhead/semver-utils/releases/tag/v4.3.0
+      - uses: madhead/semver-utils@36d1e0ed361bd7b4b77665de8093092eaeabe6ba
+        id: client-version
+        with:
+          version: ${{ env.CLIENT_VERSION }}
+
+      - name: Client Version
+        run: |
+          echo "${{steps.client-version.outputs.major}}.${{steps.client-version.outputs.minor }}.${{steps.client-version.outputs.patch }}"
+
+      - name: Copy latest build scripts to local workspace
+        shell: pwsh
+        run: |
+          # This is only currently required for <5.5.0 clients, where the location of the OS SNAPSHOT repo needs to be provided
+          # However, for consistency they should always be used and therefore must be kept in sync, as there are guaranteed to be further future breaking changes
+          cp hazelcast-csharp-client-master\hz.ps1 ${{github.workspace}}\tag\hz.ps1
+          cp hazelcast-csharp-client-master\build\utils.ps1 ${{github.workspace}}\tag\build\utils.ps1
+
+      - name: Backport SSL Tests
+        id: backport-tests
+        if: ${{  ((steps.client-version.outputs.major == '5' && steps.client-version.outputs.minor < '3') || (steps.client-version.outputs.major == '4')) }}
+        shell: pwsh
+        working-directory: tag
+        run: |
+          ./hz.ps1 copy-files -copy-files-source  ${{github.workspace}}\utils\net\ssl 
+
+      - name: Upgrade NUnit Adapter in Testing if Client v5.2.2 or v5.3.1
+        id: upgrade-nunit-adapter
+        if: ${{  ((steps.client-version.outputs.major == '5' && steps.client-version.outputs.minor == '3' &&  steps.client-version.outputs.patch == '1') || (steps.client-version.outputs.major == '5' && steps.client-version.outputs.minor == '2' &&  steps.client-version.outputs.patch == '2')) }}
+        working-directory: tag
+        run: |
+          sed -i 's/<PackageReference Include="NUnit3TestAdapter" Version="4.3.1">/<PackageReference Include="NUnit3TestAdapter" Version="4.5.0">/g' src/Hazelcast.Net.Tests/Hazelcast.Net.Tests.csproj
+
+      - name: Build
+        shell: pwsh
+        working-directory: tag
+        run: |
+          ./hz.ps1 clean, build
+
+      - name: Build Client 4.0.2 with compatibility
+        if: ${{ steps.client-version.outputs.major == '4' && steps.client-version.outputs.minor == '0'  }}
+        shell: pwsh
+        working-directory: tag
+        run: |
+          ./hz.ps1 clean, build
+
+      - uses: hazelcast/docker-actions/get-jfrog-credentials@master
+        id: jfrog
+        with:
+          aws-role-to-assume: ${{ vars.AWS_HAZELCAST_OIDC_GITHUB_ACTIONS_ROLE_ARN }}
+          jfrog-oidc-provider-name: ${{ github.repository_owner }}-snapshot-internal
+
+      - name: Run non-enterprise tests
+        if: ${{ matrix.server_kind == 'os' && steps.backport-tests.outcome == 'skipped'  }}
+        shell: pwsh
+        run: |
+          ./hz.ps1 test -tf "method != SendReceive and namespace !~ Hazelcast.Tests.CP" -server ${{ needs.upload_jars.outputs.hz_version }}
+        working-directory: tag
+        env:
+          HAZELCAST_SERVER_VERSION: ${{ needs.upload_jars.outputs.hz_version }}
+          HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ steps.jfrog.outputs.user }}
+          HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ steps.jfrog.outputs.token }}
+
+      - name: Run non-enterprise tests with compatibility
+        if: ${{ matrix.server_kind == 'os' && steps.backport-tests.outcome == 'success'  }}
+        shell: pwsh
+        run: |
+          ./hz.ps1 test -tf "method != SendReceive and namespace !~ Hazelcast.Tests.CP" -server ${{ needs.upload_jars.outputs.hz_version }}
+        working-directory: tag
+        env:
+          HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ steps.jfrog.outputs.user }}
+          HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ steps.jfrog.outputs.token }}
+
+      - name: Run all tests
+        if: ${{ matrix.server_kind == 'enterprise' && steps.backport-tests.outcome == 'skipped'  }}
+        shell: pwsh
+        run: |
+           ./hz.ps1 -enterprise -tf "method != SendReceive" -server ${{ needs.upload_jars.outputs.hz_version }} test ${{ secrets.GH_PAT }}
+        working-directory: tag
+        env:
+          HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ steps.jfrog.outputs.user }}
+          HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ steps.jfrog.outputs.token }}
+
+      - name: Run all tests with compatibility
+        if: ${{matrix.server_kind == 'enterprise' && steps.backport-tests.outcome == 'success'}}
+        shell: pwsh
+        run: |
+           ./hz.ps1 -enterprise -tf "method != SendReceive" -server ${{ needs.upload_jars.outputs.hz_version }} test ${{ secrets.GH_PAT }}
+        working-directory: tag
+        env:
+          HAZELCAST_SERVER_VERSION: ${{ needs.upload_jars.outputs.hz_version }}
+          HZ_SNAPSHOT_INTERNAL_USERNAME: ${{ steps.jfrog.outputs.user }}
+          HZ_SNAPSHOT_INTERNAL_PASSWORD: ${{ steps.jfrog.outputs.token }}
+
+      # upload logs
+      - name: Upload RC and Server logs
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Rc-Server-logs-${{ matrix.client_tag }}-${{ matrix.server_kind }}
+          path: '${{github.workspace}}\tag\temp\rc\' # entire directory
+  setup_cpp_client_matrix:
+    name: Setup the Cpp client test matrix
+    if: ${{ inputs.run_cpp }}
+    uses: ./.github/workflows/get-client-matrix.yaml
+    with:
+      client: cpp
+  test_cpp_clients:
+    needs: [ upload_jars, setup_cpp_client_matrix ]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        client_tag: ${{ fromJson(needs.setup_cpp_client_matrix.outputs.matrix) }}
+        server_kind: [ enterprise ] #TODO When tests are divided as OS, ENTERPRISE, OS matrix will be added
+    name: Test CPP client ${{ matrix.client_tag }} with ${{ matrix.server_kind }} server
+    steps:
+      - uses: actions/checkout@v6
+      - name: Checkout master
+        uses: actions/checkout@v6
+        with:
+          repository: hazelcast/hazelcast-cpp-client
+          path: master
+      - name: Checkout to tag
+        uses: actions/checkout@v6
+        with:
+          repository: hazelcast/hazelcast-cpp-client
+          path: tag
+          ref: ${{ matrix.client_tag }}
+      - name: Delete old scripts and get new ones
+        run: |
+          rm -rf tag/scripts
+          cp -R master/scripts tag/
+      - name: Download Hazelcast tests JAR
+        uses: actions/download-artifact@v8
+        with:
+          name: hazelcast-tests
+          path: tag
+      - name: Download Hazelcast SQL JAR (if exists)
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          name: hazelcast-sql
+          path: tag
+      - name: Download Hazelcast JAR
+        if: ${{ matrix.server_kind == 'os' }}
+        uses: actions/download-artifact@v8
+        with:
+          name: hazelcast
+          path: tag
+      - name: Download Hazelcast Enterprise JAR
+        if: ${{ matrix.server_kind == 'enterprise' }}
+        uses: actions/download-artifact@v8
+        with:
+          name: hazelcast-enterprise
+          path: tag
+      - name: Download Hazelcast Enterprise tests JAR
+        if: ${{ matrix.server_kind == 'enterprise' }}
+        uses: actions/download-artifact@v8
+        with:
+          name: hazelcast-enterprise-tests
+          path: tag
+      - uses: ./.github/actions/cpp-compatibility-test
+        with:
+          working-directory: tag
+          hazelcast-version: ${{ needs.upload_jars.outputs.hz_version }}
+          client-version: ${{ matrix.client_tag }}
+          hazelcast-enterprise-key: ${{ secrets[needs.upload_jars.outputs.hazelcast_enterprise_key_secret] }}
+  setup_go_client_matrix:
+    name: Setup the Go client test matrix
+    if: ${{ inputs.run_go }}
+    uses: ./.github/workflows/get-client-matrix.yaml
+    with:
+      client: go
+  test_go_client:
+    needs: [upload_jars, setup_go_client_matrix]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        client_tag: ${{ fromJson(needs.setup_go_client_matrix.outputs.matrix) }}
+
+    name: Test Go client ${{ matrix.client_tag }} with enterprise server on ubuntu-latest
+    env:
+      HAZELCAST_ENTERPRISE_KEY: ${{ secrets[needs.upload_jars.outputs.hazelcast_enterprise_key_secret] }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Read Java Config
+        run: cat ${GITHUB_WORKSPACE}/.github/java-config.env >> $GITHUB_ENV
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+
+      - name: Checkout the ${{ matrix.client_tag }}
+        uses: actions/checkout@v6
+        with:
+          repository: hazelcast/hazelcast-go-client
+          path: client
+          ref: ${{ matrix.client_tag }}
+
+      - name: Checkout default branch
+        uses: actions/checkout@v6
+        with:
+          repository: hazelcast/hazelcast-go-client
+          path: client-master
+          sparse-checkout: |
+            rc.sh
+          sparse-checkout-cone-mode: false
+
+      - name: Download Hazelcast tests JAR
+        uses: actions/download-artifact@v8
+        with:
+          name: hazelcast-tests
+          path: client
+      - name: Download Hazelcast JAR
+        uses: actions/download-artifact@v8
+        with:
+          name: hazelcast
+          path: client
+      - name: Download Hazelcast SQL JAR (if exists)
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          name: hazelcast-sql
+          path: client
+      - name: Download Hazelcast Enterprise JAR
+        uses: actions/download-artifact@v8
+        with:
+          name: hazelcast-enterprise
+          path: client
+      - name: Download Hazelcast Enterprise tests JAR
+        uses: actions/download-artifact@v8
+        with:
+          name: hazelcast-enterprise-tests
+          path: client
+
+      - name: Start Remote Controller
+        env:
+          HZ_VERSION: '${{ needs.upload_jars.outputs.hz_version }}'
+        run: |
+          ../client-master/rc.sh start
+        working-directory: client
+
+      - name: Test
+        env:
+          HZ_VERSION: '${{ needs.upload_jars.outputs.hz_version }}'
+          SSL_ENABLED: 1
+        run: |
+          make test-all
+        working-directory: client
