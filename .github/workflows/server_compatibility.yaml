@@ -289,7 +289,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Checkout to test artifacts
-        if: ${{ matrix.kind == 'enterprise' }}
+        if: ${{ matrix.server_kind == 'enterprise' }}
         uses: actions/checkout@v6
         with:
           repository: hazelcast/private-test-artifacts
@@ -335,7 +335,7 @@ jobs:
           cp -a $GITHUB_WORKSPACE/tag/lib $GITHUB_WORKSPACE/master/lib
           cp -a $GITHUB_WORKSPACE/tag/package.json $GITHUB_WORKSPACE/master/package.json
       - name: Copy certificates JAR to destination with the appropriate name
-        if: ${{ matrix.kind == 'enterprise' }}
+        if: ${{ matrix.server_kind == 'enterprise' }}
         run: |
           echo "HZ_VERSION: ${{ steps.compute_hz_version.outputs.hz_version }}"
           cp $GITHUB_WORKSPACE/certs/certs.jar $GITHUB_WORKSPACE/hazelcast-enterprise-${{ steps.compute_hz_version.outputs.hz_version }}-tests.jar
@@ -351,11 +351,11 @@ jobs:
 
       - name: Run all tests
         env:
-          HZ_VERSION: ${{ matrix.version }}
+          HZ_VERSION: ${{ steps.compute_hz_version.outputs.hz_version }}
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets[steps.get-enterprise-license.outputs.HAZELCAST_ENTERPRISE_KEY_SECRET] }}
         working-directory: master
         run: |
-          if [ "${{ matrix.kind }}" = "os" ]; then
+          if [ "${{ matrix.server_kind }}" = "os" ]; then
             unset HAZELCAST_ENTERPRISE_KEY
           fi
           cd $GITHUB_WORKSPACE && chmod +x ./rcd-ubuntu-latest && ./rcd-ubuntu-latest -version $HZ_VERSION -no-simple-server -log-level trace &
