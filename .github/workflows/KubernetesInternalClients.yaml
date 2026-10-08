@@ -47,7 +47,7 @@ jobs:
           ref: ${{ github.event.inputs.csharp_run }}
           
       - name: Setup .NET Core 8.0
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: |
             8.0.x
