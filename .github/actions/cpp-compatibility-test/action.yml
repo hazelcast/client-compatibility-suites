@@ -35,10 +35,12 @@ runs:
         
     - name: Install Thrift
       shell: bash
-      # Thrift 0.13.0 declares cmake_minimum_required 3.4, which CMake 4 (ubuntu-26.04 image) rejects.
-      # The variable goes on the sudo command line because sudo's env_reset drops step-level env.
+      env:
+        # Thrift 0.13.0 declares cmake_minimum_required 3.4, which CMake 4 (ubuntu-26.04 image) rejects.
+        CMAKE_POLICY_VERSION_MINIMUM: 3.5
+      # --preserve-env because sudo's env_reset drops step-level env.
       run: |
-        sudo CMAKE_POLICY_VERSION_MINIMUM=3.5 ./scripts/install-thrift.sh 0.13.0
+        sudo --preserve-env=CMAKE_POLICY_VERSION_MINIMUM ./scripts/install-thrift.sh 0.13.0
       working-directory: ${{ inputs.working-directory }}
 
     # https://github.com/madhead/semver-utils/releases/tag/v4.3.0
