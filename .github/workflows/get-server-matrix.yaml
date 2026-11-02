@@ -18,7 +18,7 @@ jobs:
       - id: calculate-minimum-supported-version
         run: echo "VERSION=$(echo '${{ steps.get-maintenance-versions.outputs.versions }}' | jq '.[0]')" >> ${GITHUB_OUTPUT}
       - name: Checkout to scripts
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Set server matrix
         id: set-matrix
         run: |

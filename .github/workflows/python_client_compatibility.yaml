@@ -27,11 +27,11 @@ jobs:
     name: Test Python client against ${{ matrix.kind }} ${{ matrix.version }} server
     steps:
       - name: Checkout to scripts
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Checkout to test artifacts
         if: ${{ matrix.kind == 'enterprise' }}
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: hazelcast/private-test-artifacts
           path: certs
@@ -53,14 +53,14 @@ jobs:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
 
       - name: Checkout to master
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
           path: master
           ref: master
 
       - name: Checkout to ${{ github.event.inputs.branch_name }}
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: ${{ github.event.inputs.organization_name }}/hazelcast-python-client
           path: client
