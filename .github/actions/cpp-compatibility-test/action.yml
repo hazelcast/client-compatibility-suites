@@ -65,6 +65,9 @@ runs:
         BUILD_DIR: build
         # Client tags up to v5.4.0 fetch googletest 1.10, whose CMake minimum (2.8.8) CMake 4 rejects.
         CMAKE_POLICY_VERSION_MINIMUM: 3.5
+        # Boost.Thread before 1.88 has a typo in future.hpp (run_it::operator=) that GCC 15
+        # rejects while parsing the template. build-unix.sh appends CXXFLAGS to the compiler flags.
+        CXXFLAGS: -Wno-template-body
       run: |
         ./scripts/build-unix.sh                                           \
             -DCMAKE_BUILD_TYPE=Debug                                      \
